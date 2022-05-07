@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.0.0-SNAPSHOT"
+val echopraxiaVersion = "2.0.1-SNAPSHOT"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
@@ -13,16 +13,16 @@ initialize := {
   assert(current >= required, s"Unsupported JDK: java.specification.version $current != $required")
 }
 
-ThisBuild / organization := "com.tersesystems.echopraxia-scala"
-ThisBuild / homepage     := Some(url("https://github.com/tersesystems/echopraxia-scala"))
+ThisBuild / organization := "com.tersesystems.echopraxia.plusscala"
+ThisBuild / homepage     := Some(url("https://github.com/tersesystems/echopraxia-plusscala"))
 
 ThisBuild / startYear := Some(2021)
 ThisBuild / licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
-    url("https://github.com/tersesystems/echopraxia-scala"),
-    "scm:git@github.com:tersesystems/echopraxia-scala.git"
+    url("https://github.com/tersesystems/echopraxia-plusscala"),
+    "scm:git@github.com:tersesystems/echopraxia-plusscala.git"
   )
 )
 
@@ -32,6 +32,8 @@ ThisBuild / resolvers += Resolver.mavenLocal
 ThisBuild / scalaVersion       := scala212
 ThisBuild / crossScalaVersions := scalaVersions
 ThisBuild / scalacOptions      := scalacOptionsVersion(scalaVersion.value)
+
+//ThisBuild / Compile / scalacOptions ++= optimizeInline
 
 ThisBuild / Test / parallelExecution := false
 Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
@@ -43,7 +45,6 @@ lazy val api = (project in file("api"))
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
     libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
-    libraryDependencies += "com.daodecode"              %% "scalaj-collection"       % "0.3.1"
   )
 
 lazy val logger = (project in file("logger"))
@@ -64,7 +65,7 @@ lazy val asyncLogger = (project in file("async"))
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.11"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
 
@@ -115,13 +116,13 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Yno-adapted-args",
         "-release",
         "8"
-      ) ++ optimizeInline
+      )
 
   }
 }
 
-val optimizeInline = Seq(
+lazy val optimizeInline = Seq(
   "-opt:l:inline",
-  "-opt-inline-from:com.tersesystems.echopraxia.**",
+  "-opt-inline-from:com.tersesystems.echopraxia.plusscala.**",
   "-opt-warnings:any-inline-failed"
 )

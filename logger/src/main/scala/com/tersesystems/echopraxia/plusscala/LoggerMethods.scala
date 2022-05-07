@@ -1,49 +1,30 @@
-package com.tersesystems.echopraxia.scala.async
+package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.{FieldBuilderResult, LoggerHandle}
-import com.tersesystems.echopraxia.scala.api.Condition
+import com.tersesystems.echopraxia.api.FieldBuilderResult
+import com.tersesystems.echopraxia.plusscala.api.Condition
 
 /**
- * Async Logger Methods with source code implicits.
+ * Logger methods with source code implicits
  */
-trait AsyncLoggerMethods[FB] {
+trait LoggerMethods[FB] {
 
-  // ------------------------------------------------------------------------
-  // TRACE
-
-  /**
-   * Logs using a logger handle at TRACE level.
-   *
-   * @param consumer the consumer of the logger handle.
-   */
-  def trace(consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  /** @return true if the logger level is TRACE or higher. */
+  def isTraceEnabled: Boolean
 
   /**
-   * Logs using a condition and a logger handle at TRACE level.
-   *
-   * @param c        the condition
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is TRACE or higher and the condition is met.
    */
-  def trace(c: Condition, consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def isTraceEnabled(condition: Condition): Boolean
 
   /**
    * Logs statement at TRACE level.
    *
    * @param message the given message.
    */
-  def trace(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at TRACE level using a field builder function.
@@ -107,42 +88,23 @@ trait AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit
 
-  // ------------------------------------------------------------------------
-  // DEBUG
+  /** @return true if the logger level is DEBUG or higher. */
+  def isDebugEnabled: Boolean
 
   /**
-   * Logs using a logger handle at DEBUG level.
-   *
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is DEBUG or higher and the condition is met.
    */
-  def debug(consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
-
-  /**
-   * Logs using a condition and a logger handle at DEBUG level.
-   *
-   * @param c        the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  def debug(c: Condition, consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def isDebugEnabled(condition: Condition): Boolean
 
   /**
    * Logs statement at DEBUG level.
    *
    * @param message the given message.
    */
-  def debug(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at DEBUG level using a field builder function.
@@ -181,19 +143,6 @@ trait AsyncLoggerMethods[FB] {
   ): Unit
 
   /**
-   * Conditionally logs statement at DEBUG level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param f         the field builder function.
-   */
-  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
-
-  /**
    * Conditionally logs statement at DEBUG level with exception.
    *
    * @param condition the given condition.
@@ -206,43 +155,36 @@ trait AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit
 
-  // ------------------------------------------------------------------------
-  // INFO
-
   /**
-   * Logs using a logger handle at INFO level.
+   * Conditionally logs statement at DEBUG level using a field builder function.
    *
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @param message   the message.
+   * @param f         the field builder function.
    */
-  // INFO
-  def info(consumer: LoggerHandle[FB] => Unit)(implicit
+  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit
 
+  /** @return true if the logger level is INFO or higher. */
+  def isInfoEnabled: Boolean
+
   /**
-   * Logs using a condition and a logger handle at INFO level.
-   *
-   * @param c        the condition
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is INFO or higher and the condition is met.
    */
-  def info(c: Condition, consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def isInfoEnabled(condition: Condition): Boolean
 
   /**
    * Logs statement at INFO level.
    *
    * @param message the given message.
    */
-  def info(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at INFO level using a field builder function.
@@ -306,42 +248,23 @@ trait AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit
 
-  // ------------------------------------------------------------------------
-  // WARN
+  /** @return true if the logger level is WARN or higher. */
+  def isWarnEnabled: Boolean
 
   /**
-   * Logs using a logger handle at WARN level.
-   *
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is WARN or higher and the condition is met.
    */
-  def warn(consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
-
-  /**
-   * Logs using a condition and a logger handle at WARN level.
-   *
-   * @param c        the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  def warn(c: Condition, consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def isWarnEnabled(condition: Condition): Boolean
 
   /**
    * Logs statement at WARN level.
    *
    * @param message the given message.
    */
-  def warn(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at WARN level using a field builder function.
@@ -373,49 +296,30 @@ trait AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit
 
-  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
-
   def warn(condition: Condition, message: String, e: Throwable)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit
 
-  // ------------------------------------------------------------------------
-  // ERROR
+  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit
+
+  /** @return true if the logger level is ERROR or higher. */
+  def isErrorEnabled: Boolean
 
   /**
-   * Logs using a logger handle at ERROR level.
-   *
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is ERROR or higher and the condition is met.
    */
-  def error(consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def isErrorEnabled(condition: Condition): Boolean
 
-  /**
-   * Logs using a condition and a logger handle at ERROR level.
-   *
-   * @param c        the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  def error(c: Condition, consumer: LoggerHandle[FB] => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
-
-  def error(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   def error(message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,

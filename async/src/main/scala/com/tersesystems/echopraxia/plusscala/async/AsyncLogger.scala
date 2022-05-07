@@ -1,12 +1,7 @@
-package com.tersesystems.echopraxia.scala.async
+package com.tersesystems.echopraxia.plusscala.async
 
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult}
-import com.tersesystems.echopraxia.scala.api.{
-  AbstractLoggerSupport,
-  Condition,
-  LoggerSupport,
-  Utilities
-}
+import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
+import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport}
 
 import scala.compat.java8.FunctionConverters._
 
@@ -33,7 +28,7 @@ final class AsyncLogger[FB](core: CoreLogger, fieldBuilder: FB)
 
   @inline
   override def withThreadContext: AsyncLogger[FB] = newLogger(
-    newCoreLogger = core.withThreadContext(Utilities.getThreadContextFunction)
+    newCoreLogger = core.withThreadContext(Utilities.threadContext())
   )
 
   @inline

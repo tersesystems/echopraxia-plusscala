@@ -1,8 +1,8 @@
-package com.tersesystems.echopraxia.scala
+package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
-import com.tersesystems.echopraxia.scala.api.{Condition, DefaultMethodsSupport}
+import com.tersesystems.echopraxia.api._
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._
@@ -20,18 +20,8 @@ import scala.compat.java8.FunctionConverters._
 trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   this: DefaultMethodsSupport[FB] =>
 
-  protected def sourceInfoFields(
-      fb: FB
-  )(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
-    Field.keyValue(
-      "sourcecode", // XXX make this configurable
-      Value.`object`(
-        Field.keyValue("file", Value.string(file.value)),
-        Field.keyValue("line", Value.number(line.value)),
-        Field.keyValue("enclosing", Value.string(enc.value))
-      )
-    )
-  }
+  // -----------------------------------------------------------
+  // TRACE
 
   /** @return true if the logger level is TRACE or higher. */
   def isTraceEnabled: Boolean = core.isEnabled(TRACE)
@@ -40,9 +30,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param condition the given condition.
    * @return true if the logger level is TRACE or higher and the condition is met.
    */
-  def isTraceEnabled(condition: Condition): Boolean = {
-    core.isEnabled(TRACE, condition.asJava)
-  }
+  def isTraceEnabled(condition: Condition): Boolean = core.isEnabled(TRACE, condition.asJava)
 
   /**
    * Logs statement at TRACE level.
@@ -51,9 +39,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    */
   def trace(
       message: String
-  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
-    core.withFields(sourceInfoFields, fieldBuilder).log(TRACE, message)
-  }
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit =
+    handleMessage(TRACE, message)
 
   /**
    * Logs statement at TRACE level using a field builder function.
@@ -65,11 +52,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(TRACE, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleMessageArgs(TRACE, message, f)
 
   /**
    * Logs statement at TRACE level with exception.
@@ -81,11 +64,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(TRACE, message, (fb: FB) => onlyException(e), fieldBuilder)
-  }
+  ): Unit = handleMessageThrowable(TRACE, message, e)
 
   /**
    * Conditionally logs statement at TRACE level.
@@ -97,11 +76,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(TRACE, condition.asJava, message)
-  }
+  ): Unit = handleConditionMessage(TRACE, condition, message)
 
   /**
    * Conditionally logs statement at TRACE level using a field builder function.
@@ -114,11 +89,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(TRACE, condition.asJava, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleConditionMessageArgs(TRACE, condition, message, f)
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -131,11 +102,10 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(TRACE, condition.asJava, message, (fb: FB) => onlyException(e), fieldBuilder)
-  }
+  ): Unit = handleConditionMessageThrowable(TRACE, condition, message, e)
+
+  // -----------------------------------------------------------
+  // DEBUG
 
   /** @return true if the logger level is DEBUG or higher. */
   def isDebugEnabled: Boolean = core.isEnabled(DEBUG)
@@ -153,9 +123,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    */
   def debug(
       message: String
-  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
-    core.log(DEBUG, message)
-  }
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit =
+    handleMessage(DEBUG, message)
 
   /**
    * Logs statement at DEBUG level using a field builder function.
@@ -167,11 +136,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(DEBUG, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleMessageArgs(DEBUG, message, f)
 
   /**
    * Logs statement at DEBUG level with exception.
@@ -183,11 +148,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(DEBUG, message, (fb: FB) => onlyException(e), fieldBuilder)
-  }
+  ): Unit = handleMessageThrowable(DEBUG, message, e)
 
   /**
    * Conditionally logs statement at DEBUG level.
@@ -199,11 +160,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(DEBUG, condition.asJava, message)
-  }
+  ): Unit = handleConditionMessage(DEBUG, condition, message)
 
   /**
    * Conditionally logs statement at DEBUG level with exception.
@@ -216,11 +173,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(DEBUG, condition.asJava, message, (fb: FB) => onlyException(e), fieldBuilder)
-  }
+  ): Unit = handleConditionMessageThrowable(DEBUG, condition, message, e)
 
   /**
    * Conditionally logs statement at DEBUG level using a field builder function.
@@ -233,11 +186,10 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(DEBUG, condition.asJava, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleConditionMessageArgs(DEBUG, condition, message, f)
+
+  // -----------------------------------------------------------
+  // INFO
 
   /** @return true if the logger level is INFO or higher. */
   def isInfoEnabled: Boolean = core.isEnabled(INFO)
@@ -255,9 +207,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    */
   def info(
       message: String
-  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
-    core.withFields(sourceInfoFields, fieldBuilder).log(INFO, message)
-  }
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit =
+    handleMessage(INFO, message)
 
   /**
    * Logs statement at INFO level using a field builder function.
@@ -269,11 +220,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(INFO, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleMessageArgs(INFO, message, f)
 
   /**
    * Logs statement at INFO level with exception.
@@ -285,11 +232,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(INFO, message, ((fb: FB) => onlyException(e)), fieldBuilder)
-  }
+  ): Unit = handleMessageThrowable(INFO, message, e)
 
   /**
    * Conditionally logs statement at INFO level.
@@ -301,11 +244,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(INFO, condition.asJava, message)
-  }
+  ): Unit = handleConditionMessage(INFO, condition, message)
 
   /**
    * Conditionally logs statement at INFO level using a field builder function.
@@ -318,11 +257,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(INFO, condition.asJava, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleConditionMessageArgs(INFO, condition, message, f)
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -335,11 +270,10 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(INFO, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
-  }
+  ): Unit = handleConditionMessageThrowable(INFO, condition, message, e)
+
+  // -----------------------------------------------------------
+  // WARN
 
   /** @return true if the logger level is WARN or higher. */
   def isWarnEnabled: Boolean = core.isEnabled(WARN)
@@ -357,9 +291,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    */
   def warn(
       message: String
-  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
-    core.withFields(sourceInfoFields, fieldBuilder).log(WARN, message)
-  }
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit =
+    handleMessage(WARN, message)
 
   /**
    * Logs statement at WARN level using a field builder function.
@@ -371,11 +304,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(WARN, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleMessageArgs(WARN, message, f)
 
   /**
    * Logs statement at WARN level with exception.
@@ -387,39 +316,28 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(WARN, message, ((fb: FB) => onlyException(e)), fieldBuilder)
-  }
+  ): Unit = handleMessageThrowable(WARN, message, e)
 
   def warn(condition: Condition, message: String)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(WARN, condition.asJava, message)
-  }
+  ): Unit = handleConditionMessage(WARN, condition, message)
 
   def warn(condition: Condition, message: String, e: Throwable)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(WARN, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
-  }
+  ): Unit = handleConditionMessageThrowable(WARN, condition, message, e)
 
   def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): Unit = {
-    core.log(WARN, condition.asJava, message, f.asJava, fieldBuilder)
-  }
+  ): Unit = handleConditionMessageArgs(WARN, condition, message, f)
+
+  // -----------------------------------------------------------
+  // ERROR
 
   /** @return true if the logger level is ERROR or higher. */
   def isErrorEnabled: Boolean = core.isEnabled(ERROR)
@@ -433,7 +351,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   def error(
       message: String
   )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
-    core.withFields(sourceInfoFields, fieldBuilder).log(ERROR, message)
+    handleMessage(ERROR, message)
   }
 
   def error(message: String, f: FB => FieldBuilderResult)(implicit
@@ -441,9 +359,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(ERROR, message, f.asJava, fieldBuilder)
+    handleMessageArgs(ERROR, message, f)
   }
 
   def error(message: String, e: Throwable)(implicit
@@ -451,9 +367,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(ERROR, message, ((fb: FB) => onlyException(e)), fieldBuilder)
+    handleMessageThrowable(ERROR, message, e)
   }
 
   def error(condition: Condition, message: String)(implicit
@@ -461,9 +375,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(ERROR, condition.asJava, message)
+    handleConditionMessage(ERROR, condition, message)
   }
 
   def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
@@ -471,9 +383,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(ERROR, condition.asJava, message, f.asJava, fieldBuilder)
+    handleConditionMessageArgs(ERROR, condition, message, f)
   }
 
   def error(condition: Condition, message: String, e: Throwable)(implicit
@@ -481,13 +391,111 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields, fieldBuilder)
-      .log(ERROR, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
+    handleConditionMessageThrowable(ERROR, condition, message, e)
   }
 
-  private def onlyException(e: Throwable): FieldBuilderResult = {
-    (Field.keyValue(Field.EXCEPTION, Value.exception(e)))
+  // -----------------------------------------------------------
+  // Internal methods
+
+  protected def sourceInfoFields(
+      line: Line,
+      file: File,
+      enc: Enclosing
+  ): java.util.function.Function[FB, FieldBuilderResult] = { fb: FB =>
+    Field
+      .keyValue(
+        SourceFieldConstants.sourcecode,
+        Value.`object`(
+          Field.keyValue(SourceFieldConstants.file, Value.string(file.value)),
+          Field.keyValue(SourceFieldConstants.line, Value.number(line.value: java.lang.Integer)),
+          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc.value))
+        )
+      )
+      .asInstanceOf[FieldBuilderResult]
+  }.asJava
+
+  @inline
+  private def handleMessage(level: Level, message: String)(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder).log(level, message)
+  }
+
+  @inline
+  private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult)(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core
+      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      .log(level, message, f.asJava, fieldBuilder)
+  }
+
+  @inline
+  private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core
+      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      .log(
+        level,
+        message,
+        (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+        fieldBuilder
+      )
+  }
+
+  private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core
+      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      .log(level, condition.asJava, message)
+  }
+
+  @inline
+  private def handleConditionMessageArgs(
+      level: Level,
+      condition: Condition,
+      message: String,
+      f: FB => FieldBuilderResult
+  )(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core
+      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      .log(level, condition.asJava, message, f.asJava, fieldBuilder)
+  }
+
+  @inline
+  private def handleConditionMessageThrowable(
+      level: Level,
+      condition: Condition,
+      message: String,
+      e: Throwable
+  )(implicit
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
+  ): Unit = {
+    core
+      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      .log(
+        level,
+        condition.asJava,
+        message,
+        (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+        fieldBuilder
+      )
   }
 
 }

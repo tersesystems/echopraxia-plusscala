@@ -1,7 +1,7 @@
-package com.tersesystems.echopraxia.scala.async
+package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
-import com.tersesystems.echopraxia.scala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 
 /**
  * Async Logger Factory with source code enabled.

@@ -1,21 +1,35 @@
-package com.tersesystems.echopraxia.scala
+package com.tersesystems.echopraxia.plusscala
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.api.{Field, Value}
-import com.tersesystems.echopraxia.scala.api._
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
 import java.util
-import scala.util.{Success, Try}
 
 class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = LoggerFactory.getLogger(getClass).withFieldBuilder(new MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
+
+  describe("source code") {
+    it("should return source code info") {
+      val condition: Condition = (level: Level, context: LoggingContext) => {
+        context.findString("$.sourcecode.file") match {
+          case Some(file) if file.endsWith("LoggerSpec.scala") =>
+            true
+          case _ =>
+            false
+        }
+      }
+      logger.info(condition, "logs if has sourcecode.file")
+      matchThis("logs if has sourcecode.file")
+    }
+  }
 
   describe("withCondition") {
 
@@ -46,13 +60,8 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("tuple") {
 
-    it("should log using a single tuple using keyValue") {
-      logger.debug("single tuple {}", _.keyValue("foo" -> "bar"))
-      matchThis("single tuple {}")
-    }
-
-    it("should log using a single tuple using onlyValue") {
-      logger.debug("single tuple {}", _.value("foo" -> "bar"))
+    it("should log using a single tuple") {
+      logger.debug("single tuple {}", _.string("foo" -> "bar"))
       matchThis("single tuple {}")
     }
 
@@ -61,7 +70,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         "multiple tuples {}",
         fb => {
           import fb._
-          fb.list(keyValue("foo" -> "bar"), keyValue("k2" -> "v2"))
+          fb.list(string("foo" -> "bar"), string("k2" -> "v2"))
         }
       )
 
@@ -117,31 +126,6 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
   }
 
-  describe("more complex ToValue") {
-
-    it("should log a Try") {
-      logger.debug("try {}", fb => (fb.keyValue("result", Try(true))))
-      matchThis("try {}")
-    }
-
-    it("should log a Success") {
-      logger.debug("success {}", fb => (fb.keyValue("result", Success(true))))
-      matchThis("success {}")
-    }
-
-    it("should log an option try") {
-      logger.debug("option try {}", fb => (fb.keyValue("result", Option(Try(true)))))
-      matchThis("option try {}")
-    }
-
-    it("should log an Either") {
-      val either: Either[Int, String] = Either.cond(System.currentTimeMillis() > 1, "foo", 1)
-      logger.debug("either {}", _.keyValue("result" -> either))
-      matchThis("either {}")
-    }
-
-  }
-
   describe("instant and person") {
 
     it("should log an instant as a string") {
@@ -149,7 +133,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         "mapping time = {}",
         fb => {
           import fb._
-          (keyValue("iso_timestamp" -> Instant.now()))
+          (instant("iso_timestamp" -> Instant.now()))
         }
       )
       matchThis("mapping time = {}")
@@ -161,7 +145,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         fb => {
           import fb._
           fb.list(
-            fb.keyValue("person1" -> Person("Eloise", 1)),
+            fb.person("person1" -> Person("Eloise", 1)),
             fb.obj("person2"      -> Person("Eloise", 1))
           )
         }
@@ -193,7 +177,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         "person = {}",
         fb => {
           import fb._
-          obj("owner", keyValue("person" -> Person("Eloise", 1)))
+          obj("owner", person("person" -> Person("Eloise", 1)))
         }
       )
 
@@ -206,64 +190,16 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         fb => {
           import fb._
           list(
-            keyValue("owner"         -> Person("Eloise", 1)),
-            keyValue("iso_timestamp" -> Instant.now()),
-            keyValue("foo"           -> "bar"),
-            keyValue("something"     -> true)
+            person("owner"         -> Person("Eloise", 1)),
+            instant("iso_timestamp" -> Instant.now()),
+            string("foo"           -> "bar"),
+            bool("something"     -> true)
           )
         }
       )
 
       matchThis("list of tuples = {}")
     }
-
-    it("should handle Option[Foo] as Null") {
-      val c: Condition = (_: Level, ctx: LoggingContext) => ctx.findNull("$.foo")
-
-      logger.debug(
-        c,
-        "option[foo] = {}",
-        fb => {
-          import fb._
-          val optPerson: Option[Person] = None
-          (fb.value("foo", optPerson))
-        }
-      )
-      matchThis("option[foo] = {}")
-    }
-
-    it("should handle Option[Foo] as not null") {
-      val c: Condition = (_: Level, ctx: LoggingContext) => ctx.findObject("$.foo").isDefined
-
-      logger.debug(
-        c,
-        "option[foo] = {}",
-        fb => {
-          import fb._
-          val optPerson: Option[Person] = Some(Person("eloise", 1))
-          (fb.value("foo", optPerson))
-        }
-      )
-      matchThis("option[foo] = {}")
-    }
-  }
-
-  class MyFieldBuilder extends FieldBuilder {
-
-    // Instant type
-    implicit val instantToStringValue: ToValue[Instant] = ToValue(instantValue)
-    def instant(name: String, i: Instant): Field        = keyValue(name, instantValue(i))
-    private def instantValue(i: Instant)                = Value.string(i.toString)
-
-    // Person type
-    implicit val personToValue: ToValue[Person]             = ToValue(personValue)
-    implicit val personToObjectValue: ToObjectValue[Person] = ToObjectValue(personValue(_))
-
-    def person(name: String, person: Person): Field = keyValue(name, personValue(person))
-    private def personValue(p: Person): Value.ObjectValue = Value.`object`(
-      string("name", p.name),
-      number("age", p.age)
-    )
 
   }
 
@@ -288,6 +224,22 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       .getAppender("LIST")
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
+
+  trait MyFieldBuilder extends FieldBuilder {
+    // Instant type
+    implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
+    def instant(name: String, i: Instant): Field        = keyValue(name, ToValue(i))
+    def instant(tuple: (String, Instant)): Field        = keyValue(tuple)
+
+    // Person type
+    implicit val personToObjectValue: ToObjectValue[Person] = (p: Person) => ToObjectValue(
+      string("name", p.name),
+      number("age", p.age)
+    )
+    def person(name: String, person: Person): Field = keyValue(name, person)
+    def person(tuple: (String, Person)): Field = keyValue(tuple)
+  }
+
+  object MyFieldBuilder extends MyFieldBuilder
 }
 
-case class Person(name: String, age: Int)

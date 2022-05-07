@@ -1,9 +1,9 @@
-package com.tersesystems.echopraxia.scala
+package com.tersesystems.echopraxia.plusscala
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.scala.api.{Condition, Level}
+import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -106,8 +106,9 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         condition,
         "found a list with 1 in it!",
         fb => {
-          import com.tersesystems.echopraxia.api.Value._
-          fb.array("foo", array(string("derp"), number(1), bool(false)))
+          import fb._
+          // have to explicitly make Seq[Value[_]] here
+          fb.array("foo", Seq(ToValue("derp"), ToValue(1), ToValue(false)))
         }
       )
 
@@ -128,13 +129,11 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         condition,
         "complex object",
         fb => {
-          import com.tersesystems.echopraxia.api.Value._
-          val objectValue: ObjectValue = `object`(
-            fb.value("a"    -> 1),
-            fb.keyValue("b" -> "two"),
-            fb.value("c"    -> false)
-          )
-          fb.array("array", Seq(objectValue))
+          fb.array("array", Seq(
+            fb.number("a"    -> 1),
+            fb.string("b" -> "two"),
+            fb.bool("c"    -> false)
+          ))
         }
       )
     }
@@ -144,7 +143,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     it("should match on simple object") {
       logger
         .withCondition((_, ctx) => ctx.findObject("$.foo").get("key").equals("value"))
-        .debug("simple map", fb => fb.obj("foo", fb.keyValue("key" -> "value")))
+        .debug("simple map", fb => fb.obj("foo", fb.string("key" -> "value")))
 
       matchThis("simple map")
     }
@@ -178,10 +177,10 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         "complex object",
         fb =>
           fb.obj(
-            "foo" -> Seq(
-              fb.value("a"    -> 1),
-              fb.keyValue("b" -> "two"),
-              fb.value("c"    -> false)
+            "foo", Seq(
+              fb.number("a"    -> 1),
+              fb.string("b" -> "two"),
+              fb.bool("c"    -> false)
             )
           )
       )
@@ -199,12 +198,70 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     matchThis("match list")
   }
+
+  it("should make a list contain scala maps with int") {
+    val isWill = Condition { (_: Level, context: LoggingContext) =>
+      val list = context.findList("$.person[?(@.name == 'will')]")
+      val map = list.head.asInstanceOf[Map[String, Any]]
+      map("age") == 1
+    }
+    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+
+    matchThis("match list")
+  }
+
+  it("should make a list contain scala maps with string") {
+    val isWill = Condition { (_: Level, context: LoggingContext) =>
+      val list = context.findList("$.person[?(@.name == 'will')]")
+      val map = list.head.asInstanceOf[Map[String, Any]]
+      map("name") == "will"
+    }
+    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+
+    matchThis("match list")
+  }
+
+  it("should make a list contain scala maps with float") {
+    val isWill = Condition { (_: Level, context: LoggingContext) =>
+      val map = context.findObject("$.obj").get
+      map("float") == 0.0f
+    }
+    logger.debug(isWill, "match list", fb => fb.obj("obj" -> fb.number("float" -> 0.0f)))
+
+    matchThis("match list")
+  }
+
+  it("should deal with BigInt") {
+    val isWill = Condition { (_: Level, context: LoggingContext) =>
+      val obj = context.findObject("$.obj").get
+      obj("bigint") == BigInt("1100020323232341313413")
+    }
+
+    logger.debug(isWill, "match list", fb => {
+      fb.obj("obj" -> fb.number("bigint" -> BigInt("1100020323232341313413")))
+    })
+
+    matchThis("match list")
+  }
+
+  it("should deal with BigDecimal") {
+    val isWill = Condition { (_: Level, context: LoggingContext) =>
+      val govt = context.findObject("$.government").get
+      govt("debt") == BigDecimal("1100020323232341313413")
+    }
+
+    val usGovernment = Government("US", debt = BigDecimal("1100020323232341313413"))
+    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("government" -> usGovernment))
+
+    matchThis("match list")
+  }
+
   it("should not match on an object mismatch") {
     val condition: Condition = (_, ctx) => {
-      val opt: Option[Map[String, Any]] = ctx.findObject("$.foo")
+      val opt: Option[_] = ctx.findObject("$.foo")
       opt.isDefined
     }
-    logger.debug(condition, "no match", fb => fb.keyValue("foo" -> true))
+    logger.debug(condition, "no match", _.bool("foo" -> true))
 
     noMatch
   }
@@ -218,11 +275,18 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("throwable") {
 
-    it("should match a subclass of throwable") {
+    it("should match a subclass of throwable with tuple") {
       val t = new Exception()
-      logger.info("matches on throwable {}", fb => fb.keyValue("derp" -> t))
-      matchThis("matches on throwable {}")
+      logger.info("matches on throwable {}", _.exception("derp" -> t))
+      matchThis("matches on throwable derp=java.lang.Exception")
     }
+
+    it("should match a subclass of throwable with arg") {
+      val t = new Exception()
+      logger.info("matches on throwable {}", _.exception(t))
+      matchThis("matches on throwable exception=java.lang.Exception")
+    }
+
   }
 
   private def noMatch = {
@@ -253,3 +317,26 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
 }
+
+
+case class Person(name: String, age: Int)
+
+case class Government(name: String, debt: BigDecimal)
+
+trait MyFieldBuilder extends FieldBuilder {
+  implicit val personToValue: ToObjectValue[Person] = { person: Person =>
+    ToObjectValue(
+      keyValue("name", ToValue(person.name)),
+      keyValue("age", ToValue(person.age))
+    )
+  }
+
+  implicit val govtToValue: ToObjectValue[Government] = { govt: Government =>
+    ToObjectValue(
+      keyValue("name", ToValue(govt.name)),
+      keyValue("debt", ToValue(govt.debt))
+    )
+  }
+}
+
+object MyFieldBuilder extends MyFieldBuilder

@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.scala.api
+package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.{Level => JLevel}
 
