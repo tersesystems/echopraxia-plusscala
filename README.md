@@ -7,15 +7,15 @@ The Scala API for Echopraxia is a layer over the Java API that works smoothly wi
 Add the following to your `build.sbt` file:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "logger" % "0.1.0-SNAPSHOT"
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "logger" % echopraxiaPlusScalaVersion
 ```
 
 and one of the underlying core logger providers, i.e.
 
 ```scala
 // uncomment only one of these
-// libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "2.0.0"
-// libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "2.0.0"
+// libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "2.0.1"
+// libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "2.0.1"
 ```
 
 To import the Scala API, add the following:
@@ -37,7 +37,7 @@ class Example {
 There is an asynchronous logger variant which has the same API, but logs messages asynchronously.  By default, this uses `ForkJoin.commonPool()`.
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "async" % "0.1.0-SNAPSHOT"
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "async" % echopraxiaPlusScalaVersion
 ```
 
 You can create an async logger using the `AsyncLoggerFactory`:
@@ -81,9 +81,7 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 
 A field is defined as a `name` and a `value`, where the value can one of the types defined in `Field.Value`.  Defining a value like `StringValue` or `BooleanValue` can be tedious, and so the Scala field builder has methods that take `ToValue`, `ToObjectValue`, and `ToArrayValue` type classes.
 
-The field builder can be imported with `import fb._` to provide a custom DSL that relies on tuples.  The built-in type classes are already provided for strings, numbers, and booleans, and there are also type classes for `Option[V: ToValue]` and `Try[V: ToValue]` types.
-
-There are two basic methods, `fb.value` and `fb.keyValue`, which render fields defined in a parameterized message template with "hello {}" as `hello value` and `hello key=value` in a line oriented layout, respectively.  The more specific methods, `fb.string`, `fb.number`, `fb.bool`, `fb.array`, and `fb.obj` have more specific value requirements.  Only `fb.array` and `fb.obj` use `key=value` format, and the other methods use the `value` format.
+The more field builder methods, `fb.string`, `fb.number`, `fb.bool`, `fb.array`, and `fb.obj` have more specific value requirements.  Only `fb.array` and `fb.obj` use `key=value` format, and the other methods use the `value` format.
 
 ```scala
 import com.tersesystems.echopraxia.plusscala._
@@ -237,3 +235,9 @@ final class CustomLogger(core: CoreLogger, fieldBuilder: CustomFieldBuilder)
 ```
 
 Creating a custom logger can be a good way to ensure that your field builder is used without any extra configuration, and lets you add your own methods and requirements for your application.
+
+You can also provide your own logger from scratch if you want, by only using the API dependency.
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "api" % echopraxiaPlusScalaVersion
+```

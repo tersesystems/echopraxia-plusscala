@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.0.1-SNAPSHOT"
+val echopraxiaVersion = "2.0.1"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
@@ -54,7 +54,7 @@ lazy val logger = (project in file("logger"))
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.11"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
 
