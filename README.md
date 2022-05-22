@@ -216,7 +216,7 @@ trait OptionFieldBuilder extends FieldBuilder {
 Conditions in the Scala API use Scala idioms and classes.  The `find` methods in the logging context are converted to Scala, so `java.math.BigInteger` is converted to `BigInt`, for example:
 
 ```scala
-val condition = Condition(_.findNumber("$.bigInt").get == BigInt("52"))
+val bigIntCondition = Condition(_.findNumber("$.bigInt").contains(BigInt("52")))
 ```
 
 Likewise, if you look up `findList` to find an object, it will return the object as a `Map[String, Any]` which you can then match on.
@@ -229,11 +229,11 @@ val isWill = Condition { (context: LoggingContext) =>
 }
 ```
 
-Also, `ctx.fields` returns a `Seq[Field]` which allows you to match fields using the Scala collections API.  You can use this to match on fields and values without going through JSON path, which can be useful when you want to match on an entire object rather than a single path.
+Also, `ctx.fields` returns a `Seq[Field]` which allows you to match fields using the Scala collections API.  You can use this to match on fields and values without using a JSON path, which can be useful when you want to match on an entire object rather than a single path.
 
 ```scala
 private val willField: Field = MyFieldBuilder.person("person", Person("will", 1))
-private val condition: Condition = Condition(ctx => ctx.fields.contains(willField))
+private val condition: Condition = Condition(_.fields.contains(willField))
 
 def conditionUsingFields() = {
   val thisPerson = Person("will", 1)
