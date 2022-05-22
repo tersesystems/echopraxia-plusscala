@@ -93,9 +93,16 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 
 ## Field Builder
 
-A field is defined as a `name` and a `value`, where the value can one of the types defined in `Field.Value`.  Defining a value like `StringValue` or `BooleanValue` can be tedious, and so the Scala field builder has methods that take `ToValue`, `ToObjectValue`, and `ToArrayValue` type classes.
+A `Field` is defined as a `name` and a `value`.  The field builder has methods to create
 
-The more field builder methods, `fb.string`, `fb.number`, `fb.bool`, `fb.array`, and `fb.obj` have more specific value requirements.  Only `fb.array` and `fb.obj` use `key=value` format, and the other methods use the `value` format.
+* `fb.string`: creates a field with a string as a value
+* `fb.number`: creates a field with a number as a value.
+* `fb.bool`: creates a field with a boolean as a value.
+* `fb.nullValue`: creates a field with a null as a value.
+* `fb.array`: creates a field with an array as a value.
+* `fb.obj`: creates a field with an object as a value.  
+
+When rendering using a line oriented encoder, `fb.array` and `fb.obj` render in logfmt style `key=value` format, and the other methods use the `value` format.
 
 ```scala
 import com.tersesystems.echopraxia.plusscala._
@@ -120,7 +127,7 @@ class Example {
 }
 ```
 
-Arrays will take a `Seq` of values, including object values.  Object values take a sequence of fields as arguments, and are best defined using the `ToObjectValue(fields)` method. For example, the first element in the [path example from Json-Path](https://github.com/json-path/JsonPath#path-examples) can be represented as:
+Arrays will take a `Seq` of values, including object values.  Object values take a sequence of fields as arguments, and can be defined using the `ToObjectValue(fields)` method. For example, the first element in the [path example from Json-Path](https://github.com/json-path/JsonPath#path-examples) can be represented as:
 
 ```scala
 logger.info("{}", fb => {
@@ -146,6 +153,8 @@ store={book=[{category=reference, author=Nigel Rees, title=Sayings of the Centur
 
 ## Custom Field Builder
 
+Although using the default field builder is great for one-offs, if you want to log more complex objects it can be tedious to render a large object down to its component parts.  To make it easier, Echopraxia incorporates custom fields builders that can be domain specific.
+
 You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.
 
 ```scala
@@ -157,6 +166,9 @@ trait CustomFieldBuilder extends FieldBuilder {
 
   def instant(name: String, i: Instant): Field = 
     keyValue(name, ToValue(i))
+
+  def instant(tuple: (String, Instant)): Field =
+    keyValue(tuple)
 
   implicit val bookToObjectValue: ToObjectValue[Book] = { book =>
     ToObjectValue(
@@ -179,16 +191,7 @@ And then you render an instant:
 logger.info("time {}", fb.instant("current", Instant.now))
 ```
 
-Or you can import the field builder implicit:
-
-```scala
-logger.info("time {}", fb => {
-  import fb._
-  keyValue("current" -> Instant.now)
-})
-```
-
-You can also extend the field builder to treat all `Map[String, V]` as objects:
+You can also extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
 
 ```scala
 trait MapFieldBuilder extends FieldBuilder {
