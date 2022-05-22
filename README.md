@@ -1,8 +1,8 @@
 # Scala API for Echopraxia
 
-The Scala API for Echopraxia is a layer over the Java API that works smoothly with Scala types.
+The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types.  It is compiled for Scala 2.12 and Scala 2.13.
 
-## Quick Start
+## Logger
 
 Add the following to your `build.sbt` file:
 
@@ -30,6 +30,20 @@ class Example {
     logger.info("do some stuff")
   }
 }
+```
+
+The Scala logger has some enhancements over the Java logger, notably the ability to add tuples.  
+
+```scala
+logger.info("hi {}", _.string("name", "will")) // two args
+logger.info("hi {}", _.string("name" -> "will")) // tuple
+```
+
+This can come in very handy when using collections of tuples, because you can map them directly to fields:
+
+```scala
+val seq = Seq("first" -> 1, "second" -> 2)
+logger.info("seq = {}", fb => fb.list(seq.map(fb.number)))
 ```
 
 ## Async Logger
@@ -64,7 +78,7 @@ if (asyncLogger.isDebugEnabled()) { // evaluate condition in this thread?
   // put expensive debug statement together in this thread or other thread?
   val expensiveResult = expensiveDebugLoggingQuery()
   // evaluate condition again?  Is condition still valid?
-  asyncLogger.debug("expensive but worth it {}", fb => fb.name("result", expensiveResult))
+  asyncLogger.debug("expensive but worth it {}", _.string("result", expensiveResult))
 }
 ```
 
@@ -73,7 +87,7 @@ To account for this, async logging handles conditions and expensive queries by r
 ```scala
 asyncLogger.ifDebugEnabled { log => // condition evaluation
   val result = expensiveDebugLoggingQuery() // queries in logging thread
-  log("async expensive result {}", fb => fb.number("result" -> result)) // handle does not evaluate
+  log("async expensive result {}", _.string("result", result)) // handle does not evaluate
 }
 ```
 
@@ -85,6 +99,7 @@ The more field builder methods, `fb.string`, `fb.number`, `fb.bool`, `fb.array`,
 
 ```scala
 import com.tersesystems.echopraxia.plusscala._
+import com.tersesystems.echopraxia.plusscala.api._
 
 class Example {
   val logger = LoggerFactory.getLogger
@@ -108,8 +123,6 @@ class Example {
 Arrays will take a `Seq` of values, including object values.  Object values take a sequence of fields as arguments, and are best defined using the `ToObjectValue(fields)` method. For example, the first element in the [path example from Json-Path](https://github.com/json-path/JsonPath#path-examples) can be represented as:
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api._
-
 logger.info("{}", fb => {
   import fb._
   fb.obj("store" ->
@@ -136,9 +149,6 @@ store={book=[{category=reference, author=Nigel Rees, title=Sayings of the Centur
 You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.
 
 ```scala
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.plusscala.api._
-
 case class Book(category: String, author: String, title: String, price: Double)
 
 trait CustomFieldBuilder extends FieldBuilder {
@@ -159,9 +169,6 @@ trait CustomFieldBuilder extends FieldBuilder {
 
   def book(name: String, book: Book): Field = 
     keyValue(name, ToValue(book))
-
-  implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = 
-    m => ToObjectValue(m.map(keyValue))
 }
 object CustomFieldBuilder extends CustomFieldBuilder
 ```
@@ -181,18 +188,130 @@ logger.info("time {}", fb => {
 })
 ```
 
+You can also extend the field builder to treat all `Map[String, V]` as objects:
+
+```scala
+trait MapFieldBuilder extends FieldBuilder {
+  implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = 
+    m => ToObjectValue(m.map(keyValue))
+}
+```
+
+or make `Option[V]` return either a value or a null: 
+
+```scala
+trait OptionFieldBuilder extends FieldBuilder {
+  implicit def optionToValue[V: ToValue]: ToValue[Option[V]] = {
+    case Some(v) => ToValue(v)
+    case None => Value.nullValue()
+  }
+}
+```
+
+## Conditions
+
+Conditions in the Scala API use Scala idioms and classes.  The `find` methods in the logging context are converted to Scala, so `java.math.BigInteger` is converted to `BigInt`, for example:
+
+```scala
+val condition = Condition(_.findNumber("$.bigInt").get == BigInt("52"))
+```
+
+Likewise, if you look up `findList` to find an object, it will return the object as a `Map[String, Any]` which you can then match on.
+
+```scala
+val isWill = Condition { (context: LoggingContext) =>
+  val list = context.findList("$.person[?(@.name == 'will')]")
+  val map = list.head.asInstanceOf[Map[String, Any]]
+  map("name") == "will"
+}
+```
+
+Also, `ctx.fields` returns a `Seq[Field]` which allows you to match fields using the Scala collections API.  You can use this to match on fields and values without going through JSON path, which can be useful when you want to match on an entire object rather than a single path.
+
+```scala
+private val willField: Field = MyFieldBuilder.person("person", Person("will", 1))
+private val condition: Condition = Condition(ctx => ctx.fields.contains(willField))
+
+def conditionUsingFields() = {
+  val thisPerson = Person("will", 1)
+  logger.info(condition, "person matches! {}", _.person("person" -> thisPerson))
+}
+```
+
+## Source Info
+
+Both the logger and the async logger take the source code location, file, and enclosing method as implicits, using [sourcefile](https://github.com/com-lihaoyi/sourcecode).  For example, the `DefaultLoggerMethods.error` method looks like this:
+
+```scala
+trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
+  this: DefaultMethodsSupport[FB] =>
+
+  def error(
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+  
+}
+```
+
+Internally, the source code lines are mapped to fields included with the logger, defined with keys from `SourceFieldConstants`:
+
+```scala
+trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
+  // ...
+  protected def sourceInfoFields(
+      line: Line,
+      file: File,
+      enc: Enclosing
+  ): java.util.function.Function[FB, FieldBuilderResult] = { fb: FB =>
+    Field
+      .keyValue(
+        SourceFieldConstants.sourcecode,
+        Value.`object`(
+          Field.keyValue(SourceFieldConstants.file, Value.string(file.value)),
+          Field.keyValue(SourceFieldConstants.line, Value.number(line.value: java.lang.Integer)),
+          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc.value))
+        )
+      )
+      .asInstanceOf[FieldBuilderResult]
+  }.asJava
+}
+```
+
+You can use the source code fields in conditions transparently -- this can be useful in filters where you want to either show or suppress logging statements coming from a method.  For example:
+
+```scala
+import com.tersesystems.echopraxia.api.{CoreLogger, CoreLoggerFilter}
+import com.tersesystems.echopraxia.plusscala.api.Condition
+
+class MyLoggerFilter extends CoreLoggerFilter {
+  private val sourceCodeCondition = Condition { ctx =>
+    ctx.findString("$.sourcecode.enclosing").exists(_.endsWith("thisMethod"))
+  }
+
+  override def apply(coreLogger: CoreLogger): CoreLogger = coreLogger.withCondition(sourceCodeCondition.asJava)
+}
+```
+
+will only log if the method is `thisMethod`:
+
+```scala
+def thisMethod(): Unit = {
+  logger.info("I log if the method is called thisMethod")
+}
+```
+
+You can change these constants to have different names by overriding the resource bundle.  You can also override the `sourceInfoFields` using a custom logger to change or suppress source code fields entirely.
+
 ## Custom Logger
 
 You can create a custom logger which has your own methods and field builders by extending `AbstractLoggerSupport` with `DefaultLoggerMethods`.
 
 ```scala
-import com.tersesystems.echopraxia.api.CoreLogger
+import com.tersesystems.echopraxia.api.{CoreLogger, Caller, CoreLoggerFactory, FieldBuilderResult, Utilities}
 import com.tersesystems.echopraxia.plusscala.DefaultLoggerMethods
 import com.tersesystems.echopraxia.plusscala.api._
 
 object CustomLoggerFactory {
-  import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
-
   private val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
   private val fieldBuilder: CustomFieldBuilder = CustomFieldBuilder
 
@@ -215,7 +334,6 @@ object CustomLoggerFactory {
 final class CustomLogger(core: CoreLogger, fieldBuilder: CustomFieldBuilder)
   extends AbstractLoggerSupport(core, fieldBuilder)
     with DefaultLoggerMethods[CustomFieldBuilder] {
-  import com.tersesystems.echopraxia.api.{FieldBuilderResult, Utilities}
 
   private def newLogger(coreLogger: CoreLogger): CustomLogger = 
     new CustomLogger(coreLogger, fieldBuilder)
@@ -236,7 +354,7 @@ final class CustomLogger(core: CoreLogger, fieldBuilder: CustomFieldBuilder)
 
 Creating a custom logger can be a good way to ensure that your field builder is used without any extra configuration, and lets you add your own methods and requirements for your application.
 
-You can also provide your own logger from scratch if you want, by only using the API dependency.
+You can also provide your own logger from scratch if you want, by only using the API dependency -- this ensures that users only have one logging option and you can add your own metrics and observability around your logging.
 
 ```scala
 libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "api" % echopraxiaPlusScalaVersion

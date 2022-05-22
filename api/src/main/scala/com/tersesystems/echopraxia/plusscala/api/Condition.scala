@@ -7,7 +7,7 @@ trait Condition {
   def test(level: Level, context: LoggingContext): Boolean
 
   def asJava: JCondition = { (level: JLevel, javaContext: JLoggingContext) =>
-    this.test(Level.asScala(level), LoggingContext(javaContext))
+    this.test(Level.asScala(level), LoggingContext.asScala(javaContext))
   }
 }
 

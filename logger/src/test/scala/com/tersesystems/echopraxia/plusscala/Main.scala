@@ -48,7 +48,7 @@ object Main {
 
     def book(name: String, i: Book): Field = keyValue(name, ToValue(i))
 
-    implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = m => ToObjectValue(m.map(t => keyValue(t)))
+    implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = m => ToObjectValue(m.map(keyValue(_)))
 
   }
 

@@ -45,10 +45,10 @@ trait ValueTypeClasses {
   object ToValue {
     def apply[T: ToValue](t: T): Value[_] = implicitly[ToValue[T]].toValue(t)
 
-    implicit val valueToValue: ToValue[Value[_]] = identity
+    implicit val valueToValue: ToValue[Value[_]] = identity(_)
 
-    implicit def objectValueToValue[T: ToObjectValue]: ToValue[T] = ToObjectValue[T]
-    implicit def arrayValueToValue[T: ToArrayValue]: ToValue[T]   = ToArrayValue[T]
+    implicit def objectValueToValue[T: ToObjectValue]: ToValue[T] = ToObjectValue[T](_)
+    implicit def arrayValueToValue[T: ToArrayValue]: ToValue[T]   = ToArrayValue[T](_)
 
     implicit val stringToStringValue: ToValue[String] = (s: String) => Value.string(s)
 
@@ -149,24 +149,15 @@ trait FieldBuilderResultTypeClasses {
       ToFieldBuilderResult[T](input)
 
     implicit val iterableToFieldBuilderResult: ToFieldBuilderResult[Iterable[Field]] =
-      new ToFieldBuilderResult[Iterable[Field]] {
-        override def toResult(iterable: Iterable[Field]): FieldBuilderResult =
-          FieldBuilderResult.list(iterable.toArray)
-      }
+      iterable => FieldBuilderResult.list(iterable.toArray)
 
-    implicit val iteratorToFieldBuilderResult: ToFieldBuilderResult[Iterator[Field]] =
-      new ToFieldBuilderResult[Iterator[Field]] {
-        import scala.jdk.CollectionConverters._
-        override def toResult(iterator: Iterator[Field]): FieldBuilderResult =
-          FieldBuilderResult.list(iterator.asJava)
-      }
+    implicit val iteratorToFieldBuilderResult: ToFieldBuilderResult[Iterator[Field]] = iterator => {
+      import scala.jdk.CollectionConverters._
+      FieldBuilderResult.list(iterator.asJava)
+    }
 
     // array doesn't seem to be covered by Iterable
-    implicit val arrayToFieldBuilderResult: ToFieldBuilderResult[Array[Field]] =
-      new ToFieldBuilderResult[Array[Field]] {
-        override def toResult(array: Array[Field]): FieldBuilderResult =
-          FieldBuilderResult.list(array)
-      }
+    implicit val arrayToFieldBuilderResult: ToFieldBuilderResult[Array[Field]] = FieldBuilderResult.list(_)
   }
 
   object ToFieldBuilderResult extends LowPriorityToFieldBuilderResult {

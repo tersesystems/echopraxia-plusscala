@@ -146,7 +146,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
           import fb._
           fb.list(
             fb.person("person1" -> Person("Eloise", 1)),
-            fb.obj("person2"      -> Person("Eloise", 1))
+            fb.obj("person2"    -> Person("Eloise", 1))
           )
         }
       )
@@ -190,10 +190,10 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         fb => {
           import fb._
           list(
-            person("owner"         -> Person("Eloise", 1)),
+            person("owner"          -> Person("Eloise", 1)),
             instant("iso_timestamp" -> Instant.now()),
-            string("foo"           -> "bar"),
-            bool("something"     -> true)
+            string("foo"            -> "bar"),
+            bool("something"        -> true)
           )
         }
       )
@@ -232,14 +232,14 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     def instant(tuple: (String, Instant)): Field        = keyValue(tuple)
 
     // Person type
-    implicit val personToObjectValue: ToObjectValue[Person] = (p: Person) => ToObjectValue(
-      string("name", p.name),
-      number("age", p.age)
-    )
+    implicit val personToObjectValue: ToObjectValue[Person] = (p: Person) =>
+      ToObjectValue(
+        string("name", p.name),
+        number("age", p.age)
+      )
     def person(name: String, person: Person): Field = keyValue(name, person)
-    def person(tuple: (String, Person)): Field = keyValue(tuple)
+    def person(tuple: (String, Person)): Field      = keyValue(tuple)
   }
 
   object MyFieldBuilder extends MyFieldBuilder
 }
-

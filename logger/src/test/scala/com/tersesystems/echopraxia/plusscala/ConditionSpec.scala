@@ -129,11 +129,14 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         condition,
         "complex object",
         fb => {
-          fb.array("array", Seq(
-            fb.number("a"    -> 1),
-            fb.string("b" -> "two"),
-            fb.bool("c"    -> false)
-          ))
+          fb.array(
+            "array",
+            Seq(
+              fb.number("a" -> 1),
+              fb.string("b" -> "two"),
+              fb.bool("c"   -> false)
+            )
+          )
         }
       )
     }
@@ -177,10 +180,11 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         "complex object",
         fb =>
           fb.obj(
-            "foo", Seq(
-              fb.number("a"    -> 1),
+            "foo",
+            Seq(
+              fb.number("a" -> 1),
               fb.string("b" -> "two"),
-              fb.bool("c"    -> false)
+              fb.bool("c"   -> false)
             )
           )
       )
@@ -202,7 +206,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   it("should make a list contain scala maps with int") {
     val isWill = Condition { (_: Level, context: LoggingContext) =>
       val list = context.findList("$.person[?(@.name == 'will')]")
-      val map = list.head.asInstanceOf[Map[String, Any]]
+      val map  = list.head.asInstanceOf[Map[String, Any]]
       map("age") == 1
     }
     logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
@@ -213,7 +217,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   it("should make a list contain scala maps with string") {
     val isWill = Condition { (_: Level, context: LoggingContext) =>
       val list = context.findList("$.person[?(@.name == 'will')]")
-      val map = list.head.asInstanceOf[Map[String, Any]]
+      val map  = list.head.asInstanceOf[Map[String, Any]]
       map("name") == "will"
     }
     logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
@@ -237,9 +241,13 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       obj("bigint") == BigInt("1100020323232341313413")
     }
 
-    logger.debug(isWill, "match list", fb => {
-      fb.obj("obj" -> fb.number("bigint" -> BigInt("1100020323232341313413")))
-    })
+    logger.debug(
+      isWill,
+      "match list",
+      fb => {
+        fb.obj("obj" -> fb.number("bigint" -> BigInt("1100020323232341313413")))
+      }
+    )
 
     matchThis("match list")
   }
@@ -317,7 +325,6 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
 }
-
 
 case class Person(name: String, age: Int)
 
