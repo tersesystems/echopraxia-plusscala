@@ -87,4 +87,5 @@ class ScalaLoggingContext private[api] (context: JLoggingContext) extends Loggin
     }
   }
 
+  override def asJava: JLoggingContext = context
 }

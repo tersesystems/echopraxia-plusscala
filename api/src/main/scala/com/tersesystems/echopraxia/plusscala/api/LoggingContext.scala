@@ -23,10 +23,6 @@ trait FindPathMethods {
 
 trait LoggingContext extends FindPathMethods {
   def fields: Seq[Field]
-}
 
-object LoggingContext {
-  def asScala(context: JLoggingContext): LoggingContext = {
-    new ScalaLoggingContext(context)
-  }
+  def asJava: JLoggingContext
 }

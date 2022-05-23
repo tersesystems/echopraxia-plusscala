@@ -51,7 +51,7 @@ trait Condition {
   }
 
   def asJava: JCondition = { (level: JLevel, javaContext: JLoggingContext) =>
-    this.test(Level.asScala(level), LoggingContext.asScala(javaContext))
+    this.test(level.asScala, javaContext.asScala)
   }
 }
 
@@ -60,6 +60,12 @@ object Condition {
   val always: Condition = (level: Level, context: LoggingContext) => true
 
   val never: Condition = (level: Level, context: LoggingContext) => false
+
+  val diagnostic: Condition = (level: Level, context: LoggingContext) => level.isLessOrEqual(Level.DEBUG)
+
+  val operational: Condition = (level: Level, context: LoggingContext) => level.isGreaterOrEqual(Level.INFO)
+
+  def exactly(exactLevel: Level): Condition = (level: Level, context: LoggingContext) => level.isEqual(exactLevel)
 
   def apply(f: (Level, LoggingContext) => Boolean): Condition = new Condition {
     override def test(level: Level, context: LoggingContext): Boolean = f(level, context)

@@ -52,49 +52,49 @@ class AsyncLogger[FB](core: CoreLogger, fieldBuilder: FB)
 
   class NeverAsyncLogger(core: CoreLogger, fieldBuilder: FB) extends AsyncLogger[FB](core, fieldBuilder) {
 
-    override def ifTraceEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def trace(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def trace(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def trace(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def trace(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def ifTraceEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit                                  = {}
+    override def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit            = {}
+    override def trace(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                                                    = {}
+    override def trace(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit                       = {}
+    override def trace(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                                      = {}
+    override def trace(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                              = {}
     override def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def trace(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def trace(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                = {}
 
-    override def ifDebugEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def debug(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def debug(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def debug(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def debug(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def ifDebugEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit                                  = {}
+    override def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit            = {}
+    override def debug(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                                                    = {}
+    override def debug(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit                       = {}
+    override def debug(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                                      = {}
+    override def debug(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                              = {}
     override def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def debug(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def debug(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                = {}
 
-    override def ifInfoEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def info(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def info(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def info(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def info(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def ifInfoEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit                                  = {}
+    override def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit            = {}
+    override def info(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                                                    = {}
+    override def info(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit                       = {}
+    override def info(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                                      = {}
+    override def info(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                              = {}
     override def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def info(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def info(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                = {}
 
-    override def ifWarnEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def warn(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def warn(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def warn(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def warn(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def ifWarnEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit                                  = {}
+    override def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit            = {}
+    override def warn(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                                                    = {}
+    override def warn(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit                       = {}
+    override def warn(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                                      = {}
+    override def warn(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                              = {}
     override def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def warn(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def warn(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                = {}
 
-    override def ifErrorEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def error(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def error(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def error(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def error(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def ifErrorEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit                                  = {}
+    override def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit            = {}
+    override def error(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                                                    = {}
+    override def error(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit                       = {}
+    override def error(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                                      = {}
+    override def error(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit                              = {}
     override def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
-    override def error(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {}
+    override def error(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit                = {}
   }
 }
