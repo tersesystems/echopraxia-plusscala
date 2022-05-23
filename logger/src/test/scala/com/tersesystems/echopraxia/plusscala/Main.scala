@@ -1,13 +1,13 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.api.{Field, Level}
+import com.tersesystems.echopraxia.plusscala.api._
 
 import java.time.Instant
 
 object Main {
 
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder).withCondition(Condition.always)
 
   case class Book(category: String, author: String, title: String, price: Double)
 
@@ -30,7 +30,15 @@ object Main {
     )
 
     logger.info("array of throwables {}", fb => fb.array("ex" -> Seq(new RuntimeException())))
+
+    logger.debug(infoOrHigherCondition, "INFO message")
   }
+
+  val infoOrHigherCondition: Condition = Condition((level, _) => level >= Level.INFO)
+
+  val fooCondition: Condition = Condition(_.fields.exists(_.name == "foo"))
+
+  val infoAndFoo: Condition = infoOrHigherCondition xor fooCondition
 
   trait MyFieldBuilder extends FieldBuilder {
     implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
@@ -39,10 +47,10 @@ object Main {
 
     implicit val bookToObjectValue: ToObjectValue[Book] = { book =>
       ToObjectValue(
-        string("category", book.category),
-        string("author", book.author),
-        string("title", book.title),
-        number("price", book.price)
+        keyValue("category", book.category),
+        keyValue("author", book.author),
+        keyValue("title", book.title),
+        keyValue("price", book.price)
       )
     }
 

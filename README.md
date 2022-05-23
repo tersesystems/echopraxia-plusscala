@@ -171,11 +171,12 @@ trait CustomFieldBuilder extends FieldBuilder {
     keyValue(tuple)
 
   implicit val bookToObjectValue: ToObjectValue[Book] = { book =>
+    // use keyValue when you want to override the field to include the name
     ToObjectValue(
-      string("category", book.category),
-      string("author", book.author),
-      string("title", book.title),
-      number("price", book.price)
+      keyValue("category", book.category),
+      keyValue("author", book.author),
+      keyValue("title", book.title),
+      keyValue("price", book.price)
     )
   }
 
@@ -240,6 +241,33 @@ def conditionUsingFields() = {
   logger.info(condition, "person matches! {}", _.person("person" -> thisPerson))
 }
 ```
+
+Levels in conditions have in-fix comparison operators:
+
+```scala
+val infoOrHigherCondition: Condition = Condition { (level, ctx) =>
+  level >= Level.INFO // same as greaterThanOrEqual
+}
+```
+
+Conditions can be composed using the logical operators `and`, `or`, and `xor`:
+
+```scala
+val andCondition: Condition = conditionOne and conditionTwo
+val orCondition: Condition = conditionOne or conditionTwo
+val xorCondition: Condition = conditionOne xor conditionTwo
+```
+
+There are two special conditions, `Condition.always` and `Condition.never`.  Using one of these conditions will short-circuit other conditions under the right circumstances, and can enable logging optimizations.
+
+For example, using `logger.withCondition(Condition.always)` will return the same logger, while using `Condition.never` will result in a no-op logger being returned:
+
+```scala
+val neverLogger = logger.withCondition(Condition.never)
+neverLogger.error("I will never log") // no-op
+```
+
+Because the JVM is very good at optimizing out no-op methods, using `Condition.never` can enable zero-overhead logging, in the style of [zerolog](https://github.com/obsidiandynamics/zerolog).
 
 ## Source Info
 

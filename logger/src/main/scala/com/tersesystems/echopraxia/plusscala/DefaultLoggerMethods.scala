@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
+import com.tersesystems.echopraxia.api.{Condition => JCondition}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Enclosing, File, Line}
 
@@ -457,7 +458,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, condition.asJava, message)
+      .log(level, handleCondition(condition), message)
   }
 
   @inline
@@ -473,7 +474,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, condition.asJava, message, f.asJava, fieldBuilder)
+      .log(level, handleCondition(condition), message, f.asJava, fieldBuilder)
   }
 
   @inline
@@ -491,11 +492,23 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
       .log(
         level,
-        condition.asJava,
+        handleCondition(condition),
         message,
         (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
         fieldBuilder
       )
+  }
+
+  @inline
+  protected def handleCondition(condition: Condition): JCondition = {
+    condition match {
+      case always if always == Condition.always =>
+        JCondition.always()
+      case never if never == Condition.never =>
+        JCondition.never()
+      case other =>
+        other.asJava
+    }
   }
 
 }

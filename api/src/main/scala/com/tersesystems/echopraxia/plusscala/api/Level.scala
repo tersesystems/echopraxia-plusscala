@@ -19,25 +19,29 @@ object Level {
 }
 
 sealed class Level(private val level: JLevel) {
-  def isGreater(r: Level): Boolean = level.compareTo(r.level) > 0
-
+  def isGreater(r: Level): Boolean  = level.compareTo(r.level) > 0
   def isGreater(r: JLevel): Boolean = level.compareTo(r) > 0
+  def >(r: Level): Boolean          = isGreater(level)
+  def >(r: JLevel): Boolean         = isGreater(level)
 
-  def isGreaterOrEqual(r: Level): Boolean = level.compareTo(r.level) >= 0
-
+  def isGreaterOrEqual(r: Level): Boolean  = level.compareTo(r.level) >= 0
   def isGreaterOrEqual(r: JLevel): Boolean = level.compareTo(r) >= 0
+  def >=(r: Level): Boolean                = isGreaterOrEqual(r)
+  def >=(r: JLevel): Boolean               = isGreaterOrEqual(r)
 
-  def isLess(r: Level): Boolean = level.compareTo(r.level) < 0
-
+  def isLess(r: Level): Boolean  = level.compareTo(r.level) < 0
   def isLess(r: JLevel): Boolean = level.compareTo(r) < 0
+  def <(r: Level): Boolean       = isLess(r)
+  def <(r: JLevel): Boolean      = isLess(r)
 
-  def isLessOrEqual(r: Level): Boolean = level.compareTo(r.level) <= 0
-
+  def isLessOrEqual(r: Level): Boolean  = level.compareTo(r.level) <= 0
   def isLessOrEqual(r: JLevel): Boolean = level.compareTo(r) <= 0
+  def <=(r: Level): Boolean             = isLessOrEqual(r)
+  def <=(r: JLevel): Boolean            = isLessOrEqual(r)
 
-  def isEqual(r: Level): Boolean = this.level == r.level
-
+  def isEqual(r: Level): Boolean  = this.level == r.level
   def isEqual(r: JLevel): Boolean = this.level == r
+  // == is already present
 
   def asJava: JLevel = level
 }
