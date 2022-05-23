@@ -14,7 +14,7 @@ object ScalaLoggingContext {
 /**
  * A scala logging context.
  */
-class ScalaLoggingContext private[api] (context: JLoggingContext) extends LoggingContext {
+class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   override def fields: Seq[Field] = {
     context.getFields.asScala.toSeq // needed for 2.13 since it's immutable
   }
