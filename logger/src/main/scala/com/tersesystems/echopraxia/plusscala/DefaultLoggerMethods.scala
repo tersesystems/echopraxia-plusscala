@@ -508,9 +508,11 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, handleCondition(condition), message)
+    if (condition != Condition.never) {
+      core
+        .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+        .log(level, condition.asJava, message)
+    }
   }
 
   @inline
@@ -524,9 +526,11 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
+    if (condition != Condition.never) {
+      core
       .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, handleCondition(condition), message, f.asJava, fieldBuilder)
+      .log(level, condition.asJava, message, f.asJava, fieldBuilder)
+    }
   }
 
   @inline
@@ -540,26 +544,16 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
+    if (condition != Condition.never) {
+      core
       .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
       .log(
         level,
-        handleCondition(condition),
+        condition.asJava,
         message,
         (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
         fieldBuilder
       )
-  }
-
-  @inline
-  protected def handleCondition(condition: Condition): JCondition = {
-    condition match {
-      case always if always == Condition.always =>
-        JCondition.always()
-      case never if never == Condition.never =>
-        JCondition.never()
-      case other =>
-        other.asJava
     }
   }
 
