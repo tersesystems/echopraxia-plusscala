@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceFieldConstants}
 import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._
@@ -453,7 +453,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       line: Line,
       file: File,
       enc: Enclosing
-  ): java.util.function.Function[FB, FieldBuilderResult] = { fb: FB =>
+  ): java.util.function.Function[FB, FieldBuilderResult] = { _: FB =>
     Field
       .keyValue(
         SourceFieldConstants.sourcecode,
@@ -472,7 +472,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder).log(level, message)
+    coreLoggerWithFields.log(level, message)
   }
 
   @inline
@@ -481,8 +481,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .log(level, message, f.asJava, fieldBuilder)
   }
 
@@ -492,8 +491,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .log(
         level,
         message,
@@ -508,8 +506,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-        .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      coreLoggerWithFields
         .log(level, condition.asJava, message)
     }
   }
@@ -526,9 +523,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, condition.asJava, message, f.asJava, fieldBuilder)
+      coreLoggerWithFields
+        .log(level, condition.asJava, message, f.asJava, fieldBuilder)
     }
   }
 
@@ -544,16 +540,20 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(
-        level,
-        condition.asJava,
-        message,
-        (_: FB) => onlyException(e),
-        fieldBuilder
-      )
+      coreLoggerWithFields
+        .log(
+          level,
+          condition.asJava,
+          message,
+          (_: FB) => onlyException(e),
+          fieldBuilder
+        )
     }
+  }
+
+  @inline
+  private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger = {
+    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
   }
 
   @inline

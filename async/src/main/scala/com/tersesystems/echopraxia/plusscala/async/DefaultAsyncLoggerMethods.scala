@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceFieldConstants}
 import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._
@@ -455,14 +455,14 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       line: Line,
       file: File,
       enc: Enclosing
-  ): java.util.function.Function[FB, FieldBuilderResult] = { fb: FB =>
+  ): java.util.function.Function[FB, FieldBuilderResult] = { _: FB =>
     Field
       .keyValue(
-        "sourcecode", // XXX make this configurable
+        SourceFieldConstants.sourcecode,
         Value.`object`(
-          Field.keyValue("file", Value.string(file.value)),
-          Field.keyValue("line", Value.number(line.value: java.lang.Integer)),
-          Field.keyValue("enclosing", Value.string(enc.value))
+          Field.keyValue(SourceFieldConstants.file, Value.string(file.value)),
+          Field.keyValue(SourceFieldConstants.line, Value.number(line.value: java.lang.Integer)),
+          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc.value))
         )
       )
       .asInstanceOf[FieldBuilderResult]
@@ -474,13 +474,17 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   }
 
   @inline
+  private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger = {
+    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+  }
+
+  @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit
       line: Line,
       file: File,
       enc: Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .asyncLog(
         level,
         (h: LoggerHandle[FB]) => consumer(h),
@@ -494,8 +498,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       file: File,
       enc: Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .asyncLog(
         level,
         condition.asJava,
@@ -521,7 +524,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder).log(level, message)
+    coreLoggerWithFields.log(level, message)
   }
 
   @inline
@@ -530,8 +533,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .log(level, message, f.asJava, fieldBuilder)
   }
 
@@ -541,8 +543,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       file: sourcecode.File,
       enc: sourcecode.Enclosing
   ): Unit = {
-    core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreLoggerWithFields
       .log(
         level,
         message,
@@ -557,8 +558,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-        .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      coreLoggerWithFields
         .log(level, condition.asJava, message)
     }
   }
@@ -575,9 +575,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-      .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-      .log(level, condition.asJava, message, f.asJava, fieldBuilder)
+      coreLoggerWithFields
+        .log(level, condition.asJava, message, f.asJava, fieldBuilder)
     }
   }
 
@@ -593,8 +592,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): Unit = {
     if (condition != Condition.never) {
-      core
-        .withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+      coreLoggerWithFields
         .log(
           level,
           condition.asJava,

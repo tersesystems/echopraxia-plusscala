@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala
+package com.tersesystems.echopraxia.plusscala.api
 
 import java.util.ResourceBundle
 
