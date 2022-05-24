@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.api.{Condition => JCondition}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Enclosing, File, Line}
 
@@ -498,7 +497,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
       .log(
         level,
         message,
-        (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+        (_: FB) => onlyException(e),
         fieldBuilder
       )
   }
@@ -551,10 +550,15 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
         level,
         condition.asJava,
         message,
-        (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+        (_: FB) => onlyException(e),
         fieldBuilder
       )
     }
+  }
+
+  @inline
+  private def onlyException(e: Throwable): FieldBuilderResult = {
+    Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e))
   }
 
 }

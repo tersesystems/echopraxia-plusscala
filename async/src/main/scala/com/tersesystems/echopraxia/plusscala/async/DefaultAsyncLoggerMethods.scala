@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.api.{Condition => JCondition}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Enclosing, File, Line}
 
@@ -547,7 +546,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
       .log(
         level,
         message,
-        (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+        (_: FB) => onlyException(e),
         fieldBuilder
       )
   }
@@ -600,7 +599,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
           level,
           condition.asJava,
           message,
-          (_: FB) => Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e)),
+          (_: FB) => onlyException(e),
           fieldBuilder
         )
     }
