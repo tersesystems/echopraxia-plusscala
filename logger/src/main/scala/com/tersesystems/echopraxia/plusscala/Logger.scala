@@ -6,7 +6,7 @@ import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
-/** 
+/**
  * Logger with source code implicit parameters.
  */
 class Logger[FB](core: CoreLogger, fieldBuilder: FB)

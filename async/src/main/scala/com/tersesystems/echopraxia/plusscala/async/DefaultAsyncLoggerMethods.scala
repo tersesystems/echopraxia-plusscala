@@ -34,7 +34,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at TRACE level.
    *
-   * @param message the given message.
+   * @param message
+   *   the given message.
    */
   def trace(
       message: String
@@ -44,8 +45,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at TRACE level using a field builder function.
    *
-   * @param message the message.
-   * @param f       the field builder function.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def trace(message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -56,8 +59,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at TRACE level with exception.
    *
-   * @param message the message.
-   * @param e       the given exception.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def trace(message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -68,8 +73,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at TRACE level.
    *
-   * @param condition the given condition.
-   * @param message   the message.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
    */
   def trace(condition: Condition, message: String)(implicit
       line: sourcecode.Line,
@@ -80,9 +87,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at TRACE level using a field builder function.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param f         the field builder function.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -93,9 +103,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at TRACE level with exception.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param e         the given exception.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def trace(condition: Condition, message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -121,7 +134,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at DEBUG level.
    *
-   * @param message the given message.
+   * @param message
+   *   the given message.
    */
   def debug(
       message: String
@@ -131,8 +145,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at DEBUG level using a field builder function.
    *
-   * @param message the message.
-   * @param f       the field builder function.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def debug(message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -143,8 +159,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at DEBUG level with exception.
    *
-   * @param message the message.
-   * @param e       the given exception.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def debug(message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -155,8 +173,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at DEBUG level.
    *
-   * @param condition the given condition.
-   * @param message   the message.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
    */
   def debug(condition: Condition, message: String)(implicit
       line: sourcecode.Line,
@@ -167,9 +187,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at DEBUG level with exception.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param e         the given exception.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def debug(condition: Condition, message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -180,9 +203,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at DEBUG level using a field builder function.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param f         the field builder function.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -208,7 +234,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at INFO level.
    *
-   * @param message the given message.
+   * @param message
+   *   the given message.
    */
   def info(
       message: String
@@ -218,8 +245,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at INFO level using a field builder function.
    *
-   * @param message the message.
-   * @param f       the field builder function.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def info(message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -230,8 +259,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at INFO level with exception.
    *
-   * @param message the message.
-   * @param e       the given exception.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def info(message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -242,8 +273,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at INFO level.
    *
-   * @param condition the given condition.
-   * @param message   the message.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
    */
   def info(condition: Condition, message: String)(implicit
       line: sourcecode.Line,
@@ -254,9 +287,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at INFO level using a field builder function.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param f         the field builder function.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -267,9 +303,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Conditionally logs statement at INFO level with exception.
    *
-   * @param condition the given condition.
-   * @param message   the message.
-   * @param e         the given exception.
+   * @param condition
+   *   the given condition.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def info(condition: Condition, message: String, e: Throwable)(implicit
       line: sourcecode.Line,
@@ -295,7 +334,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at WARN level.
    *
-   * @param message the given message.
+   * @param message
+   *   the given message.
    */
   def warn(
       message: String
@@ -305,8 +345,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at WARN level using a field builder function.
    *
-   * @param message the message.
-   * @param f       the field builder function.
+   * @param message
+   *   the message.
+   * @param f
+   *   the field builder function.
    */
   def warn(message: String, f: FB => FieldBuilderResult)(implicit
       line: sourcecode.Line,
@@ -317,8 +359,10 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   /**
    * Logs statement at WARN level with exception.
    *
-   * @param message the message.
-   * @param e       the given exception.
+   * @param message
+   *   the message.
+   * @param e
+   *   the given exception.
    */
   def warn(message: String, e: Throwable)(implicit
       line: sourcecode.Line,

@@ -9,8 +9,7 @@ trait ValueTypeClasses {
   /**
    * The ToValue trait, used for turning scala things into Value.
    *
-   * Most of the time you will define this in your own field builder.
-   * For example to define `java.time.Instant` you could do this:
+   * Most of the time you will define this in your own field builder. For example to define `java.time.Instant` you could do this:
    *
    * {{{
    * trait InstantFieldBuilder extends FieldBuilder {
@@ -34,7 +33,8 @@ trait ValueTypeClasses {
    * })
    * }}}
    *
-   * @tparam T the object type
+   * @tparam T
+   *   the object type
    */
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToValue[${T}]")
@@ -79,7 +79,8 @@ trait ValueTypeClasses {
    * logger.info("{}", fb => fb.array("array", array)
    * }}}
    *
-   * @tparam T the array type.
+   * @tparam T
+   *   the array type.
    */
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToArrayValue[${T}]")
@@ -107,10 +108,10 @@ trait ValueTypeClasses {
   }
 
   /**
-   * ToObjectValue is used when providing an explicit `object` value to
-   * a field builder.  Notable when you have a field or fields in a collection.
+   * ToObjectValue is used when providing an explicit `object` value to a field builder. Notable when you have a field or fields in a collection.
    *
-   * @tparam T the object type
+   * @tparam T
+   *   the object type
    */
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToObjectValue[${T}]")
