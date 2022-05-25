@@ -385,8 +385,16 @@ final class CustomLogger(core: CoreLogger, fieldBuilder: CustomFieldBuilder)
 
 Creating a custom logger can be a good way to ensure that your field builder is used without any extra configuration, and lets you add your own methods and requirements for your application.
 
-You can also provide your own logger from scratch if you want, by only using the API dependency -- this ensures that users only have one logging option and you can add your own metrics and observability around your logging.
+You can also provide your own logger from scratch if you want, by only using the API dependency -- this ensures that users only have one logging option, and you can add your own metrics and observability around your logging.
 
 ```scala
 libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "api" % echopraxiaPlusScalaVersion
 ```
+
+## Conversion to Java
+
+You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.
+
+Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
+
+To enable type enrichment, import the `api` package, or `import com.tersesystems.echopraxia.plusscala.api.Implicits._` explicitly.
