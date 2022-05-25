@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
-import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport}
+import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
@@ -9,7 +9,7 @@ import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 /**
  * Logger with source code implicit parameters.
  */
-class Logger[FB](core: CoreLogger, fieldBuilder: FB)
+class Logger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     extends AbstractLoggerSupport(core, fieldBuilder)
     with LoggerSupport[FB]
     with DefaultLoggerMethods[FB] {
@@ -42,12 +42,12 @@ class Logger[FB](core: CoreLogger, fieldBuilder: FB)
   }
 
   @inline
-  override def withFieldBuilder[NEWFB](newFieldBuilder: NEWFB): Logger[NEWFB] = {
+  override def withFieldBuilder[NEWFB <: SourceCodeFieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
   @inline
-  private def newLogger[T](
+  private def newLogger[T <: SourceCodeFieldBuilder](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
   ): Logger[T] =

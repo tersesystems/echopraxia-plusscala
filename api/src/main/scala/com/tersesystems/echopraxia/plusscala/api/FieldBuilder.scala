@@ -263,6 +263,25 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
 
 }
 
-trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder
+trait SourceCodeFieldBuilder {
+  def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult
+}
+
+trait DefaultSourceCodeFieldBuilder extends SourceCodeFieldBuilder {
+  override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = {
+    Field
+      .keyValue(
+        SourceFieldConstants.sourcecode,
+        Value.`object`(
+          Field.keyValue(SourceFieldConstants.file, Value.string(file)),
+          Field.keyValue(SourceFieldConstants.line, Value.number(line: java.lang.Integer)),
+          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc))
+        )
+      )
+      .asInstanceOf[FieldBuilderResult]
+  }
+}
+
+trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder with DefaultSourceCodeFieldBuilder
 
 object FieldBuilder extends FieldBuilder

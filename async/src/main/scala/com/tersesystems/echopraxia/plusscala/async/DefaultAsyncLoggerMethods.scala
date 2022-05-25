@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceFieldConstants}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder, SourceFieldConstants}
 import sourcecode.{Enclosing, File, Line}
 
 import java.util.function
@@ -11,7 +11,7 @@ import scala.compat.java8.FunctionConverters._
 /**
  * Default Async Logger Methods with source code implicits.
  */
-trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
+trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLoggerMethods[FB] {
   self: DefaultMethodsSupport[FB] =>
 
   // ------------------------------------------------------------------------
@@ -323,7 +323,8 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   // -----------------------------------------------------------
   // Internal methods
 
-  protected def sourceInfoFields(line: Line, file: File, enc: Enclosing): function.Function[FB, FieldBuilderResult] = { _: FB =>
+  @inline
+  private def sourceInfoFields(line: Line, file: File, enc: Enclosing): function.Function[FB, FieldBuilderResult] = { fb: FB =>
     Field
       .keyValue(
         SourceFieldConstants.sourcecode,

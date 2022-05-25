@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
-import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport}
+import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._
@@ -9,7 +9,7 @@ import scala.compat.java8.FunctionConverters._
 /**
  * Async Logger with source code enabled.
  */
-class AsyncLogger[FB](core: CoreLogger, fieldBuilder: FB)
+class AsyncLogger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     extends AbstractLoggerSupport[FB](core, fieldBuilder)
     with LoggerSupport[FB]
     with DefaultAsyncLoggerMethods[FB] {
@@ -40,11 +40,11 @@ class AsyncLogger[FB](core: CoreLogger, fieldBuilder: FB)
   )
 
   @inline
-  override def withFieldBuilder[T](newBuilder: T): AsyncLogger[T] =
+  override def withFieldBuilder[T <: SourceCodeFieldBuilder](newBuilder: T): AsyncLogger[T] =
     newLogger(newFieldBuilder = newBuilder)
 
   @inline
-  private def newLogger[T](
+  private def newLogger[T <: SourceCodeFieldBuilder](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
   ): AsyncLogger[T] =
