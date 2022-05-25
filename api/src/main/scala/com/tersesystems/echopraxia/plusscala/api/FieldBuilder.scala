@@ -177,9 +177,9 @@ trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
 }
 
 trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
-  protected def keyValue[V: ToValue](tuple: (String, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
+  def keyValue[V: ToValue](tuple: (String, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
 
-  protected def value[V: ToValue](tuple: (String, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
+  def value[V: ToValue](tuple: (String, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
 
   def string(tuple: (String, String)): Field = value(tuple)
 
@@ -202,12 +202,12 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // keyValue
 
-  protected def keyValue[V: ToValue](key: String, value: V): Field = Field.keyValue(key, ToValue(value))
+  def keyValue[V: ToValue](key: String, value: V): Field = Field.keyValue(key, ToValue(value))
 
   // ------------------------------------------------------------------
   // value
 
-  protected def value[V: ToValue](key: String, value: V): Field = Field.value(key, ToValue(value))
+  def value[V: ToValue](key: String, value: V): Field = Field.value(key, ToValue(value))
 
   // ------------------------------------------------------------------
   // string
