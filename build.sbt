@@ -69,6 +69,16 @@ lazy val asyncLogger = (project in file("async"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
+lazy val traceLogger = (project in file("trace")).settings(
+  name := "trace-logger",
+
+  libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
+  //
+  libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+  libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+)
+  .dependsOn(api % "compile->compile;test->compile")
+
 lazy val root = (project in file("."))
   .settings(
     Compile / doc / sources                := Seq.empty,
@@ -76,7 +86,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger)
+  .aggregate(api, logger, asyncLogger, traceLogger)
 
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {
