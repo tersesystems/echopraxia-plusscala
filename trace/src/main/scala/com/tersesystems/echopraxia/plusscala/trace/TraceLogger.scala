@@ -1,30 +1,54 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
 import com.tersesystems.echopraxia.api.Level.TRACE
+import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities, Value}
 import com.tersesystems.echopraxia.plusscala.api._
-import sourcecode.{Enclosing, File, Line}
+import sourcecode.{Args, Enclosing, File, Line}
 
 import java.util.Objects
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
-trait ArgumentFieldBuilder {
-  def argumentFields(args: sourcecode.Args): FieldBuilderResult
+trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+  def entering(args: sourcecode.Args): FieldBuilderResult
+
+  def exiting(value: Value[_]): FieldBuilderResult
+
+  def throwing(ex: Throwable): FieldBuilderResult
 }
 
-trait DefaultArgumentFieldBuilder extends ArgumentFieldBuilder { self: FieldBuilder =>
-  override def argumentFields(args: sourcecode.Args): FieldBuilderResult = {
-    val argsValue = ToArrayValue(args.value.map { list =>
+trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
+  import DefaultTracingFieldBuilder._
+
+  override def entering(args: sourcecode.Args): FieldBuilderResult = {
+    val argsValue: Value.ArrayValue = ToArrayValue(args.value.map { list =>
       ToArrayValue(list.map { txt =>
         keyValue(txt.source, Objects.toString(txt.value))
       })
     })
-    array("args", argsValue)
+    list(string(Trace, Entry), keyValue(DefaultTracingFieldBuilder.Args, argsValue))
+  }
+
+  override def exiting(value: Value[_]): FieldBuilderResult = {
+    list(string(Trace, Exit), keyValue(Result, value))
+  }
+
+  override def throwing(ex: Throwable): FieldBuilderResult = {
+    list(string(Trace, Throwing), exception(ex))
   }
 }
 
-class TraceLogger[FB <: FieldBuilder with ArgumentFieldBuilder](core: CoreLogger, fieldBuilder: FB)
+object DefaultTracingFieldBuilder {
+  val Trace: String = "trace"
+  val Entry: String = "entry"
+  val Exit: String = "exit"
+  val Throwing: String = "throwing"
+  val Args: String = "args"
+  val Result: String = "result"
+}
+
+
+class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   extends AbstractLoggerSupport(core, fieldBuilder) with LoggerSupport[FB] {
 
   @inline
@@ -32,6 +56,10 @@ class TraceLogger[FB <: FieldBuilder with ArgumentFieldBuilder](core: CoreLogger
     condition match {
       case Condition.always =>
         this
+      case Condition.never =>
+        new TraceLogger[FB](core, fieldBuilder){
+          override def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+        }
       case other =>
         newLogger(newCoreLogger = core.withCondition(other.asJava))
     }
@@ -50,39 +78,36 @@ class TraceLogger[FB <: FieldBuilder with ArgumentFieldBuilder](core: CoreLogger
   }
 
   @inline
-  def withFieldBuilder[NEWFB <: FieldBuilder with ArgumentFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
+  def withFieldBuilder[NEWFB <: TracingFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
-  // XXX needs better control over the fields used to indicate entry state.
   // XXX Needs some tests
-  // XXX Needs to handle conditions?  Shortcut on never condition?
-  // XXX trace entry/exit/throwing needs to be handled through field builder
   def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: sourcecode.Args): B = {
-    val srcF: FB => FieldBuilderResult = fb => fb.sourceCodeFields(line.value, file.value, enc.value)
-    val coreWithFields = core.withFields(srcF.asJava, fieldBuilder)
-    val entryF: FB => FieldBuilderResult = fb => fb.string("trace", "entry") ++ fb.argumentFields(args)
-    coreWithFields.log(TRACE, "{}: {}", entryF.asJava, fieldBuilder)
-    val result = Try(attempt)
-    result match {
-      case Success(ret) =>
-        val f: FB => FieldBuilderResult = fb => {
-          val retValue = implicitly[FB#ToValue[B]].toValue(ret)
-          fb.string("trace", "exit") ++ fb.keyValue("result", retValue)
-        }
-        coreWithFields.log(TRACE, "{}: {}", f.asJava, fieldBuilder)
-      case Failure(ex) =>
-        val f: FB => FieldBuilderResult = fb => fb.string("trace", "throwing") ++ fb.exception(ex)
-        core.log(TRACE, "{}: {}", f.asJava, fieldBuilder)
+    if (! core.isEnabled(TRACE)) {
+      attempt
+    } else {
+      val srcF: FB => FieldBuilderResult = fb => fb.sourceCodeFields(line.value, file.value, enc.value)
+      val coreWithFields = core.withFields(srcF.asJava, fieldBuilder)
+
+      val entryF: FB => FieldBuilderResult = fb => fb.entering(args)
+      coreWithFields.log(TRACE, "{}: {}", entryF.asJava, fieldBuilder)
+
+      val result = Try(attempt)
+      val exitF: FB => FieldBuilderResult = result match {
+        case Success(ret) => _.exiting(implicitly[FB#ToValue[B]].toValue(ret))
+        case Failure(ex) => _.throwing(ex)
+      }
+      coreWithFields.log(TRACE, "{}: {}", exitF.asJava, fieldBuilder)
+      result.get // rethrow the exception
     }
-    result.get // rethrow the exception
   }
 
   @inline
-  private def newLogger[T <: FieldBuilder with ArgumentFieldBuilder](
+  private def newLogger[T <: TracingFieldBuilder](
                                                       newCoreLogger: CoreLogger = core,
                                                       newFieldBuilder: T = fieldBuilder
                                                     ): TraceLogger[T] =
     new TraceLogger[T](newCoreLogger, newFieldBuilder)
-
 }
+

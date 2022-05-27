@@ -7,22 +7,22 @@ import java.util.stream.Collectors
 
 trait LowPriorityImplicits {
 
-  implicit class RichCondition(javaCondition: JCondition) {
+  final implicit class RichCondition(javaCondition: JCondition) {
     @inline
     def asScala: Condition = Condition((level, context) => javaCondition.test(level.asJava, context.asJava))
   }
 
-  implicit class RichLoggingContext(context: JLoggingContext) {
+  final implicit class RichLoggingContext(context: JLoggingContext) {
     @inline
     def asScala: LoggingContext = new ScalaLoggingContext(context)
   }
 
-  implicit class RichLevel(level: JLevel) {
+  final implicit class RichLevel(level: JLevel) {
     @inline
     def asScala: Level = Level.asScala(level)
   }
 
-  implicit class RichFieldBuilderResult(result: JFieldBuilderResult) {
+  final implicit class RichFieldBuilderResult(result: JFieldBuilderResult) {
     @inline
     def concat(other: JFieldBuilderResult): JFieldBuilderResult = {
       () => stream.Stream.concat(result.fields().stream(), other.fields().stream()).collect(Collectors.toList())

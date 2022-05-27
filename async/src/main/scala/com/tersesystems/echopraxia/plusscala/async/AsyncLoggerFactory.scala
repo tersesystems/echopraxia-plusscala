@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import sourcecode.FullName
 
 /**
  * Async Logger Factory with source code enabled.
