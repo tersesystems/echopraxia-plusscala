@@ -84,14 +84,14 @@ trait ValueTypeClasses {
    */
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToArrayValue[${T}]")
-  trait ToArrayValue[-T] {
-    def toArrayValue(t: T): Value.ArrayValue
+  trait ToArrayValue[-T] extends ToValue[T] {
+    def toValue(t: T): Value.ArrayValue
   }
 
   object ToArrayValue {
 
     def apply[T: ToArrayValue](array: T): Value.ArrayValue =
-      implicitly[ToArrayValue[T]].toArrayValue(array)
+      implicitly[ToArrayValue[T]].toValue(array)
 
     implicit val identityArrayValue: ToArrayValue[Value.ArrayValue] = identity(_)
 
@@ -115,14 +115,14 @@ trait ValueTypeClasses {
    */
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToObjectValue[${T}]")
-  trait ToObjectValue[-T] {
-    def toObjectValue(t: T): Value.ObjectValue
+  trait ToObjectValue[-T] extends ToValue[T] {
+    def toValue(t: T): Value.ObjectValue
   }
 
   object ToObjectValue {
 
     def apply[T: ToObjectValue](obj: T): Value.ObjectValue =
-      implicitly[ToObjectValue[T]].toObjectValue(obj)
+      implicitly[ToObjectValue[T]].toValue(obj)
 
     def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
 
@@ -241,7 +241,7 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // null
 
-  def nullField(name: String): Field = keyValue(name, Value.nullValue())
+  def nullField(name: String): Field = Field.keyValue(name, Value.nullValue())
 
   // ------------------------------------------------------------------
   // exception

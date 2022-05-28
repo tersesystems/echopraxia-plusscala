@@ -212,6 +212,50 @@ trait OptionFieldBuilder extends FieldBuilder {
 }
 ```
 
+## Automatic Type Class Derivation
+
+You can incorporate automatic type class derivation by adding the `ToValueDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
+
+```scala
+import com.tersesystems.echopraxia.plusscala.LoggerFactory
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.auto.ToValueDerivation
+
+trait GenericFieldBuilder extends FieldBuilder with ToValueDerivation
+
+object GenericFieldBuilder extends GenericFieldBuilder
+
+final case class IceCream(name: String, numCherries: Int, inCone: Boolean)
+final case class EntityId(raw: Int) extends AnyVal
+final case class Bar(underlying: String) extends AnyVal
+final case class Foo(bar: Bar)
+
+object GenericMain {
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(GenericFieldBuilder)
+
+  def main(args: Array[String]): Unit = {
+    logger.info("{}", _.keyValue("icecream", IceCream("sundae", 1, false)))
+    logger.info("{}", _.keyValue("entityId", EntityId(1)))
+    logger.info("{}", _.keyValue("foo", Foo(Bar("underlying"))))
+  }
+}
+```
+
+produces
+
+```
+15:55:43.104 [main] INFO com.example.GenericMain$ - icecream={name=sundae, numCherries=1, inCone=false}
+15:55:43.109 [main] INFO com.example.GenericMain$ - entityId=1
+15:55:43.111 [main] INFO com.example.GenericMain$ - foo={bar=underlying}
+```
+
+Note that this feature depends on Scala reflection and macros.  To install, add the following dependencies:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "auto" % "0.1.1-SNAPSHOT"
+libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
+```
+
 ## Conditions
 
 Conditions in the Scala API use Scala idioms and classes.  The `find` methods in the logging context are converted to Scala, so `java.math.BigInteger` is converted to `BigInt`, for example:
