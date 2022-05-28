@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.api.Level.TRACE
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities, Value}
+import com.tersesystems.echopraxia.api.{CoreLogger, Field, FieldBuilderResult, Utilities, Value}
 import com.tersesystems.echopraxia.plusscala.api._
-import sourcecode.{Args, Enclosing, File, FullName, Line}
+import sourcecode.{Args, Enclosing, File, FullName, Line, Text}
 
 import java.util.Objects
 import scala.compat.java8.FunctionConverters._
@@ -20,12 +20,12 @@ trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
   import DefaultTracingFieldBuilder._
 
+  def argumentField(txt: Text[_]): Field = {
+    keyValue(txt.source, Value.string(Objects.toString(txt.value)))
+  }
+
   override def entering(method: sourcecode.FullName, args: sourcecode.Args): FieldBuilderResult = {
-    val argsValue: Value.ArrayValue = ToArrayValue(args.value.map { list =>
-      ToArrayValue(list.map { txt =>
-        keyValue(txt.source, Objects.toString(txt.value))
-      })
-    })
+    val argsValue = ToArrayValue(args.value.map(list => ToArrayValue(list.map(argumentField))))
     value(Trace, ToObjectValue(keyValue(Method, method.value), keyValue("tag", Entry), keyValue(Arguments, argsValue)))
   }
 

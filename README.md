@@ -2,6 +2,7 @@
 
 The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types.  It is compiled for Scala 2.12 and Scala 2.13.
 
+
 ## Logger
 
 Add the following to your `build.sbt` file:
@@ -90,6 +91,58 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
   log("async expensive result {}", _.string("result", result)) // handle does not evaluate
 }
 ```
+
+## Trace Logger
+
+You can use a trace logger to debug methods and interactions in your code.  This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
+
+```scala
+def myMethod = traceLogger.trace {
+  // ... logic
+}
+```
+
+The behavior of the trace logger is determined by `TracingFieldBuilder`.  You can extend `DefaultTracingFieldBuilder` and override various bits of functionality.  Trace logging works particularly well with automatic derivation:
+
+```scala
+object TraceMain {
+
+  trait TraceFieldBuilder extends DefaultTracingFieldBuilder with ToValueDerivation {
+    override def argumentField(txt: Text[_]): Field = {
+      // you can override how arguments are presented
+      value(txt.source, Objects.toString(txt.value))
+    }
+  }
+  object TraceFieldBuilder extends TraceFieldBuilder
+
+  private val traceLogger = TraceLoggerFactory.getLogger.withFieldBuilder(TraceFieldBuilder)
+
+  private def createFoo(barValue: String): Foo = traceLogger.trace {
+    Foo(Bar(barValue))
+  }
+
+  def main(args: Array[String]): Unit = {
+    val foo = createFoo("bar value")
+    println(s"foo = $foo")
+  }
+}
+```
+
+produces the following:
+
+```
+16:45:24.839 TRACE [main]: {method=com.example.TraceMain.createFoo, tag=entry, arguments=[[{bar value}]]}
+16:45:24.885 TRACE [main]: {com.example.TraceMain.createFoo, exit, result={bar=bar value}}
+foo = Foo(Bar(bar value))
+```
+
+## API
+
+You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.
+
+Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
+
+To enable type enrichment, import the `api` package, or `import com.tersesystems.echopraxia.plusscala.api.Implicits._` explicitly.
 
 ## Field Builder
 
@@ -434,11 +487,3 @@ You can also provide your own logger from scratch if you want, by only using the
 ```scala
 libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "api" % echopraxiaPlusScalaVersion
 ```
-
-## Conversion to Java
-
-You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.
-
-Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
-
-To enable type enrichment, import the `api` package, or `import com.tersesystems.echopraxia.plusscala.api.Implicits._` explicitly.
