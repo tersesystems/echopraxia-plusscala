@@ -42,15 +42,12 @@ lazy val api = (project in file("api"))
   .settings(
     name := "api",
     //
+    libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
     libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
   )
-
-lazy val auto = (project in file("auto")).settings(
-  libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
-  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
-).dependsOn(api % "compile->compile;test->compile")
 
 lazy val logger = (project in file("logger"))
   .settings(
@@ -91,7 +88,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, auto, logger, asyncLogger, traceLogger)
+  .aggregate(api, logger, asyncLogger, traceLogger)
 
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {

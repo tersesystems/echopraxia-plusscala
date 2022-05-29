@@ -68,6 +68,14 @@ trait ValueTypeClasses {
     // use fb.nullField("foo") instead.
     // implicit val nullToValue: ToValue[Nothing] = bool => Value.nullValue()
 
+    // Derivation makes a mess of Option, because it thinks it's a regular case class.
+    // Adding optionToValue as a trait makes it too low priority, so add it here.
+    implicit def optionToValue[V: ToValue]: ToValue[Option[V]] = {
+      case Some(v) => ToValue(v)
+      case None => Value.nullValue()
+    }
+    implicit val noneToValue: ToValue[None.type] = _ => Value.nullValue()
+
     implicit val throwableToValue: ToValue[Throwable] = e => Value.exception(e)
   }
 
@@ -135,7 +143,6 @@ trait ValueTypeClasses {
     implicit val immutableIterableToObjectValue: ToObjectValue[collection.immutable.Iterable[Field]] =
       t => Value.`object`(t.toArray: _*)
   }
-
 }
 
 trait FieldBuilderResultTypeClasses {
