@@ -46,6 +46,8 @@ lazy val api = (project in file("api"))
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
+
+    // XXX only include collection-compat if we're on 2.12
     libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
   )
 

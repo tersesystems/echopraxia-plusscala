@@ -2,11 +2,8 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.{Field, Value}
 
-import language.experimental.macros
-import magnolia1._
-
-import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
+import magnolia1._
 
 /**
  * This trait uses Magnolia to provide generic type class derivation
@@ -41,47 +38,58 @@ import scala.language.experimental.macros
 sealed trait Derivation extends ValueTypeClasses {
   type Typeclass[T] = ToValue[T]
 
+  type CaseClass[T] = magnolia1.CaseClass[Typeclass, T]
+  type SealedTrait[T] = magnolia1.SealedTrait[Typeclass, T]
+
+  // https://github.com/scanamo/scanamo/pull/538
+  // https://github.com/softwaremill/magnolia/issues/267
+  // https://github.com/spotify/magnolify
+  // https://www.lyh.me/magnolify.html
+  // https://github.com/vpavkin/circe-magnolia/blob/master/derivation/src/main/scala/io/circe/magnolia/MagnoliaDecoder.scala
+
+  // logger.info("{}", _.keyValue("none", None)
+  // how do I say there's no derivation here?  Just leave the default?
+  // fallback: ensure that field builders can special case using the protected join* methods
+
   // leave this as public so we can access the macro "stack trace" when calling
   //     AutoFieldBuilder.gen[Option[Instant]]
   // for debugging purposes:
   // https://github.com/softwaremill/magnolia/tree/scala2#debugging
-  final def join[T](ctx: CaseClass[Typeclass, T]): Typeclass[T] = {
+  final def join[T](ctx: CaseClass[T]): Typeclass[T] = {
       if (ctx.isValueClass) {
-        val param = ctx.parameters.head
-        value => param.typeclass.toValue(param.dereference(value))
-      } else if (ctx.isObject) { // a case object
-
-
-        // https://www.lyh.me/magnolify.html
-        // https://github.com/scanamo/scanamo/pull/538
-        // https://github.com/softwaremill/magnolia/issues/267
-        // Magnolify
-
-        // logger.info("{}", _.keyValue("none", None)
-        // how do I say there's no derivation here?
-        //    {
-        //      if (ctx.parameters.isEmpty) {
-        //        // if this is a None, render null.
-        //        // if this is an array, render an empty array.
-        //        // if this is an empty tuple, what do?
-        //        Value.ArrayValue.EMPTY
-        //      } else {
-        //        throw new IllegalStateException(s"${ctx.typeName}")
-        //      }
-        //    }
-        value => Value.exception(new IllegalStateException(s"${ctx.typeName} for ${value}"))
-      } else { // this is a regular case class
-        value => {
-          val fields: Seq[Field] = ctx.parameters.map { p =>
-            Field.keyValue(p.label, p.typeclass.toValue(p.dereference(value)))
-          }
-          val typeInfoField = Field.keyValue("@type", Value.string(ctx.typeName.full))
-          Value.`object`((fields :+ typeInfoField).asJava)
-        }
+        joinValueClass(ctx)
+      } else if (ctx.isObject) {
+        joinCaseObject(ctx)
+      } else {
+        joinCaseClass(ctx)
       }
   }
 
-  final def split[T](ctx: SealedTrait[Typeclass, T]): Typeclass[T] = (value: T) => {
+  // this is a regular case class
+  protected def joinCaseClass[T](ctx: CaseClass[T]): Typeclass[T] = {
+    value => {
+      val typeInfo = Field.keyValue("@type", ToValue(ctx.typeName.full))
+      val fields: Seq[Field] = ctx.parameters.map { p =>
+        Field.keyValue(p.label, p.typeclass.toValue(p.dereference(value)))
+      }
+      ToObjectValue(typeInfo +: fields)
+    }
+  }
+
+  // this is a case object, we can't do anything with it.
+  protected def joinCaseObject[T](ctx: CaseClass[T]): Typeclass[T]  = {
+    // ctx has no parameters, so we're better off just passing it straight through.
+    value => Value.string(value.toString)
+  }
+
+  // this is a value class aka AnyVal
+  protected def joinValueClass[T](ctx: CaseClass[T]): Typeclass[T]  = {
+    val param = ctx.parameters.head
+    value => param.typeclass.toValue(param.dereference(value))
+  }
+
+  // this is a sealed trait
+  def split[T](ctx: SealedTrait[T]): Typeclass[T] = (value: T) => {
     ctx.split(value) { sub =>
       sub.typeclass.toValue(sub.cast(value))
     }
