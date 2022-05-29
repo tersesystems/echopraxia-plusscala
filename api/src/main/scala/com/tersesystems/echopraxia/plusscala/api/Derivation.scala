@@ -10,8 +10,8 @@ import magnolia1._
  * for case classes and sealed traits.  Note that you need to include
  * the `scala-reflect` library to use it, see installation instructions.
  *
- * If you create a field builder that extends GenericValueTypeClasses,
- * then any case class that devolves down to the basic values is available:
+ * If you create a field builder that uses derivation, it will automatically
+ * log case classes where all the attributes have `ToValue` type classes in scope.
  *
  * {{{
  * final case class IceCream(name: String, numCherries: Int, inCone: Boolean)
@@ -82,7 +82,7 @@ sealed trait Derivation extends ValueTypeClasses {
     value => Value.string(value.toString)
   }
 
-  // this is a value class aka AnyVal
+  // this is a value class aka AnyVal, we should pass it through.
   protected def joinValueClass[T](ctx: CaseClass[T]): Typeclass[T]  = {
     val param = ctx.parameters.head
     value => param.typeclass.toValue(param.dereference(value))
@@ -108,4 +108,26 @@ trait AutoDerivation extends Derivation {
  */
 trait SemiAutoDerivation extends Derivation {
   final def gen[T]: Typeclass[T] = macro Magnolia.gen[T]
+}
+
+/**
+ * This trait renders case classes in key=value format, without the `@type` associated with case classes.
+ */
+trait KeyValueCaseClassDerivation { self: Derivation =>
+  override protected def joinCaseClass[T](ctx: CaseClass[T]): Typeclass[T] = { v =>
+    ToObjectValue(ctx.parameters.map { p =>
+      Field.keyValue(p.label, p.typeclass.toValue(p.dereference(v)))
+    })
+  }
+}
+
+/**
+ * This trait renders case classes in value format, without the `@type` associated with case classes.
+ */
+trait ValueCaseClassDerivation { self: Derivation =>
+  override protected def joinCaseClass[T](ctx: CaseClass[T]): Typeclass[T] = { v =>
+    ToObjectValue(ctx.parameters.map { p =>
+      Field.value(p.label, p.typeclass.toValue(p.dereference(v)))
+    })
+  }
 }
