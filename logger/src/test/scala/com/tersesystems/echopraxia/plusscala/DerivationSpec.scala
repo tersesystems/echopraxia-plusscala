@@ -27,20 +27,26 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   object AutoFieldBuilder extends AutoFieldBuilder
 
   trait SemiAutoFieldBuilder extends FieldBuilder with SemiAutoDerivation {
-    implicit val userToValue: ToValue[User] = gen[User]
-    implicit val lineItemToValue: ToValue[LineItem] = gen[LineItem]
-    implicit val skuToValue: ToValue[Sku] = gen[Sku]
-    implicit val paymentInfoToValue: ToValue[PaymentInfo] = gen[PaymentInfo]
-    implicit val shippingInfoToValue: ToValue[ShippingInfo] = gen[ShippingInfo]
-    implicit val orderToValue: ToValue[Order] = gen[Order]
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
-    implicit val someObjectToValue: ToValue[SomeObject.type] = gen[SomeObject.type]
-    implicit val someIdToValue: ToValue[SomeId] = gen[SomeId]
+    // XXX there is an NPE bug in Magnolia -- the Instant implicit must be defined
+    // BEFORE the payment info implicit, or the resolve will fail at runtime
+    // an easy way to get around this is to define everything with lazy val
+    // and that will delay initialization long enough.
+    // https://github.com/softwaremill/magnolia/issues/402
+    implicit lazy val userToValue: ToValue[User]                 = gen[User]
+    implicit lazy val lineItemToValue: ToValue[LineItem]         = gen[LineItem]
+    implicit lazy val skuToValue: ToValue[Sku]                   = gen[Sku]
+    implicit lazy val paymentInfoToValue: ToValue[PaymentInfo]   = gen[PaymentInfo]
+    implicit lazy val shippingInfoToValue: ToValue[ShippingInfo] = gen[ShippingInfo]
+    implicit lazy val orderToValue: ToValue[Order]               = gen[Order]
+
+    implicit lazy val someObjectToValue: ToValue[SomeObject.type] = gen[SomeObject.type]
+    implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
   }
   object SemiAutoFieldBuilder extends SemiAutoFieldBuilder
 
-  trait KeyValueOnly extends FieldBuilder with SemiAutoDerivation with KeyValueCaseClassDerivation
+  trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
 
   trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
 
@@ -72,7 +78,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should derive a tuple") {
-      autoLogger.info("{}", _.keyValue("tuple", (1,2,3,4)))
+      autoLogger.info("{}", _.keyValue("tuple", (1, 2, 3, 4)))
     }
   }
 
