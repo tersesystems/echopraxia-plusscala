@@ -70,10 +70,10 @@ sealed trait Derivation extends ValueTypeClasses {
   protected def joinCaseClass[T](ctx: CaseClass[T]): Typeclass[T] = { obj =>
     val typeInfo = Field.keyValue("@type", ToValue(ctx.typeName.full))
     val fields: Seq[Field] = ctx.parameters.map { p =>
-      val name: String = p.label
-      val attribute = p.dereference(obj)
-      val typeclassInstance = Objects.requireNonNull(p.typeclass, "type class is null!")
-      val value: Value[_] = typeclassInstance.toValue(attribute)
+      val name: String      = p.label
+      val attribute         = p.dereference(obj)
+      val typeclassInstance = Objects.requireNonNull(p.typeclass, "Null typeclass!  Please see https://github.com/softwaremill/magnolia/issues/402")
+      val value: Value[_]   = typeclassInstance.toValue(attribute)
       Field.keyValue(name, value)
     }
     ToObjectValue(typeInfo +: fields)

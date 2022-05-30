@@ -268,10 +268,12 @@ object AutoFieldBuilder extends AutoFieldBuilder
 
 trait SemiAutoFieldBuilder extends FieldBuilder with SemiAutoDerivation
 object SemiAutoFieldBuilder extends SemiAutoFieldBuilder {
-  implicit val iceCreamToValue: ToValue[IceCream] = gen[IceCream]
-  implicit val entityIdToValue: ToValue[EntityId] = gen[EntityId]
-  implicit val barToValue: ToValue[Bar] = gen[Bar]
-  implicit val fooToValue: ToValue[Foo] = gen[Foo]
+  // Please use `implicit lazy val` in semi-automatic derivation as a workaround
+  // for https://github.com/softwaremill/magnolia/issues/402
+  implicit lazy val iceCreamToValue: ToValue[IceCream] = gen[IceCream]
+  implicit lazy val entityIdToValue: ToValue[EntityId] = gen[EntityId]
+  implicit lazy val barToValue: ToValue[Bar] = gen[Bar]
+  implicit lazy val fooToValue: ToValue[Foo] = gen[Foo]
 }
 
 object GenericMain {
@@ -289,6 +291,91 @@ object GenericMain {
   }
 }
 ```
+
+Because automatic derivation creates fields and values automatically, decisions made about the format and structure are made by modifying the field builder.
+
+### Type and Key Value
+
+The default is to create a `@type` field and include it with the case class, and render all values as key value pairs.  For example, 
+
+```scala
+logger.info("{}", _.keyValue("tuple", (1,2,3,4)))
+```
+
+would log the following: 
+
+```
+tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}
+```
+
+### Key Value Only
+
+The `KeyValueCaseClassDerivation` will render only `key=value` format, without the `@type` field:
+
+```scala
+trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
+object KeyValueOnly extends KeyValueOnly
+logger.withFieldBuilder(KeyValueOnly).info("{}", _.keyValue("tuple", (1,2,3,4)))
+```
+
+logs the following:
+
+```
+tuple={_1=1, _2=2, _3=3, _4=4}
+```
+
+### Value Only
+
+The `ValueCaseClassDerivation` will render only `value` format, without the `@type` field:
+
+```scala
+trait ValueOnly extends FieldBuilder with AutoDerivation with ValueCaseClassDerivation
+object ValueOnly extends ValueOnly
+logger.withFieldBuilder(ValueOnly).info("{}", _.keyValue("tuple", (1,2,3,4)))
+```
+
+logs the following:
+
+```
+tuple={1, 2, 3, 4}
+```
+
+### Option and Either
+
+`Option` and `Either` are treated as regular case classes by default:
+
+```scala
+autoLogger.info("{}", _.keyValue("some", Option(1)))
+autoLogger.info("{}", _.keyValue("none", None))
+autoLogger.info("{}", _.keyValue("right", Right(true)))
+autoLogger.info("{}", _.keyValue("left", Left(false)))
+```
+
+produces:
+
+```
+12:32:36.294 [main] INFO com.example.GenericMain$ - some={value=1}
+12:32:36.295 [main] INFO com.example.GenericMain$ - none=None
+12:32:36.298 [main] INFO com.example.GenericMain$ - right={value=true}
+12:32:36.300 [main] INFO com.example.GenericMain$ - left={value=false}
+```
+
+To collapse `Option` and `Either` down to a direct value use `EitherValueTypes` and `OptionValueTypes`:
+
+```scala
+trait ShortFieldBuilder extends FieldBuilder with AutoDerivation with EitherValueTypes with OptionValueTypes
+```
+
+produces the following logs:
+
+```
+12:35:13.566 [main] INFO com.example.GenericMain$ - some=1
+12:35:13.567 [main] INFO com.example.GenericMain$ - none=null
+12:35:13.570 [main] INFO com.example.GenericMain$ - right=true
+12:35:13.571 [main] INFO com.example.GenericMain$ - left=false
+```
+
+You can also use `EitherValueTypes` and `OptionValueTypes` in regular field builders for the implicits.
 
 ## Conditions
 
