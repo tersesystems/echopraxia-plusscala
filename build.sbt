@@ -33,7 +33,7 @@ ThisBuild / scalaVersion       := scala212
 ThisBuild / crossScalaVersions := scalaVersions
 ThisBuild / scalacOptions      := scalacOptionsVersion(scalaVersion.value)
 
-//ThisBuild / Compile / scalacOptions ++= optimizeInline
+ThisBuild / Compile / scalacOptions ++= optimizeInline
 
 ThisBuild / Test / parallelExecution := false
 Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
@@ -43,12 +43,10 @@ lazy val api = (project in file("api"))
     name := "api",
     //
     libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
-
-    // XXX only include collection-compat if we're on 2.12
-    libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
+    libraryDependencies ++= compatLibraries(scalaVersion.value)
   )
 
 lazy val logger = (project in file("logger"))
@@ -92,6 +90,16 @@ lazy val root = (project in file("."))
   )
   .aggregate(api, logger, asyncLogger, traceLogger)
 
+def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, n)) if n == 12 =>
+      // only need collection compat in 2.12
+      Seq("org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0")
+    case other =>
+      Nil
+  }
+}
+
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, n)) if n >= 13 =>
@@ -111,7 +119,7 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Xsource:2.13",
         "-release",
         "8"
-      ) ++ optimizeInline
+      )
     case Some((2, n)) if n == 12 =>
       Seq(
         "-unchecked",
@@ -131,7 +139,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-release",
         "8"
       )
-
   }
 }
 

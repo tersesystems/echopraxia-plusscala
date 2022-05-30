@@ -39,18 +39,18 @@ trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
 }
 
 object DefaultTracingFieldBuilder {
-  val Trace: String = "trace"
-  val Entry: String = "entry"
-  val Exit: String = "exit"
-  val Throwing: String = "throwing"
+  val Trace: String     = "trace"
+  val Entry: String     = "entry"
+  val Exit: String      = "exit"
+  val Throwing: String  = "throwing"
   val Arguments: String = "arguments"
-  val Result: String = "result"
-  val Method = "method"
+  val Result: String    = "result"
+  val Method            = "method"
 }
 
-
 class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
-  extends AbstractLoggerSupport(core, fieldBuilder) with LoggerSupport[FB] {
+    extends AbstractLoggerSupport(core, fieldBuilder)
+    with LoggerSupport[FB] {
 
   @inline
   override def withCondition(condition: Condition): TraceLogger[FB] = {
@@ -58,8 +58,9 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
       case Condition.always =>
         this
       case Condition.never =>
-        new TraceLogger[FB](core, fieldBuilder){
-          override def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = attempt
+        new TraceLogger[FB](core, fieldBuilder) {
+          override def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B =
+            attempt
         }
       case other =>
         newLogger(newCoreLogger = core.withCondition(other.asJava))
@@ -84,12 +85,14 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   }
 
   // XXX Needs some tests
-  def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, fullname: sourcecode.FullName, enc: Enclosing, args: sourcecode.Args): B = {
-    if (! core.isEnabled(TRACE)) {
+  def trace[B: FB#ToValue](
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: sourcecode.FullName, enc: Enclosing, args: sourcecode.Args): B = {
+    if (!core.isEnabled(TRACE)) {
       attempt
     } else {
       val srcF: FB => FieldBuilderResult = fb => fb.sourceCodeFields(line.value, file.value, enc.value)
-      val coreWithFields = core.withFields(srcF.asJava, fieldBuilder)
+      val coreWithFields                 = core.withFields(srcF.asJava, fieldBuilder)
 
       val entryF: FB => FieldBuilderResult = fb => fb.entering(fullname, args)
       coreWithFields.log(TRACE, "{}", entryF.asJava, fieldBuilder)
@@ -97,7 +100,7 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
       val result = Try(attempt)
       val exitF: FB => FieldBuilderResult = result match {
         case Success(ret) => _.exiting(fullname, implicitly[FB#ToValue[B]].toValue(ret))
-        case Failure(ex) => _.throwing(fullname, ex)
+        case Failure(ex)  => _.throwing(fullname, ex)
       }
       coreWithFields.log(TRACE, "{}", exitF.asJava, fieldBuilder)
       result.get // rethrow the exception
@@ -106,9 +109,8 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
   @inline
   private def newLogger[T <: TracingFieldBuilder](
-                                                      newCoreLogger: CoreLogger = core,
-                                                      newFieldBuilder: T = fieldBuilder
-                                                    ): TraceLogger[T] =
+      newCoreLogger: CoreLogger = core,
+      newFieldBuilder: T = fieldBuilder
+  ): TraceLogger[T] =
     new TraceLogger[T](newCoreLogger, newFieldBuilder)
 }
-

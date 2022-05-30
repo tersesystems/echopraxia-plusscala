@@ -258,12 +258,6 @@ trait MapFieldBuilder extends FieldBuilder {
 
 You can incorporate automatic type class derivation by adding the `AutoDerivation` or `SemiAutoDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
 
-Note that this feature depends on Scala reflection, so you must add:
-
-```scala
-libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
-```
-
 Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly.  The example hopefully explains the difference:
 
 ```scala
