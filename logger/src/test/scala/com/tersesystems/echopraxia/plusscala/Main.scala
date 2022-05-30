@@ -7,7 +7,7 @@ import java.time.Instant
 
 object Main {
 
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder).withCondition(Condition.always)
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
 
   case class Book(category: String, author: String, title: String, price: Double)
 

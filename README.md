@@ -107,7 +107,7 @@ The behavior of the trace logger is determined by `TracingFieldBuilder`.  You ca
 ```scala
 object TraceMain {
 
-  trait TraceFieldBuilder extends DefaultTracingFieldBuilder with ToValueDerivation {
+  trait TraceFieldBuilder extends DefaultTracingFieldBuilder with AutoDerivation {
     override def argumentField(txt: Text[_]): Field = {
       // you can override how arguments are presented
       value(txt.source, Objects.toString(txt.value))
@@ -254,59 +254,40 @@ trait MapFieldBuilder extends FieldBuilder {
 }
 ```
 
-or make `Option[V]` return either a value or a null: 
-
-```scala
-trait OptionFieldBuilder extends FieldBuilder {
-  implicit def optionToValue[V: ToValue]: ToValue[Option[V]] = {
-    case Some(v) => ToValue(v)
-    case None => Value.nullValue()
-  }
-}
-```
-
 ## Automatic Type Class Derivation
 
-You can incorporate automatic type class derivation by adding the `ToValueDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
+You can incorporate automatic type class derivation by adding the `AutoDerivation` or `SemiAutoDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
+
+Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly.  The example hopefully explains the difference:
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.LoggerFactory
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.plusscala.auto.ToValueDerivation
+import com.tersesystems.echopraxia.plusscala.api._
 
-trait GenericFieldBuilder extends FieldBuilder with ToValueDerivation
+trait AutoFieldBuilder extends FieldBuilder with AutoDerivation
+object AutoFieldBuilder extends AutoFieldBuilder
 
-object GenericFieldBuilder extends GenericFieldBuilder
-
-final case class IceCream(name: String, numCherries: Int, inCone: Boolean)
-final case class EntityId(raw: Int) extends AnyVal
-final case class Bar(underlying: String) extends AnyVal
-final case class Foo(bar: Bar)
+trait SemiAutoFieldBuilder extends FieldBuilder with SemiAutoDerivation
+object SemiAutoFieldBuilder extends SemiAutoFieldBuilder {
+  implicit val iceCreamToValue: ToValue[IceCream] = gen[IceCream]
+  implicit val entityIdToValue: ToValue[EntityId] = gen[EntityId]
+  implicit val barToValue: ToValue[Bar] = gen[Bar]
+  implicit val fooToValue: ToValue[Foo] = gen[Foo]
+}
 
 object GenericMain {
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(GenericFieldBuilder)
+  private val autoLogger = LoggerFactory.getLogger.withFieldBuilder(AutoFieldBuilder)
+  private val semiAutoLogger = LoggerFactory.getLogger.withFieldBuilder(SemiAutoFieldBuilder)
 
   def main(args: Array[String]): Unit = {
-    logger.info("{}", _.keyValue("icecream", IceCream("sundae", 1, false)))
-    logger.info("{}", _.keyValue("entityId", EntityId(1)))
-    logger.info("{}", _.keyValue("foo", Foo(Bar("underlying"))))
+    autoLogger.info("{}", _.keyValue("icecream", IceCream("sundae", 1, false)))
+    autoLogger.info("{}", _.keyValue("entityId", EntityId(1)))
+    autoLogger.info("{}", _.keyValue("foo", Foo(Bar("underlying"))))
+
+    semiAutoLogger.info("{}", _.keyValue("icecream", IceCream("sundae", 1, false)))
+    semiAutoLogger.info("{}", _.keyValue("entityId", EntityId(1)))
+    semiAutoLogger.info("{}", _.keyValue("foo", Foo(Bar("underlying"))))
   }
 }
-```
-
-produces
-
-```
-15:55:43.104 [main] INFO com.example.GenericMain$ - icecream={name=sundae, numCherries=1, inCone=false}
-15:55:43.109 [main] INFO com.example.GenericMain$ - entityId=1
-15:55:43.111 [main] INFO com.example.GenericMain$ - foo={bar=underlying}
-```
-
-Note that this feature depends on Scala reflection and macros.  To install, add the following dependencies:
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "auto" % "0.1.1-SNAPSHOT"
-libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
 ```
 
 ## Conditions

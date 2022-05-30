@@ -14,10 +14,8 @@ class Logger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     with LoggerSupport[FB]
     with DefaultLoggerMethods[FB] {
 
-  @inline
   override def name: String = core.getName
 
-  @inline
   override def withCondition(condition: Condition): Logger[FB] = {
     condition match {
       case Condition.always =>
@@ -29,19 +27,16 @@ class Logger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     }
   }
 
-  @inline
   override def withFields(f: FB => FieldBuilderResult): Logger[FB] = {
     newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
 
-  @inline
   override def withThreadContext: Logger[FB] = {
     newLogger(
       newCoreLogger = core.withThreadContext(Utilities.threadContext())
     )
   }
 
-  @inline
   override def withFieldBuilder[NEWFB <: SourceCodeFieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
