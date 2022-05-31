@@ -94,15 +94,25 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 
 ## Trace Logger
 
-You can use a trace logger to debug methods and interactions in your code.  This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
+You can use a trace logger to debug methods and interactions in your code.  
 
 ```scala
-def myMethod = traceLogger.trace {
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace" % echopraxiaPlusScalaVersion
+```
+
+This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
+
+```scala
+import com.tersesystems.echopraxia.plusscala.trace._
+val traceLogger = TraceLoggerFactory.getLogger
+def myMethod(arg1: String): Int = traceLogger.trace {
   // ... logic
 }
 ```
 
-The behavior of the trace logger is determined by `TracingFieldBuilder`.  You can extend `DefaultTracingFieldBuilder` and override various bits of functionality.  Trace logging works particularly well with automatic derivation:
+Trace logging works particularly well with automatic derivation.
+
+The behavior of the trace logger is determined by `TracingFieldBuilder`.  You can extend `DefaultTracingFieldBuilder` and override various bits of functionality, such as `argumentField`:
 
 ```scala
 object TraceMain {
@@ -142,18 +152,30 @@ You can convert levels, conditions, and logging contexts to Java using the `.asJ
 
 Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
 
-To enable type enrichment, import the `api` package, or `import com.tersesystems.echopraxia.plusscala.api.Implicits._` explicitly.
+To enable type enrichment, import the `api` package,
+
+```scala
+import com.tersesystems.echopraxia.plusscala.api._
+```
+
+or 
+
+```
+import com.tersesystems.echopraxia.plusscala.api.Implicits._
+```
+
+explicitly if you only want the implicits.
 
 ## Field Builder
 
-A `Field` is defined as a `name` and a `value`.  The field builder has methods to create
+A `Field` is defined as a `name: String` and a `value: com.tersesystems.echopraxia.api.Value`.  The field builder has methods to create fields. 
 
-* `fb.string`: creates a field with a string as a value
-* `fb.number`: creates a field with a number as a value.
-* `fb.bool`: creates a field with a boolean as a value.
-* `fb.nullValue`: creates a field with a null as a value.
-* `fb.array`: creates a field with an array as a value.
-* `fb.obj`: creates a field with an object as a value.  
+* `fb.string`: creates a field with a string as a value, same as `fb.value(name, Value.string(str))`.
+* `fb.number`: creates a field with a number as a value, same as `fb.value(name, Value.number(num))`.
+* `fb.bool`: creates a field with a boolean as a value, same as `fb.value(name, Value.bool(b))`.
+* `fb.nullValue`: creates a field with a null as a value, same as `fb.value(name, Value.nullValue())`
+* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
+* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
 
 When rendering using a line oriented encoder, `fb.array` and `fb.obj` render in logfmt style `key=value` format, and the other methods use the `value` format.
 
@@ -165,7 +187,7 @@ class Example {
   val logger = LoggerFactory.getLogger
 
   def doStuff: Unit = {
-    logger.info("{} {} {} {}", fb => fb.list {
+    logger.info("{} {} {} {}", fb => {
       import fb._
       obj("person" -> 
         array(
@@ -256,9 +278,11 @@ trait MapFieldBuilder extends FieldBuilder {
 
 ## Automatic Type Class Derivation
 
+Mapping individual case classes and value objects can get repetitive, so there's a shortcut you can use: [type class derivation](https://blog.kaizen-solutions.io/2020/typeclass-derivation-with-magnolia/). 
+
 You can incorporate automatic type class derivation by adding the `AutoDerivation` or `SemiAutoDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
 
-Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly.  The example hopefully explains the difference:
+Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly:
 
 ```scala
 import com.tersesystems.echopraxia.plusscala.api._
@@ -275,6 +299,11 @@ object SemiAutoFieldBuilder extends SemiAutoFieldBuilder {
   implicit lazy val barToValue: ToValue[Bar] = gen[Bar]
   implicit lazy val fooToValue: ToValue[Foo] = gen[Foo]
 }
+
+final case class IceCream(name: String, numCherries: Int, inCone: Boolean)
+final case class EntityId(raw: Int) extends AnyVal
+final case class Bar(underlying: String) extends AnyVal
+final case class Foo(bar: Bar)
 
 object GenericMain {
   private val autoLogger = LoggerFactory.getLogger.withFieldBuilder(AutoFieldBuilder)
@@ -383,6 +412,8 @@ Conditions in the Scala API use Scala idioms and classes.  The `find` methods in
 
 ```scala
 val bigIntCondition = Condition(_.findNumber("$.bigInt").contains(BigInt("52")))
+val bigIntLogger = logger.withCondition(bigIntCondition)
+bigIntLogger.info("only logs if bigInt is 52", _.number("bigInt", BigInt("52")))
 ```
 
 Likewise, if you look up `findList` to find an object, it will return the object as a `Map[String, Any]` which you can then match on.
@@ -398,6 +429,7 @@ val isWill = Condition { (context: LoggingContext) =>
 Also, `ctx.fields` returns a `Seq[Field]` which allows you to match fields using the Scala collections API.  You can use this to match on fields and values without using a JSON path, which can be useful when you want to match on an entire object rather than a single path.
 
 ```scala
+// matching a field is easier than multiple inline predicates
 private val willField: Field = MyFieldBuilder.person("person", Person("will", 1))
 private val condition: Condition = Condition(_.fields.contains(willField))
 
@@ -439,39 +471,34 @@ Because the JVM is very good at optimizing out no-op methods, using `Condition.n
 Both the logger and the async logger take the source code location, file, and enclosing method as implicits, using [sourcefile](https://github.com/com-lihaoyi/sourcecode).  For example, the `DefaultLoggerMethods.error` method looks like this:
 
 ```scala
-trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
+import sourcecode._
+trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[FB] {
   this: DefaultMethodsSupport[FB] =>
-
+  
   def error(
       message: String
-  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+  )(implicit line: Line, file: File, enc: Enclosing): Unit = {
+    // ...
+  }
   
 }
 ```
 
-Internally, the source code lines are mapped to fields included with the logger, defined with keys from `SourceFieldConstants`:
+Internally, the source code fields delegate to `fb.sourceCodeFields`, which is defined by `SourceCodeFieldBuilder`:
 
 ```scala
-trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
-  // ...
-  protected def sourceInfoFields(
-      line: Line,
-      file: File,
-      enc: Enclosing
-  ): java.util.function.Function[FB, FieldBuilderResult] = { fb: FB =>
-    Field
-      .keyValue(
-        SourceFieldConstants.sourcecode,
-        Value.`object`(
-          Field.keyValue(SourceFieldConstants.file, Value.string(file.value)),
-          Field.keyValue(SourceFieldConstants.line, Value.number(line.value: java.lang.Integer)),
-          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc.value))
-        )
-      )
-      .asInstanceOf[FieldBuilderResult]
-  }.asJava
+trait SourceCodeFieldBuilder {
+  def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult
 }
 ```
+
+The default implementation is `DefaultSourceCodeFieldBuilder`, which is included as part of `FieldBuilder`.
+
+```scala
+trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder with DefaultSourceCodeFieldBuilder
+```
+
+You can override or replace the `sourceCodeFields` method in your own field builder implementation.
 
 You can use the source code fields in conditions transparently -- this can be useful in filters where you want to either show or suppress logging statements coming from a method.  For example:
 

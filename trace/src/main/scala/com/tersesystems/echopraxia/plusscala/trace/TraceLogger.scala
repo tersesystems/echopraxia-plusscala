@@ -52,7 +52,6 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     extends AbstractLoggerSupport(core, fieldBuilder)
     with LoggerSupport[FB] {
 
-  @inline
   override def withCondition(condition: Condition): TraceLogger[FB] = {
     condition match {
       case Condition.always =>
@@ -67,19 +66,16 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     }
   }
 
-  @inline
   override def withFields(f: FB => FieldBuilderResult): TraceLogger[FB] = {
     newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
 
-  @inline
   override def withThreadContext: TraceLogger[FB] = {
     newLogger(
       newCoreLogger = core.withThreadContext(Utilities.threadContext())
     )
   }
 
-  @inline
   def withFieldBuilder[NEWFB <: TracingFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
