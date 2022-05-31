@@ -11,6 +11,13 @@ import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
 trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+
+  def enteringTemplate: String
+
+  def exitingTemplate: String
+
+  def throwingTemplate: String
+
   def entering(method: sourcecode.FullName, args: sourcecode.Args): FieldBuilderResult
 
   def exiting(method: sourcecode.FullName, value: Value[_]): FieldBuilderResult
@@ -21,26 +28,32 @@ trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
   import DefaultTracingFieldBuilder._
 
+  val enteringTemplate: String = "{}: "
+
+  val exitingTemplate: String = "{}"
+
+  val throwingTemplate: String = "{}"
+
   def argumentField(txt: Text[_]): Field = {
     keyValue(txt.source, Value.string(Objects.toString(txt.value)))
   }
 
   override def entering(method: sourcecode.FullName, args: sourcecode.Args): FieldBuilderResult = {
     val argsValue = ToArrayValue(args.value.map(list => ToArrayValue(list.map(argumentField))))
-    value(Trace, ToObjectValue(keyValue(Method, method.value), keyValue("tag", Entry), keyValue(Arguments, argsValue)))
+    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Entry), keyValue(Arguments, argsValue)))
   }
 
   override def exiting(method: sourcecode.FullName, retValue: Value[_]): FieldBuilderResult = {
-    value(Trace, ToObjectValue(value(Method, method.value), string(Trace, Exit), keyValue(Result, retValue)))
+    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Exit), keyValue(Result, retValue)))
   }
 
   override def throwing(method: sourcecode.FullName, ex: Throwable): FieldBuilderResult = {
-    value(Trace, ToObjectValue(value(Method, method.value), string(Trace, Throwing), exception(ex)))
+    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Throwing), exception(ex)))
   }
 }
 
-object DefaultTracingFieldBuilder {
-  val Trace: String     = "trace"
+object DefaultTracingFieldBuilder extends DefaultTracingFieldBuilder {
+  val Tag: String     = "tag"
   val Entry: String     = "entry"
   val Exit: String      = "exit"
   val Throwing: String  = "throwing"
@@ -53,15 +66,15 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     extends AbstractLoggerSupport(core, fieldBuilder)
     with LoggerSupport[FB] {
 
+  import fieldBuilder._
+
   override def withCondition(condition: Condition): TraceLogger[FB] = {
     condition match {
       case Condition.always =>
         this
       case Condition.never =>
-        new TraceLogger[FB](core, fieldBuilder) {
-          override def trace[B: FB#ToValue](attempt: => B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B =
-            attempt
-        }
+        // XXX optimize this
+        new TraceLogger[FB](core.withCondition(Condition.never.asJava), fieldBuilder)
       case other =>
         newLogger(newCoreLogger = core.withCondition(other.asJava))
     }
@@ -81,34 +94,61 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
-  def trace[B: FB#ToValue](
-      attempt: => B
-  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+  def trace[B: ToValue](attempt: => B)
+                          (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     handle(JLevel.TRACE, attempt)
   }
 
-  def debug[B: FB#ToValue](
-      attempt: => B
-  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+  def trace[B: ToValue](condition: Condition)
+                          (attempt: => B)
+                          (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handleCondition(JLevel.TRACE, condition, attempt)
+  }
+
+  def debug[B: ToValue](attempt: => B)
+                          (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     handle(JLevel.DEBUG, attempt)
   }
 
-  def info[B: FB#ToValue](
-      attempt: => B
-  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+
+  def debug[B: ToValue](condition: Condition)
+                          (attempt: => B)
+                          (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handleCondition(JLevel.DEBUG, condition, attempt)
+  }
+
+  def info[B: ToValue](attempt: => B)
+                         (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     handle(JLevel.INFO, attempt)
   }
 
-  def warn[B: FB#ToValue](
-      attempt: => B
-  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+  def info[B: ToValue](condition: Condition)
+                         (attempt: => B)
+                         (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handleCondition(JLevel.INFO, condition, attempt)
+  }
+
+  def warn[B: ToValue](attempt: => B)
+                         (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     handle(JLevel.WARN, attempt)
   }
 
-  def error[B: FB#ToValue](
-      attempt: => B
-  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+  def warn[B: ToValue](condition: Condition)
+                         (attempt: => B)
+                         (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handleCondition(JLevel.WARN, condition, attempt)
+  }
+
+
+  def error[B: ToValue](attempt: => B)
+                          (implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     handle(JLevel.ERROR, attempt)
+  }
+
+  def error[B: ToValue](condition: Condition)(
+                            attempt: => B
+                          )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handleCondition(JLevel.ERROR, condition, attempt)
   }
 
   @inline
@@ -122,8 +162,8 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   }.asJava
 
   @inline
-  private def exiting[B: FB#ToValue](fullname: FullName, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.exiting(fullname, implicitly[FB#ToValue[B]].toValue(ret))
+  private def exiting[B: ToValue](fullname: FullName, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.exiting(fullname, implicitly[ToValue[B]].toValue(ret))
   }.asJava
 
   @inline
@@ -132,26 +172,46 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   }.asJava
 
   @inline
-  private def handle[B: FB#ToValue](
+  private def handle[B: ToValue](
       level: JLevel,
       attempt: => B
   )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
     if (!core.isEnabled(level)) {
       attempt
     } else {
-      val srcF           = sourceInfoFields(line, file, enc)
-      val coreWithFields = core.withFields(srcF, fieldBuilder)
-      coreWithFields.log(level, "{}", entering(fullname, args), fieldBuilder)
-
-      val result = Try(attempt)
-      val exitF = result match {
-        case Success(ret) => exiting(fullname, ret)
-        case Failure(ex)  => throwing(fullname, ex)
-      }
-      coreWithFields.log(level, "{}", exitF, fieldBuilder)
-      result.get // rethrow the exception
+      execute(level, attempt)
     }
   }
+
+  @inline
+  private def handleCondition[B: ToValue](
+    level: JLevel,
+    condition: Condition,
+    attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    if (!core.isEnabled(level, condition.asJava)) {
+      attempt
+    } else {
+      execute(level, attempt)
+    }
+  }
+
+  @inline
+  private def execute[B: ToValue](level: JLevel,
+                      attempt: => B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args) = {
+    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    coreWithFields.log(level, fieldBuilder.enteringTemplate, entering(fullname, args), fieldBuilder)
+
+    val result = Try(attempt)
+    result match {
+      case Success(ret) =>
+        coreWithFields.log(level, fieldBuilder.exitingTemplate, exiting(fullname, ret), fieldBuilder)
+      case Failure(ex)  =>
+        coreWithFields.log(level, fieldBuilder.throwingTemplate, throwing(fullname, ex), fieldBuilder)
+    }
+    result.get // rethrow the exception
+  }
+
 
   @inline
   private def newLogger[T <: TracingFieldBuilder](
