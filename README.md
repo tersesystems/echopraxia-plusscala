@@ -1,7 +1,10 @@
 # Scala API for Echopraxia
 
-The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types.  It is compiled for Scala 2.12 and Scala 2.13.
+Echopraxia is a structured logging framework with plugins for Logback and Log4J, oriented for "printf debugging" so you can dump your internal state and [dynamic debug logging](https://github.com/tersesystems/dynamic-debug-logging) for debugging running applications.
 
+The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types and has a number of features to make debugging even smoother, including a "trace" logger and automatic type class derivation.  
+
+Echopraxia is compiled for Scala 2.12 and Scala 2.13.
 
 ## Logger
 
@@ -33,7 +36,7 @@ class Example {
 }
 ```
 
-The Scala logger has some enhancements over the Java logger, notably the ability to add tuples.  
+The Scala logger (technically, the default field builder) has some enhancements over the Java logger, notably the ability to add tuples.  
 
 ```scala
 logger.info("hi {}", _.string("name", "will")) // two args
@@ -110,7 +113,7 @@ def myMethod(arg1: String): Int = traceLogger.trace {
 }
 ```
 
-Trace logging works particularly well with automatic derivation.
+Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.
 
 The behavior of the trace logger is determined by `TracingFieldBuilder`.  You can extend `DefaultTracingFieldBuilder` and override various bits of functionality, such as `argumentField`:
 
@@ -165,6 +168,8 @@ import com.tersesystems.echopraxia.plusscala.api.Implicits._
 ```
 
 explicitly if you only want the implicits.
+
+This is useful when using the [condition scripts](https://github.com/tersesystems/echopraxia#dynamic-conditions-with-scripts) module of Echopraxia, for example.
 
 ## Field Builder
 

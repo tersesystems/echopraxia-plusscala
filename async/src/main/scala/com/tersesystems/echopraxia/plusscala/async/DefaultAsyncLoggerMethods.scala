@@ -369,6 +369,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
   private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
     coreLoggerWithFields.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
 
+  @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
     if (condition != Condition.never) {
       coreLoggerWithFields

@@ -1,11 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.Level.TRACE
+import com.tersesystems.echopraxia.api.{Level => JLevel}
 import com.tersesystems.echopraxia.api.{CoreLogger, Field, FieldBuilderResult, Utilities, Value}
 import com.tersesystems.echopraxia.plusscala.api._
 import sourcecode.{Args, Enclosing, File, FullName, Line, Text}
 
 import java.util.Objects
+import java.util.function.Function
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -80,25 +81,74 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
-  // XXX Needs some tests
   def trace[B: FB#ToValue](
       attempt: => B
-  )(implicit line: Line, file: File, fullname: sourcecode.FullName, enc: Enclosing, args: sourcecode.Args): B = {
-    if (!core.isEnabled(TRACE)) {
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handle(JLevel.TRACE, attempt)
+  }
+
+  def debug[B: FB#ToValue](
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handle(JLevel.DEBUG, attempt)
+  }
+
+  def info[B: FB#ToValue](
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handle(JLevel.INFO, attempt)
+  }
+
+  def warn[B: FB#ToValue](
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handle(JLevel.WARN, attempt)
+  }
+
+  def error[B: FB#ToValue](
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    handle(JLevel.ERROR, attempt)
+  }
+
+  @inline
+  private def sourceInfoFields(line: Line, file: File, enc: Enclosing): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.sourceCodeFields(line.value, file.value, enc.value)
+  }.asJava
+
+  @inline
+  private def entering(fullname: FullName, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.entering(fullname, args)
+  }.asJava
+
+  @inline
+  private def exiting[B: FB#ToValue](fullname: FullName, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.exiting(fullname, implicitly[FB#ToValue[B]].toValue(ret))
+  }.asJava
+
+  @inline
+  private def throwing(fullname: FullName, ex: Throwable): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.throwing(fullname, ex)
+  }.asJava
+
+  @inline
+  private def handle[B: FB#ToValue](
+      level: JLevel,
+      attempt: => B
+  )(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): B = {
+    if (!core.isEnabled(level)) {
       attempt
     } else {
-      val srcF: FB => FieldBuilderResult = fb => fb.sourceCodeFields(line.value, file.value, enc.value)
-      val coreWithFields                 = core.withFields(srcF.asJava, fieldBuilder)
-
-      val entryF: FB => FieldBuilderResult = fb => fb.entering(fullname, args)
-      coreWithFields.log(TRACE, "{}", entryF.asJava, fieldBuilder)
+      val srcF           = sourceInfoFields(line, file, enc)
+      val coreWithFields = core.withFields(srcF, fieldBuilder)
+      coreWithFields.log(level, "{}", entering(fullname, args), fieldBuilder)
 
       val result = Try(attempt)
-      val exitF: FB => FieldBuilderResult = result match {
-        case Success(ret) => _.exiting(fullname, implicitly[FB#ToValue[B]].toValue(ret))
-        case Failure(ex)  => _.throwing(fullname, ex)
+      val exitF = result match {
+        case Success(ret) => exiting(fullname, ret)
+        case Failure(ex)  => throwing(fullname, ex)
       }
-      coreWithFields.log(TRACE, "{}", exitF.asJava, fieldBuilder)
+      coreWithFields.log(level, "{}", exitF, fieldBuilder)
       result.get // rethrow the exception
     }
   }
