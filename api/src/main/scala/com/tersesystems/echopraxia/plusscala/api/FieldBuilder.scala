@@ -294,11 +294,11 @@ trait DefaultSourceCodeFieldBuilder extends SourceCodeFieldBuilder {
   override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = {
     Field
       .keyValue(
-        SourceFieldConstants.sourcecode,
+        "sourcecode",
         Value.`object`(
-          Field.keyValue(SourceFieldConstants.file, Value.string(file)),
-          Field.keyValue(SourceFieldConstants.line, Value.number(line: java.lang.Integer)),
-          Field.keyValue(SourceFieldConstants.enclosing, Value.string(enc))
+          Field.keyValue("file", Value.string(file)),
+          Field.keyValue("line", Value.number(line: java.lang.Integer)),
+          Field.keyValue("enclosing", Value.string(enc))
         )
       )
       .asInstanceOf[FieldBuilderResult]

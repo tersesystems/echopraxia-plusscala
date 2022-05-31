@@ -14,10 +14,8 @@ class AsyncLogger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: 
     with LoggerSupport[FB]
     with DefaultAsyncLoggerMethods[FB] {
 
-  @inline
   override def name: String = core.getName
 
-  @inline
   override def withCondition(scalaCondition: Condition): AsyncLogger[FB] = {
     scalaCondition match {
       case Condition.always =>
@@ -29,17 +27,14 @@ class AsyncLogger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: 
     }
   }
 
-  @inline
   override def withFields(f: FB => FieldBuilderResult): AsyncLogger[FB] = {
     newLogger(newCoreLogger = core.withFields[FB](f.asJava, fieldBuilder))
   }
 
-  @inline
   override def withThreadContext: AsyncLogger[FB] = newLogger(
     newCoreLogger = core.withThreadContext(Utilities.threadContext())
   )
 
-  @inline
   override def withFieldBuilder[T <: SourceCodeFieldBuilder](newBuilder: T): AsyncLogger[T] =
     newLogger(newFieldBuilder = newBuilder)
 
