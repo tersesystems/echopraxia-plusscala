@@ -18,11 +18,11 @@ trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
   def throwingTemplate: String
 
-  def entering(method: sourcecode.FullName, args: sourcecode.Args): FieldBuilderResult
+  def entering(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult
 
-  def exiting(method: sourcecode.FullName, value: Value[_]): FieldBuilderResult
+  def exiting(value: Value[_])(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult
 
-  def throwing(method: sourcecode.FullName, ex: Throwable): FieldBuilderResult
+  def throwing(ex: Throwable)(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult
 }
 
 trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
@@ -38,17 +38,17 @@ trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
     keyValue(txt.source, Value.string(Objects.toString(txt.value)))
   }
 
-  override def entering(method: sourcecode.FullName, args: sourcecode.Args): FieldBuilderResult = {
+  override def entering(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
     val argsValue = ToArrayValue(args.value.map(list => ToArrayValue(list.map(argumentField))))
-    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Entry), keyValue(Arguments, argsValue)))
+    value(Tag, ToObjectValue(keyValue(Method, fullName.value), keyValue(Tag, Entry), keyValue(Arguments, argsValue)))
   }
 
-  override def exiting(method: sourcecode.FullName, retValue: Value[_]): FieldBuilderResult = {
-    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Exit), keyValue(Result, retValue)))
+  override def exiting(retValue: Value[_])(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
+    value(Tag, ToObjectValue(keyValue(Method, fullName.value), keyValue(Tag, Exit), keyValue(Result, retValue)))
   }
 
-  override def throwing(method: sourcecode.FullName, ex: Throwable): FieldBuilderResult = {
-    value(Tag, ToObjectValue(keyValue(Method, method.value), keyValue(Tag, Throwing), exception(ex)))
+  override def throwing(ex: Throwable)(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
+    value(Tag, ToObjectValue(keyValue(Method, fullName.value), keyValue(Tag, Throwing), exception(ex)))
   }
 }
 
@@ -157,18 +157,18 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   }.asJava
 
   @inline
-  private def entering(fullname: FullName, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.entering(fullname, args)
+  private def entering(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.entering
   }.asJava
 
   @inline
-  private def exiting[B: ToValue](fullname: FullName, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.exiting(fullname, implicitly[ToValue[B]].toValue(ret))
+  private def exiting[B: ToValue](ret: B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.exiting(ToValue(ret))
   }.asJava
 
   @inline
-  private def throwing(fullname: FullName, ex: Throwable): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.throwing(fullname, ex)
+  private def throwing(ex: Throwable)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.throwing(ex)
   }.asJava
 
   @inline
@@ -200,18 +200,17 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
   private def execute[B: ToValue](level: JLevel,
                       attempt: => B)(implicit line: Line, file: File, fullname: FullName, enc: Enclosing, args: Args) = {
     val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-    coreWithFields.log(level, fieldBuilder.enteringTemplate, entering(fullname, args), fieldBuilder)
+    coreWithFields.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
 
     val result = Try(attempt)
     result match {
       case Success(ret) =>
-        coreWithFields.log(level, fieldBuilder.exitingTemplate, exiting(fullname, ret), fieldBuilder)
+        coreWithFields.log(level, fieldBuilder.exitingTemplate, exiting(ret), fieldBuilder)
       case Failure(ex)  =>
-        coreWithFields.log(level, fieldBuilder.throwingTemplate, throwing(fullname, ex), fieldBuilder)
+        coreWithFields.log(level, fieldBuilder.throwingTemplate, throwing(ex), fieldBuilder)
     }
     result.get // rethrow the exception
   }
-
 
   @inline
   private def newLogger[T <: TracingFieldBuilder](

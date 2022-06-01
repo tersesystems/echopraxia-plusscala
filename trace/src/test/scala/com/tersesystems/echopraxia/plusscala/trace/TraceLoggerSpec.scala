@@ -3,27 +3,64 @@ package com.tersesystems.echopraxia.plusscala.trace
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.plusscala.api.{Condition, Level, LoggingContext}
+import com.tersesystems.echopraxia.api.{FieldBuilderResult, Value}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder}
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
+import sourcecode.{Args, Enclosing, File, FullName, Line}
 
 import java.util
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
-class TraceLoggerSpec  extends AnyFunSpec with BeforeAndAfterEach with Matchers {
-  trait SimpleTraceFieldBuilder extends DefaultTracingFieldBuilder
-  object SimpleTraceFieldBuilder extends SimpleTraceFieldBuilder
+class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   private val logger = TraceLoggerFactory.getLogger(getClass)
 
-  private def doSomething: String = logger.trace {
-    "I return string"
-  }
-
   describe("simple") {
     it("should enter and exit") {
+      def doSomething: String = logger.trace {
+        "I return string"
+      }
       doSomething
+
+      logsContain("doSomething")
+      logsContain("tag=entry")
+      logsContain("tag=exit")
+      logsContain("I return string")
+    }
+
+    it("should enter and throw") {
+      def divideByZero: Int = logger.trace {
+        1 / 0
+      }
+
+      Try(divideByZero)
+      logsContain("divideByZero")
+      logsContain("tag=entry")
+      logsContain("tag=throwing")
+    }
+
+    it("should not log if disabled") {
+      def noLogging: String = logger.trace(Condition.never) {
+        "I do not log"
+      }
+
+      noLogging
+      logsNotContain("noLogging")
+    }
+  }
+
+  describe("custom") {
+    it("should enter and exit") {
+      val customLogger = logger.withFieldBuilder(SimpleTraceFieldBuilder)
+      def doSomething: String = customLogger.trace {
+        "I return string"
+      }
+
+      doSomething
+
       logsContain("doSomething")
       logsContain("tag=entry")
       logsContain("tag=exit")
@@ -31,14 +68,16 @@ class TraceLoggerSpec  extends AnyFunSpec with BeforeAndAfterEach with Matchers 
     }
   }
 
-  // XXX test conditions
-  // XXX test never logger
-  // XXX test customization
-
   private def logsContain(message: String): Assertion = {
     val listAppender: ListAppender[ILoggingEvent] = getListAppender
     val list: util.List[ILoggingEvent]            = listAppender.list
     list.asScala.exists { event => event.getFormattedMessage.contains(message) } must be(true)
+  }
+
+  private def logsNotContain(message: String): Assertion = {
+    val listAppender: ListAppender[ILoggingEvent] = getListAppender
+    val list: util.List[ILoggingEvent]            = listAppender.list
+    list.asScala.exists { event => event.getFormattedMessage.contains(message) } must be(false)
   }
 
   override def beforeEach(): Unit = {
@@ -55,5 +94,35 @@ class TraceLoggerSpec  extends AnyFunSpec with BeforeAndAfterEach with Matchers 
       .getAppender("LIST")
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
+  trait SimpleTraceFieldBuilder extends FieldBuilder with TracingFieldBuilder {
+    override def enteringTemplate: String = "entering: {}"
+
+    override def exitingTemplate: String = "exiting: {} => {}"
+
+    override def throwingTemplate: String = "throwing: {} ! {}"
+
+    override def entering(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
+      keyValue("method", fullName.value)
+    }
+
+    override def exiting(value: Value[_])
+                        (implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
+      list(
+        this.value("method", fullName.value),
+        this.value("returning", value)
+      )
+    }
+
+    override def throwing(ex: Throwable)(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
+      this.list(
+        value("method", fullName.value),
+        this.exception(ex)
+      )
+    }
+
+    override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = FieldBuilderResult.empty()
+  }
+
+  object SimpleTraceFieldBuilder extends SimpleTraceFieldBuilder
 
 }
