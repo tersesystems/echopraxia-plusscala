@@ -62,8 +62,8 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       doSomething
 
       logsContain("doSomething")
-      logsContain("tag=entry")
-      logsContain("tag=exit")
+      logsContain("entering: method=")
+      logsContain("exiting: method=")
       logsContain("I return string")
     }
   }
@@ -108,7 +108,7 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     override def exiting(value: Value[_])
                         (implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
       list(
-        this.value("method", fullName.value),
+        this.keyValue("method", fullName.value),
         this.value("returning", value)
       )
     }
