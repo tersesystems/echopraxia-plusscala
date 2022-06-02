@@ -66,7 +66,31 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logsContain("exiting: method=")
       logsContain("I return string")
     }
+
+    it("should enter and throw") {
+      val customLogger = logger.withFieldBuilder(SimpleTraceFieldBuilder)
+      def divideByZero: Int = customLogger.trace {
+        1 / 0
+      }
+
+      Try(divideByZero)
+      logsContain("divideByZero")
+      logsContain("tag=entry")
+      logsContain("tag=throwing")
+    }
+
+    it("should not log if disabled") {
+      // if we define a logger inline here we can crash Scala 2.12 :-D
+      def noCustomLogging: String = customLogger.trace(Condition.never) {
+        "I do not log"
+      }
+
+      noCustomLogging
+      logsNotContain("noLogging")
+    }
   }
+
+  private val customLogger = logger.withFieldBuilder(SimpleTraceFieldBuilder)
 
   private def logsContain(message: String): Assertion = {
     val listAppender: ListAppender[ILoggingEvent] = getListAppender
