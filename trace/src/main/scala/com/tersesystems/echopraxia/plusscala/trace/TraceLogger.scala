@@ -13,10 +13,8 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
   override def withCondition(condition: Condition): TraceLogger[FB] = {
     condition match {
-      case Condition.always =>
-        newLogger(newCoreLogger = core.withCondition(Condition.always.asJava))
       case Condition.never =>
-        new TraceLogger.NeverLogger[FB](core.withCondition(Condition.never.asJava), fieldBuilder)
+        neverLogger()
       case other =>
         newLogger(newCoreLogger = core.withCondition(other.asJava))
     }
@@ -34,6 +32,11 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
   def withFieldBuilder[NEWFB <: TracingFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
+  }
+
+  @inline
+  private def neverLogger(): TraceLogger[FB] = {
+    new TraceLogger.NeverLogger[FB](core.withCondition(Condition.never.asJava), fieldBuilder)
   }
 
   @inline
