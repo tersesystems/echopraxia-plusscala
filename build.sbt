@@ -53,6 +53,8 @@ lazy val logger = (project in file("logger")).enablePlugins(JmhPlugin)
   .settings(
     name := "logger",
     //
+    run / fork := true,
+    //
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
