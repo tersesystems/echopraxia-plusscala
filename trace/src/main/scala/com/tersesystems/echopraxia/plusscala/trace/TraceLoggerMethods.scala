@@ -6,9 +6,9 @@ import sourcecode.{Args, Enclosing, File, FullName, Line}
 trait TraceLoggerMethods[FB <: TracingFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 
   // Need a solid value to use dependent types here
-  override val fieldBuilder: FB
+  private[trace] val fb: FB = this.fieldBuilder
 
-  type ToValue[B] = fieldBuilder.ToValue[B]
+  type ToValue[B] = this.fb.ToValue[B]
 
   // -----------------------------------------
   // Trace

@@ -75,8 +75,8 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
       Try(divideByZero)
       logsContain("divideByZero")
-      logsContain("tag=entry")
-      logsContain("tag=throwing")
+      logsContain("entering: method=")
+      logsContain("throwing: method=")
     }
 
     it("should not log if disabled") {
@@ -139,7 +139,7 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     override def throwing(ex: Throwable)(implicit line: Line, file: File, fullName: FullName, enc: Enclosing, args: Args): FieldBuilderResult = {
       this.list(
-        value("method", fullName.value),
+        keyValue("method", fullName.value),
         this.exception(ex)
       )
     }
