@@ -49,7 +49,7 @@ lazy val api = (project in file("api"))
     libraryDependencies ++= compatLibraries(scalaVersion.value)
   )
 
-lazy val logger = (project in file("logger"))
+lazy val logger = (project in file("logger")).enablePlugins(JmhPlugin)
   .settings(
     name := "logger",
     //
@@ -60,7 +60,7 @@ lazy val logger = (project in file("logger"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val asyncLogger = (project in file("async"))
+lazy val asyncLogger = (project in file("async")).enablePlugins(JmhPlugin)
   .settings(
     name := "async-logger",
     //
@@ -71,7 +71,8 @@ lazy val asyncLogger = (project in file("async"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val traceLogger = (project in file("trace")).settings(
+lazy val traceLogger = (project in file("trace")).enablePlugins(JmhPlugin)
+  .settings(
   name := "trace-logger",
 
   libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",

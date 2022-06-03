@@ -8,3 +8,6 @@ addSbtPlugin("com.github.sbt" % "sbt-release" % "1.1.0")
 
 // https://github.com/xerial/sbt-sonatype
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.10")
+
+// https://github.com/sbt/sbt-jmhs
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.3")
