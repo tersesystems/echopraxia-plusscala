@@ -49,7 +49,7 @@ lazy val api = (project in file("api"))
     libraryDependencies ++= compatLibraries(scalaVersion.value)
   )
 
-lazy val logger = (project in file("logger")).enablePlugins(JmhPlugin)
+lazy val logger = (project in file("logger"))
   .settings(
     name := "logger",
     //
@@ -62,7 +62,7 @@ lazy val logger = (project in file("logger")).enablePlugins(JmhPlugin)
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val asyncLogger = (project in file("async")).enablePlugins(JmhPlugin)
+lazy val asyncLogger = (project in file("async"))
   .settings(
     name := "async-logger",
     //
@@ -73,7 +73,7 @@ lazy val asyncLogger = (project in file("async")).enablePlugins(JmhPlugin)
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val traceLogger = (project in file("trace")).enablePlugins(JmhPlugin)
+lazy val traceLogger = (project in file("trace"))
   .settings(
   name := "trace-logger",
 
@@ -84,6 +84,15 @@ lazy val traceLogger = (project in file("trace")).enablePlugins(JmhPlugin)
 )
   .dependsOn(api % "compile->compile;test->compile")
 
+lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).settings(
+  Compile / doc / sources                := Seq.empty,
+  Compile / packageDoc / publishArtifact := false,
+  publishArtifact                        := false,
+  publish / skip                         := true,
+
+  libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion
+).dependsOn(api, logger, asyncLogger, traceLogger)
+
 lazy val root = (project in file("."))
   .settings(
     Compile / doc / sources                := Seq.empty,
@@ -91,7 +100,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger, traceLogger)
+  .aggregate(api, logger, asyncLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

@@ -12,10 +12,6 @@ build
 
 bin/
 
-project/
 target/
 
 *.log
-
-target/
-.bsp/

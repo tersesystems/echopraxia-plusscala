@@ -1,5 +1,6 @@
-package com.tersesystems.echopraxia.plusscala
+package com.tersesystems.echopraxia.benchmarks
 
+import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api.Condition
 
 import java.util.concurrent.TimeUnit
