@@ -49,7 +49,7 @@ class TraceLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
 object TraceLogger {
 
-  class NeverLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB) extends TraceLogger[FB](core, fieldBuilder) {
+  final class NeverLogger[FB <: TracingFieldBuilder](core: CoreLogger, fieldBuilder: FB) extends TraceLogger[FB](core, fieldBuilder) {
 
     override def trace[B: ToValue](
         attempt: => B

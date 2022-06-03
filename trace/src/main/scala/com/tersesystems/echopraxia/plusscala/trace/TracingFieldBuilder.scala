@@ -24,11 +24,11 @@ trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
   import DefaultTracingFieldBuilder._
 
-  val enteringTemplate: String = "{}: "
+  override val enteringTemplate: String = "{}: "
 
-  val exitingTemplate: String = "{}"
+  override val exitingTemplate: String = "{}"
 
-  val throwingTemplate: String = "{}"
+  override val throwingTemplate: String = "{}"
 
   def argumentField(txt: Text[_]): Field = {
     keyValue(txt.source, Value.string(Objects.toString(txt.value)))

@@ -1,12 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Args, Enclosing, File, FullName, Line}
 
-trait TraceLoggerMethods[FB <: TracingFieldBuilder] {
+trait TraceLoggerMethods[FB <: TracingFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 
   // Need a solid value to use dependent types here
-  val fieldBuilder: FB
+  override val fieldBuilder: FB
 
   type ToValue[B] = fieldBuilder.ToValue[B]
 
