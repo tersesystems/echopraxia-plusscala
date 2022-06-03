@@ -472,6 +472,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       )
   }
 
+  @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
     if (condition != Condition.never) {
       coreLoggerWithFields

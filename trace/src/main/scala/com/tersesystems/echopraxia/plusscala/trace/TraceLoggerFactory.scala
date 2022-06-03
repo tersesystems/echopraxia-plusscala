@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 
 object TraceLoggerFactory {
-  val FQCN: String = classOf[TraceLogger[_]].getName
+  val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName
 
-  val fieldBuilder: DefaultTracingFieldBuilder = new FieldBuilder with DefaultTracingFieldBuilder {}
+  val fieldBuilder: TracingFieldBuilder = DefaultTracingFieldBuilder
 
   def getLogger(name: String): TraceLogger[TracingFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
