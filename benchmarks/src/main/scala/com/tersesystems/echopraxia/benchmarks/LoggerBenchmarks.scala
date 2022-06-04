@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.{Condition, EmptySourceCodeFieldBuilder, FieldBuilder}
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
@@ -27,7 +27,8 @@ class LoggerBenchmarks {
 }
 
 object LoggerBenchmarks {
-  private val logger = LoggerFactory.getLogger
+  private val noSourceInfoFieldBuilder = new FieldBuilder with EmptySourceCodeFieldBuilder {}
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(noSourceInfoFieldBuilder)
 
   private val neverLogger = LoggerFactory.getLogger.withCondition(Condition.never)
 }

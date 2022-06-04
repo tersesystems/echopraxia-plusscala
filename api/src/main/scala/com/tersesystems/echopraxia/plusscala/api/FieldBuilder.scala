@@ -290,8 +290,16 @@ trait SourceCodeFieldBuilder {
   def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult
 }
 
+trait EmptySourceCodeFieldBuilder extends SourceCodeFieldBuilder {
+  override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = FieldBuilderResult.empty()
+}
+
 trait DefaultSourceCodeFieldBuilder extends SourceCodeFieldBuilder {
+
   override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = {
+    // XXX since sourcecode data is static, we could cache the result given the inputs
+    // and save on some allocation.  Or would it be possible to turn this into a macro at
+    // and point to constant fields and values?
     Field
       .keyValue(
         "sourcecode",
@@ -305,6 +313,6 @@ trait DefaultSourceCodeFieldBuilder extends SourceCodeFieldBuilder {
   }
 }
 
-trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder with DefaultSourceCodeFieldBuilder
+trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder with EmptySourceCodeFieldBuilder
 
 object FieldBuilder extends FieldBuilder

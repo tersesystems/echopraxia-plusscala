@@ -469,7 +469,7 @@ val neverLogger = logger.withCondition(Condition.never)
 neverLogger.error("I will never log") // no-op
 ```
 
-Because the JVM is very good at optimizing out no-op methods, using `Condition.never` can enable zero-overhead logging, in the style of [zerolog](https://github.com/obsidiandynamics/zerolog).
+Because the JVM is very good at optimizing out no-op methods, using `Condition.never` is only ~1ns overhead over a straight call.
 
 ## Source Info
 
@@ -497,13 +497,15 @@ trait SourceCodeFieldBuilder {
 }
 ```
 
-The default implementation is `DefaultSourceCodeFieldBuilder`, which is included as part of `FieldBuilder`.
+The default `FieldBuilder` returns `FieldBuilderResult.empty` from the `sourceCodeFields` method.  There is an implementation called `DefaultSourceCodeFieldBuilder` which provides a `sourcecode` field containing an object with the line, file, and enclosing method that can be incorporated to override behavior.
 
 ```scala
-trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder with DefaultSourceCodeFieldBuilder
-```
+trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
+object SourceInfoBuilder extends SourceInfoBuilder 
 
-You can override or replace the `sourceCodeFields` method in your own field builder implementation.
+// now you have source info for free :-)
+val sourceInfoBuilder = LoggerFactory.getLogger.withFieldBuilder(SourceInfoBuilder)
+```
 
 You can use the source code fields in conditions transparently -- this can be useful in filters where you want to either show or suppress logging statements coming from a method.  For example:
 

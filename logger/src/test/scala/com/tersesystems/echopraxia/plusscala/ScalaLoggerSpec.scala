@@ -14,22 +14,10 @@ import java.util
 
 class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = LoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
+  trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
+  object SourceInfoBuilder extends SourceInfoBuilder
 
-  describe("source code") {
-    it("should return source code info") {
-      val condition: Condition = (level: Level, context: LoggingContext) => {
-        context.findString("$.sourcecode.file") match {
-          case Some(file) if file.endsWith("LoggerSpec.scala") =>
-            true
-          case _ =>
-            false
-        }
-      }
-      logger.info(condition, "logs if has sourcecode.file")
-      matchThis("logs if has sourcecode.file")
-    }
-  }
+  private val logger = LoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
 
   describe("withCondition") {
 
@@ -202,6 +190,22 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
   }
+
+  describe("source code") {
+    it("should return source code info") {
+      val condition: Condition = (level: Level, context: LoggingContext) => {
+        context.findString("$.sourcecode.file") match {
+          case Some(file) if file.endsWith("LoggerSpec.scala") =>
+            true
+          case _ =>
+            false
+        }
+      }
+      logger.withFieldBuilder(SourceInfoBuilder).info(condition, "logs if has sourcecode.file")
+      matchThis("logs if has sourcecode.file")
+    }
+  }
+
 
   private def matchThis(message: String) = {
     val listAppender: ListAppender[ILoggingEvent] = getListAppender
