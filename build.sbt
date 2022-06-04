@@ -90,6 +90,8 @@ lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).s
   publishArtifact                        := false,
   publish / skip                         := true,
 
+
+
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion
 ).dependsOn(api, logger, asyncLogger, traceLogger)
 
