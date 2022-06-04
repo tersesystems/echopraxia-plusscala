@@ -503,7 +503,7 @@ The default `FieldBuilder` returns `FieldBuilderResult.empty` from the `sourceCo
 trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
 object SourceInfoBuilder extends SourceInfoBuilder 
 
-// now you have source info for free :-)
+// now you have source info in JSON for free :-)
 val sourceInfoBuilder = LoggerFactory.getLogger.withFieldBuilder(SourceInfoBuilder)
 ```
 
