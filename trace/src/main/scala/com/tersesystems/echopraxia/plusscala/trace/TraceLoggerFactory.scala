@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.plusscala.trace
 import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
 
 object TraceLoggerFactory {
-  val FQCN: String = classOf[DefaultVerboseTraceLoggerMethods[_]].getName
+  val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName
 
   val fieldBuilder: TracingFieldBuilder = DefaultTracingFieldBuilder
 

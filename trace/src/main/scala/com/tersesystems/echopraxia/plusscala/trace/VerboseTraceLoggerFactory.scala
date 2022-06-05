@@ -5,7 +5,7 @@ import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
 object VerboseTraceLoggerFactory {
   val FQCN: String = classOf[DefaultVerboseTraceLoggerMethods[_]].getName
 
-  val fieldBuilder: VerboseTracingFieldBuilder = DefaultVerboseTracingFieldBuilder$
+  val fieldBuilder: VerboseTracingFieldBuilder = DefaultVerboseTracingFieldBuilder
 
   def getLogger(name: String): VerboseTraceLogger[VerboseTracingFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
