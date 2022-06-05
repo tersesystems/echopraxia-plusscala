@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, EmptySourceCodeFieldBuilder, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
 import java.util.function.Function
