@@ -512,11 +512,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
 
   @inline
   private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger = {
-    if (fieldBuilder.isInstanceOf[EmptySourceCodeFieldBuilder]) {
-      core
-    } else {
-      core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-    }
+    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
   }
 
   @inline

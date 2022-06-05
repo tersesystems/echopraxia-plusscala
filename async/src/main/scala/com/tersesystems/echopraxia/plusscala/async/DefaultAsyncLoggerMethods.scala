@@ -336,11 +336,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
 
   @inline
   private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger =
-    if (fieldBuilder.isInstanceOf[EmptySourceCodeFieldBuilder]) {
-      core
-    } else {
-      core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-    }
+    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
 
   @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
