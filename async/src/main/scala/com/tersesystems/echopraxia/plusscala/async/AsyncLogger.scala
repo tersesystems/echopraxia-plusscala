@@ -4,7 +4,9 @@ import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilitie
 import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, LoggerSupport, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
+import java.util.concurrent.Executor
 import scala.compat.java8.FunctionConverters._
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 /**
  * Async Logger with source code enabled.
@@ -29,6 +31,10 @@ class AsyncLogger[FB <: SourceCodeFieldBuilder](core: CoreLogger, fieldBuilder: 
 
   override def withFields(f: FB => FieldBuilderResult): AsyncLogger[FB] = {
     newLogger(newCoreLogger = core.withFields[FB](f.asJava, fieldBuilder))
+  }
+
+  def withExecutor(executor: Executor): AsyncLogger[FB] = {
+    newLogger(newCoreLogger = core.withExecutor(executor))
   }
 
   override def withThreadContext: AsyncLogger[FB] = newLogger(

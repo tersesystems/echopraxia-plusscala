@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, EmptySourceCodeFieldBuilder, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
 import java.util.function.Function
@@ -512,7 +512,11 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
 
   @inline
   private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger = {
-    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    if (fieldBuilder.isInstanceOf[EmptySourceCodeFieldBuilder]) {
+      core
+    } else {
+      core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    }
   }
 
   @inline

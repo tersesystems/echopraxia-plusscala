@@ -1,10 +1,11 @@
 package com.tersesystems.echopraxia.benchmarks
 
-import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultSourceCodeFieldBuilder, FieldBuilder}
+import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
+import org.openjdk.jmh.annotations.{Benchmark, BenchmarkMode, Fork, Measurement, Mode, OutputTimeUnit, Scope, State, Warmup}
 
-import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
+import java.util.concurrent.{Executor, TimeUnit}
+
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -12,8 +13,8 @@ import org.openjdk.jmh.annotations._
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class LoggerBenchmarks {
-  import LoggerBenchmarks._
+class AsyncLoggerBenchmarks {
+  import AsyncLoggerBenchmarks._
 
   @Benchmark
   def info(): Unit = {
@@ -54,16 +55,18 @@ class LoggerBenchmarks {
   def traceWithStringArg(): Unit = {
     logger.trace("Hello {}", _.string("name", "world"))
   }
-
 }
 
-object LoggerBenchmarks {
-  private val logger = LoggerFactory.getLogger
+object AsyncLoggerBenchmarks {
+  // logger with no executor, at all.
+  private val logger = AsyncLoggerFactory.getLogger.withExecutor(new Executor {
+    override def execute(command: Runnable): Unit = {}
+  })
 
   trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
   object SourceInfoBuilder extends SourceInfoBuilder
 
   private val sourceInfoLogger = logger.withFieldBuilder(SourceInfoBuilder)
 
-  private val neverLogger = LoggerFactory.getLogger.withCondition(Condition.never)
+  private val neverLogger = AsyncLoggerFactory.getLogger.withCondition(Condition.never)
 }

@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, EmptySourceCodeFieldBuilder, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
 import java.util.function
@@ -336,45 +336,52 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
 
   @inline
   private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger =
-    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    if (fieldBuilder.isInstanceOf[EmptySourceCodeFieldBuilder]) {
+      core
+    } else {
+      core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    }
 
   @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
     coreLoggerWithFields.asyncLog(level, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
 
   @inline
-  private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    coreLoggerWithFields.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+  private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
+    if (condition != Condition.never) {
+      coreLoggerWithFields.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    }
+  }
 
   @inline
   private implicit def toHandle(h: LoggerHandle[FB]): Handle = new Handle {
+    @inline
     override def apply(message: String): Unit = h.log(message)
+    @inline
     override def apply(message: String, e: Throwable): Unit = {
       val f: function.Function[FB, FieldBuilderResult] = _ => onlyException(e)
       h.log(message, f)
     }
+    @inline
     override def apply(message: String, f: FB => FieldBuilderResult): Unit =
       h.log(message, f.asJava)
   }
 
   @inline
   private def handleMessage(level: Level, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    coreLoggerWithFields.log(level, message)
+    handleConsumer(level, handle => handle(message))
 
   @inline
   private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    coreLoggerWithFields.log(level, message, f.asJava, fieldBuilder)
+    handleConsumer(level, handle => handle(message, f))
 
   @inline
   private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    coreLoggerWithFields.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
+    handleConsumer(level, handle => handle(message, e))
 
   @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    if (condition != Condition.never) {
-      coreLoggerWithFields
-        .log(level, condition.asJava, message)
-    }
+      handleConsumer(level, condition, handle => handle(message))
 
   @inline
   private def handleConditionMessageArgs(level: Level, condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
@@ -382,10 +389,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never) {
-      coreLoggerWithFields
-        .log(level, condition.asJava, message, f.asJava, fieldBuilder)
-    }
+      handleConsumer(level, condition, handle => handle(message, f))
   }
 
   @inline
@@ -394,9 +398,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never) {
-      coreLoggerWithFields.log(level, condition.asJava, message, (_: FB) => onlyException(e), fieldBuilder)
-    }
+    handleConsumer(level, condition, handle => handle(message, e))
   }
 
 }
