@@ -5,7 +5,7 @@ import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCodeFieldB
 import sourcecode.{Args, Enclosing, File, Line}
 
 
-trait TracingWithArgsFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+trait VerboseTracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
   def enteringTemplate: String
 
@@ -20,41 +20,39 @@ trait TracingWithArgsFieldBuilder extends SourceCodeFieldBuilder with ValueTypeC
   def throwing(ex: Throwable)(implicit line: Line, file: File,  enc: Enclosing, args: Args): FieldBuilderResult
 }
 
-trait DefaultTracingWithArgsFieldBuilder extends FieldBuilder with TracingWithArgsFieldBuilder {
-  import DefaultTracingWithArgsFieldBuilder._
+trait DefaultVerboseTracingFieldBuilder extends FieldBuilder with VerboseTracingFieldBuilder {
+  import DefaultVerboseTracingFieldBuilder._
 
   override val enteringTemplate: String = "{} {}: {}"
 
-  override val exitingTemplate: String = "{} {}: {} => {}"
+  override val exitingTemplate: String = "{}: {} => {}"
 
-  override val throwingTemplate: String = "{} {}: {} ! {}"
+  override val throwingTemplate: String = "{}: {} ! {}"
 
   override def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
-    val argsValue = ToArrayValue(args.value.map(_.source))
-    list(keyValue(DefaultTracingWithArgsFieldBuilder.Enclosing, enc.value), keyValue(Arguments, argsValue), entryTag)
+    list(string(Signature, signature), entryTag)
   }
 
   override def exiting(retValue: Value[_])(implicit line: Line, file: File,  enc: Enclosing, args: Args): FieldBuilderResult = {
-    val argsValue = ToArrayValue(args.value.map(_.source))
-    list(keyValue(DefaultTracingWithArgsFieldBuilder.Enclosing, enc.value), keyValue(Arguments, argsValue), exitTag, keyValue(Result, retValue))
+    list(string(Signature, signature), exitTag, keyValue(Result, retValue))
   }
 
   override def throwing(ex: Throwable)(implicit line: Line, file: File,  enc: Enclosing, args: Args): FieldBuilderResult = {
-    val argsValue = ToArrayValue(args.value.map(_.source))
-    list(keyValue(DefaultTracingWithArgsFieldBuilder.Enclosing, enc.value), keyValue(Arguments, argsValue), throwingTag, exception(ex))
+    list(string(Signature, signature), throwingTag, exception(ex))
   }
+
+  def signature(implicit enc: Enclosing, args: Args) = s"${enc.value}(${args.value.map(_.source)})"
 }
 
-object DefaultTracingWithArgsFieldBuilder extends DefaultTracingWithArgsFieldBuilder {
+object DefaultVerboseTracingFieldBuilder extends DefaultVerboseTracingFieldBuilder {
 
   val Tag: String       = "tag"
   val Entry: String     = "entry"
   val Exit: String      = "exit"
   val Throwing: String  = "throwing"
 
-  val Arguments: String = "arguments"
   val Result: String    = "result"
-  val Enclosing: String = "enclosing"
+  val Signature: String    = "signature"
 
   val entryTag: Field = keyValue(Tag, Entry)
   val exitTag: Field = keyValue(Tag, Exit)

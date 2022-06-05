@@ -8,7 +8,7 @@ import java.util.function.Function
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
-trait DefaultTraceLoggerMethodsWithArgs[FB <: TracingWithArgsFieldBuilder] extends DefaultMethodsSupport[FB] with TraceLoggerMethodsWithArgs[FB] {
+trait DefaultVerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] extends DefaultMethodsSupport[FB] with VerboseTraceLoggerMethods[FB] {
 
   def trace[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     handle(JLevel.TRACE, attempt)

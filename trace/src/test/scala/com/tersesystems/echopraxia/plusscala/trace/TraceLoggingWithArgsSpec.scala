@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters._
 
 class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = TraceLoggerWithArgsFactory.getLogger(getClass)
+  private val logger = VerboseTraceLoggerFactory.getLogger(getClass)
 
   describe("simple") {
     it("should enter and exit") {
@@ -119,7 +119,7 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
 
-  trait SimpleTraceFieldBuilder extends FieldBuilder with TracingWithArgsFieldBuilder {
+  trait SimpleTraceFieldBuilder extends FieldBuilder with VerboseTracingFieldBuilder {
     override def enteringTemplate: String = "entering: {}"
 
     override def exitingTemplate: String = "exiting: {} => {}"
