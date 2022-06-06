@@ -23,9 +23,8 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       }
       doSomething
 
-      logsContain("doSomething")
-      logsContain("tag=entry")
-      logsContain("tag=exit")
+      logsContain("entry")
+      logsContain("exit")
       logsContain("I return string")
     }
 
@@ -35,9 +34,8 @@ class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       }
 
       Try(divideByZero)
-      logsContain("divideByZero")
-      logsContain("tag=entry")
-      logsContain("tag=throwing")
+      logsContain("entry")
+      logsContain("throwing")
     }
 
     it("should not log if disabled") {
