@@ -77,12 +77,21 @@ lazy val traceLogger = (project in file("trace"))
   .settings(
   name := "trace-logger",
 
-  libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
-  //
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
   libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
-)
+).dependsOn(api % "compile->compile;test->compile")
+
+lazy val verboseTraceLogger = (project in file("verbose-trace"))
+  .settings(
+    name := "verbose-trace-logger",
+
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+  )
   .dependsOn(api % "compile->compile;test->compile")
+
 
 lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).settings(
   Compile / doc / sources                := Seq.empty,
@@ -90,10 +99,8 @@ lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).s
   publishArtifact                        := false,
   publish / skip                         := true,
 
-
-
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion
-).dependsOn(api, logger, asyncLogger, traceLogger)
+).dependsOn(api, logger, asyncLogger, traceLogger, verboseTraceLogger)
 
 lazy val root = (project in file("."))
   .settings(
@@ -102,7 +109,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger, traceLogger, benchmarks)
+  .aggregate(api, logger, asyncLogger, traceLogger, verboseTraceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

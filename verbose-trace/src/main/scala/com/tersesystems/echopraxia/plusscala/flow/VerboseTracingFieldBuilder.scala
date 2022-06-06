@@ -1,8 +1,8 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCodeFieldBuilder, ValueTypeClasses}
-import sourcecode.{Args, Enclosing, File, Line, Text}
+import sourcecode._
 
 trait VerboseTracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 

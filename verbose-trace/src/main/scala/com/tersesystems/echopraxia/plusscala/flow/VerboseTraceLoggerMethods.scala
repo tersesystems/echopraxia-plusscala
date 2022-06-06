@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode.{Args, Enclosing, File, Line}
@@ -6,7 +6,7 @@ import sourcecode.{Args, Enclosing, File, Line}
 trait VerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 
   // Need a solid value to use dependent types here
-  private[trace] val fb: FB = this.fieldBuilder
+  private[flow] val fb: FB = this.fieldBuilder
 
   type ToValue[B] = this.fb.ToValue[B]
 

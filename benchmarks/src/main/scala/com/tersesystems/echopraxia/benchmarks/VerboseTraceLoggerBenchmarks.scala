@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.trace.VerboseTraceLoggerFactory
+import com.tersesystems.echopraxia.plusscala.flow.VerboseTraceLoggerFactory
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 

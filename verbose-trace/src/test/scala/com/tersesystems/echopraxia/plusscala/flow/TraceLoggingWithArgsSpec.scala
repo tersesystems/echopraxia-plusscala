@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent

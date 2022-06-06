@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import com.tersesystems.echopraxia.api
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}

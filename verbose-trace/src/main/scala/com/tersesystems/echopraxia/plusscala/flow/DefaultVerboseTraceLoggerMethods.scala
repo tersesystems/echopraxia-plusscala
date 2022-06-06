@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import com.tersesystems.echopraxia.api.{FieldBuilderResult, Level => JLevel}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
