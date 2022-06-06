@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -12,9 +12,9 @@ import java.util
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 
-class TraceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+class FlowLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = TraceLoggerFactory.getLogger(getClass)
+  private val logger = FlowLoggerFactory.getLogger(getClass)
 
   describe("simple") {
     it("should enter and exit") {

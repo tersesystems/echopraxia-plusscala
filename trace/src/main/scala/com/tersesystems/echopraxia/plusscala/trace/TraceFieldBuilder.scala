@@ -1,10 +1,10 @@
-package com.tersesystems.echopraxia.plusscala.flow
+package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCodeFieldBuilder, ValueTypeClasses}
 import sourcecode._
 
-trait VerboseTracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+trait TraceFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
   def enteringTemplate: String
 
@@ -19,8 +19,8 @@ trait VerboseTracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeCl
   def throwing(ex: Throwable)(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult
 }
 
-trait DefaultVerboseTracingFieldBuilder extends FieldBuilder with VerboseTracingFieldBuilder {
-  import DefaultVerboseTracingFieldBuilder._
+trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
+  import DefaultTraceFieldBuilder._
 
   override val enteringTemplate: String = "{}: {}({})"
 
@@ -55,7 +55,7 @@ trait DefaultVerboseTracingFieldBuilder extends FieldBuilder with VerboseTracing
   def signature(implicit enc: Enclosing, args: Args) = s"${enc.value}(${args.value.map(argumentTypes).mkString(",")})"
 }
 
-object DefaultVerboseTracingFieldBuilder extends DefaultVerboseTracingFieldBuilder {
+object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder {
 
   val TraceTag: String = "traceTag"
   val Entry: String    = "entry"

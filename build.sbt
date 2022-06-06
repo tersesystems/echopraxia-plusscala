@@ -73,17 +73,17 @@ lazy val asyncLogger = (project in file("async"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val traceLogger = (project in file("trace"))
+lazy val flowLogger = (project in file("flow"))
   .settings(
-  name := "trace-logger",
+  name := "flow-logger",
 
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
   libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
 ).dependsOn(api % "compile->compile;test->compile")
 
-lazy val verboseTraceLogger = (project in file("verbose-trace"))
+lazy val traceLogger = (project in file("trace"))
   .settings(
-    name := "verbose-trace-logger",
+    name := "trace-logger",
 
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
@@ -100,7 +100,7 @@ lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).s
   publish / skip                         := true,
 
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion
-).dependsOn(api, logger, asyncLogger, traceLogger, verboseTraceLogger)
+).dependsOn(api, logger, asyncLogger, flowLogger, traceLogger)
 
 lazy val root = (project in file("."))
   .settings(
@@ -109,7 +109,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger, traceLogger, verboseTraceLogger, benchmarks)
+  .aggregate(api, logger, asyncLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

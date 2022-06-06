@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.flow.VerboseTraceLoggerFactory
+import com.tersesystems.echopraxia.plusscala.flow.FlowLoggerFactory
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class VerboseTraceLoggerBenchmarks {
-  import VerboseTraceLoggerBenchmarks._
+class FlowLoggerBenchmarks {
+  import FlowLoggerBenchmarks._
 
   @Benchmark
   def info(blackhole: Blackhole): Unit = {
@@ -23,7 +23,6 @@ class VerboseTraceLoggerBenchmarks {
     }
     blackhole.consume(result)
   }
-
   @Benchmark
   def neverInfo(blackhole: Blackhole): Unit = {
     val result = neverLogger.info {
@@ -42,8 +41,8 @@ class VerboseTraceLoggerBenchmarks {
 
 }
 
-object VerboseTraceLoggerBenchmarks {
-  private val logger = VerboseTraceLoggerFactory.getLogger
+object FlowLoggerBenchmarks {
+  private val logger = FlowLoggerFactory.getLogger
 
   private val neverLogger = logger.withCondition(Condition.never)
 }

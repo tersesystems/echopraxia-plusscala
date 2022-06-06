@@ -5,19 +5,19 @@ import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
 object TraceLoggerFactory {
   val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName
 
-  val fieldBuilder: TracingFieldBuilder = DefaultTracingFieldBuilder
+  val fieldBuilder: TraceFieldBuilder = DefaultTraceFieldBuilder
 
-  def getLogger(name: String): TraceLogger[TracingFieldBuilder] = {
+  def getLogger(name: String): TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     new TraceLogger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): TraceLogger[TracingFieldBuilder] = {
+  def getLogger(clazz: Class[_]): TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     new TraceLogger(core, fieldBuilder)
   }
 
-  def getLogger: TraceLogger[TracingFieldBuilder] = {
+  def getLogger: TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     new TraceLogger(core, fieldBuilder)
   }

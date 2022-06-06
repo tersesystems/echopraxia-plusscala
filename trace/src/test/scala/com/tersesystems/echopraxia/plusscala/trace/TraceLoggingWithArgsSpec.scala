@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.flow
+package com.tersesystems.echopraxia.plusscala.trace
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters._
 
 class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = VerboseTraceLoggerFactory.getLogger(getClass)
+  private val logger = TraceLoggerFactory.getLogger(getClass)
 
   describe("simple") {
     it("should enter and exit") {
@@ -119,7 +119,7 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
 
-  trait SimpleTraceFieldBuilder extends FieldBuilder with VerboseTracingFieldBuilder {
+  trait SimpleTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
     override def enteringTemplate: String = "entering: {}"
 
     override def exitingTemplate: String = "exiting: {} => {}"
