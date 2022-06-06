@@ -6,7 +6,6 @@ import org.openjdk.jmh.annotations.{Benchmark, BenchmarkMode, Fork, Measurement,
 
 import java.util.concurrent.{Executor, TimeUnit}
 
-
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
@@ -63,7 +62,7 @@ object AsyncLoggerBenchmarks {
     override def execute(command: Runnable): Unit = {}
   })
 
-  trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
+  trait SourceInfoBuilder  extends FieldBuilder with DefaultSourceCodeFieldBuilder
   object SourceInfoBuilder extends SourceInfoBuilder
 
   private val sourceInfoLogger = logger.withFieldBuilder(SourceInfoBuilder)
