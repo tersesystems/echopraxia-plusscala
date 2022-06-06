@@ -60,12 +60,12 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     val autoLogger = logger.withFieldBuilder(AutoFieldBuilder)
 
     it("should derive a case class") {
-      val paymentInfo = PaymentInfo("41111111", Instant.now())
+      val paymentInfo  = PaymentInfo("41111111", Instant.now())
       val shippingInfo = ShippingInfo("address 1", "address 2")
-      val sku1 = Sku(232313, "some furniture")
-      val lineItems = Seq(LineItem(sku1, 1))
-      val user = User("user1", 2342331)
-      val order = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
+      val sku1         = Sku(232313, "some furniture")
+      val lineItems    = Seq(LineItem(sku1, 1))
+      val user         = User("user1", 2342331)
+      val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
       autoLogger.info("{}", _.keyValue("order", order))
     }
 
@@ -86,12 +86,12 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     val semiAutoLogger = logger.withFieldBuilder(SemiAutoFieldBuilder)
 
     it("should derive a case class") {
-      val paymentInfo = PaymentInfo("41111111", Instant.now())
+      val paymentInfo  = PaymentInfo("41111111", Instant.now())
       val shippingInfo = ShippingInfo("address 1", "address 2")
-      val sku1 = Sku(232313, "some furniture")
-      val lineItems = Seq(LineItem(sku1, 1))
-      val user = User("user1", 2342331)
-      val order = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
+      val sku1         = Sku(232313, "some furniture")
+      val lineItems    = Seq(LineItem(sku1, 1))
+      val user         = User("user1", 2342331)
+      val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
       semiAutoLogger.info("{}", _.keyValue("order", order))
     }
 
@@ -105,7 +105,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     it("should derive a tuple") {
       pending // of limited value :-/
-      //semiAutoLogger.info("{}", _.keyValue("tuple", (1,2,3,4)))
+      // semiAutoLogger.info("{}", _.keyValue("tuple", (1,2,3,4)))
     }
   }
 

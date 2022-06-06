@@ -29,6 +29,6 @@ trait VerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] { self: Defaul
   def error[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
   def error[B: ToValue](condition: Condition)(
-    attempt: => B
+      attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 }

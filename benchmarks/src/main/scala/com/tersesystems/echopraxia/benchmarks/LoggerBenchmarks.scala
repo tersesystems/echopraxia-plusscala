@@ -60,7 +60,7 @@ class LoggerBenchmarks {
 object LoggerBenchmarks {
   private val logger = LoggerFactory.getLogger
 
-  trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
+  trait SourceInfoBuilder  extends FieldBuilder with DefaultSourceCodeFieldBuilder
   object SourceInfoBuilder extends SourceInfoBuilder
 
   private val sourceInfoLogger = logger.withFieldBuilder(SourceInfoBuilder)

@@ -47,7 +47,7 @@ trait DefaultVerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] extends
   }
 
   def error[B: ToValue](condition: Condition)(
-    attempt: => B
+      attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     handleCondition(JLevel.ERROR, condition, attempt)
   }
@@ -58,29 +58,28 @@ trait DefaultVerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] extends
   }.asJava
 
   @inline
-  private def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = {
-    fb: FB =>
-      fb.entering
+  private def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.entering
   }.asJava
 
   @inline
   private def exiting[B: ToValue](
-                                   ret: B
-                                 )(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+      ret: B
+  )(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
     fb.exiting(implicitly[ToValue[B]].toValue(ret))
   }.asJava
 
   @inline
   private def throwing(
-                        ex: Throwable
-                      )(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
+      ex: Throwable
+  )(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
     fb.throwing(ex)
   }.asJava
 
   protected def handle[B: ToValue](
-                                    level: JLevel,
-                                    attempt: => B
-                                  )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
+      level: JLevel,
+      attempt: => B
+  )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     if (!core.isEnabled(level)) {
       attempt
     } else {
@@ -89,10 +88,10 @@ trait DefaultVerboseTraceLoggerMethods[FB <: VerboseTracingFieldBuilder] extends
   }
 
   protected def handleCondition[B: ToValue](
-                                             level: JLevel,
-                                             condition: Condition,
-                                             attempt: => B
-                                           )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
+      level: JLevel,
+      condition: Condition,
+      attempt: => B
+  )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     if (!core.isEnabled(level, condition.asJava)) {
       attempt
     } else {

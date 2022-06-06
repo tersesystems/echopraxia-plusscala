@@ -41,14 +41,14 @@ trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
 }
 
 object DefaultTracingFieldBuilder extends DefaultTracingFieldBuilder {
-  val Tag: String       = "tag"
-  val Entry: String     = "entry"
-  val Exit: String      = "exit"
+  val Tag: String   = "tag"
+  val Entry: String = "entry"
+  val Exit: String  = "exit"
 
-  val Throwing: String  = "throwing"
-  val Result: String    = "result"
+  val Throwing: String = "throwing"
+  val Result: String   = "result"
 
-  val entryTag: Field = keyValue(Tag, Entry)
-  val exitTag: Field = keyValue(Tag, Exit)
+  val entryTag: Field    = keyValue(Tag, Entry)
+  val exitTag: Field     = keyValue(Tag, Exit)
   val throwingTag: Field = keyValue(Tag, Throwing)
 }

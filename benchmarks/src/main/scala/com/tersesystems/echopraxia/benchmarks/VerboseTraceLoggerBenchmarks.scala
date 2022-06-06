@@ -42,7 +42,6 @@ class VerboseTraceLoggerBenchmarks {
 
 }
 
-
 object VerboseTraceLoggerBenchmarks {
   private val logger = VerboseTraceLoggerFactory.getLogger
 

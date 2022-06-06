@@ -52,9 +52,8 @@ trait DefaultTraceLoggerMethods[FB <: TracingFieldBuilder] extends DefaultMethod
   }
 
   @inline
-  private def entering: Function[FB, FieldBuilderResult] = {
-    fb: FB =>
-      fb.entering
+  private def entering: Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.entering
   }.asJava
 
   @inline

@@ -130,8 +130,7 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
       keyValue("method", enc.value)
     }
 
-    override def exiting(value: Value[_])
-                        (implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
+    override def exiting(value: Value[_])(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
       list(
         this.keyValue("method", enc.value),
         this.value("returning", value)

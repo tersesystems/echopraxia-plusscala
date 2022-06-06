@@ -377,7 +377,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
 
   @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
-      handleConsumer(level, condition, handle => handle(message))
+    handleConsumer(level, condition, handle => handle(message))
 
   @inline
   private def handleConditionMessageArgs(level: Level, condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
@@ -385,7 +385,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
       file: File,
       enc: Enclosing
   ): Unit = {
-      handleConsumer(level, condition, handle => handle(message, f))
+    handleConsumer(level, condition, handle => handle(message, f))
   }
 
   @inline
