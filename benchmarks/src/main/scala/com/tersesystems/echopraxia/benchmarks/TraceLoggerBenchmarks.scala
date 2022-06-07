@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.trace._
+import com.tersesystems.echopraxia.plusscala.trace.TraceLoggerFactory
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
@@ -23,6 +23,7 @@ class TraceLoggerBenchmarks {
     }
     blackhole.consume(result)
   }
+
   @Benchmark
   def neverInfo(blackhole: Blackhole): Unit = {
     val result = neverLogger.info {

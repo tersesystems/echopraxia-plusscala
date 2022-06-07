@@ -1,9 +1,9 @@
-package com.tersesystems.echopraxia.plusscala.trace
+package com.tersesystems.echopraxia.plusscala.flow
 
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.plusscala.api._
 
-trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+trait FlowFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
   def enteringTemplate: String
 
@@ -18,8 +18,8 @@ trait TracingFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
   def throwing(ex: Throwable): FieldBuilderResult
 }
 
-trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
-  import DefaultTracingFieldBuilder._
+trait DefaultFlowFieldBuilder extends FieldBuilder with FlowFieldBuilder {
+  import DefaultFlowFieldBuilder._
 
   override val enteringTemplate: String = "{}"
 
@@ -40,8 +40,8 @@ trait DefaultTracingFieldBuilder extends FieldBuilder with TracingFieldBuilder {
   }
 }
 
-object DefaultTracingFieldBuilder extends DefaultTracingFieldBuilder {
-  val Tag: String   = "tag"
+object DefaultFlowFieldBuilder extends DefaultFlowFieldBuilder {
+  val Tag: String   = "flowTag"
   val Entry: String = "entry"
   val Exit: String  = "exit"
 

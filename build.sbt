@@ -73,16 +73,25 @@ lazy val asyncLogger = (project in file("async"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val traceLogger = (project in file("trace"))
+lazy val flowLogger = (project in file("flow"))
   .settings(
-  name := "trace-logger",
+  name := "flow-logger",
 
-  libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
-  //
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
   libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
-)
+).dependsOn(api % "compile->compile;test->compile")
+
+lazy val traceLogger = (project in file("trace"))
+  .settings(
+    name := "trace-logger",
+
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+  )
   .dependsOn(api % "compile->compile;test->compile")
+
 
 lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).settings(
   Compile / doc / sources                := Seq.empty,
@@ -90,10 +99,8 @@ lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).s
   publishArtifact                        := false,
   publish / skip                         := true,
 
-
-
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion
-).dependsOn(api, logger, asyncLogger, traceLogger)
+).dependsOn(api, logger, asyncLogger, flowLogger, traceLogger)
 
 lazy val root = (project in file("."))
   .settings(
@@ -102,7 +109,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger, traceLogger, benchmarks)
+  .aggregate(api, logger, asyncLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

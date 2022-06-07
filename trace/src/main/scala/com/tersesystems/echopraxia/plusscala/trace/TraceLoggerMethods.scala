@@ -1,47 +1,34 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
+import sourcecode.{Args, Enclosing, File, Line}
 
-trait TraceLoggerMethods[FB <: TracingFieldBuilder] { self: DefaultMethodsSupport[FB] =>
+trait TraceLoggerMethods[FB <: TraceFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 
   // Need a solid value to use dependent types here
   private[trace] val fb: FB = this.fieldBuilder
 
   type ToValue[B] = this.fb.ToValue[B]
 
-  // -----------------------------------------
-  // Trace
+  def trace[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def trace[B: ToValue](attempt: => B): B
+  def trace[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def trace[B: ToValue](condition: Condition)(attempt: => B): B
+  def debug[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  // -----------------------------------------
-  // Debug
+  def debug[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def debug[B: ToValue](attempt: => B): B
+  def info[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def debug[B: ToValue](condition: Condition)(attempt: => B): B
+  def info[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  // -----------------------------------------
-  // Info
+  def warn[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def info[B: ToValue](attempt: => B): B
+  def warn[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  def info[B: ToValue](condition: Condition)(attempt: => B): B
+  def error[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 
-  // -----------------------------------------
-  // Warn
-
-  def warn[B: ToValue](attempt: => B): B
-
-  def warn[B: ToValue](condition: Condition)(attempt: => B): B
-
-  // -----------------------------------------
-  // Error
-
-  def error[B: ToValue](attempt: => B): B
-
-  def error[B: ToValue](condition: Condition)(attempt: => B): B
-
+  def error[B: ToValue](condition: Condition)(
+      attempt: => B
+  )(implicit line: Line, file: File, enc: Enclosing, args: Args): B
 }
