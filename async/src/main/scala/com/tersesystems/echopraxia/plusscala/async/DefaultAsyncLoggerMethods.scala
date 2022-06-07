@@ -339,12 +339,15 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
     core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
 
   @inline
-  private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
-    coreLoggerWithFields.asyncLog(level, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+  private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
+    if (core.isEnabled(level)) {
+      coreLoggerWithFields.asyncLog(level, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    }
+  }
 
   @inline
   private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (condition != Condition.never) {
+    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
     }
   }

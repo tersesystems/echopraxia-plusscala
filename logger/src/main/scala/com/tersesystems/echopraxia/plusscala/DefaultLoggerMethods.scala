@@ -452,31 +452,29 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
 
   @inline
   private def handleMessage(level: Level, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    coreLoggerWithFields.log(level, message)
+    if (core.isEnabled(level)) {
+      coreLoggerWithFields.log(level, message)
+    }
   }
 
   @inline
   private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    coreLoggerWithFields
-      .log(level, message, f.asJava, fieldBuilder)
+    if (core.isEnabled(level)) {
+      coreLoggerWithFields.log(level, message, f.asJava, fieldBuilder)
+    }
   }
 
   @inline
   private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    coreLoggerWithFields
-      .log(
-        level,
-        message,
-        (_: FB) => onlyException(e),
-        fieldBuilder
-      )
+    if (core.isEnabled(level)) {
+      coreLoggerWithFields.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
+    }
   }
 
   @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (condition != Condition.never) {
-      coreLoggerWithFields
-        .log(level, condition.asJava, message)
+    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
+      coreLoggerWithFields.log(level, condition.asJava, message)
     }
   }
 
@@ -486,7 +484,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never) {
+    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields
         .log(level, condition.asJava, message, f.asJava, fieldBuilder)
     }
@@ -498,7 +496,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never) {
+    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields
         .log(
           level,

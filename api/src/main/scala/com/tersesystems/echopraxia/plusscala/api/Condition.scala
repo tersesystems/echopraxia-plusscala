@@ -56,7 +56,9 @@ trait Condition {
     this.test(level, context) ^ c.test(level, context)
   }
 
-  def asJava: JCondition = { (level: JLevel, javaContext: JLoggingContext) =>
+  def asJava: JCondition = javaCondition
+
+  private lazy val javaCondition: JCondition = { (level: JLevel, javaContext: JLoggingContext) =>
     this.test(level.asScala, javaContext.asScala)
   }
 }
