@@ -347,7 +347,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
 
   @inline
   private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
+    if (core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
     }
   }

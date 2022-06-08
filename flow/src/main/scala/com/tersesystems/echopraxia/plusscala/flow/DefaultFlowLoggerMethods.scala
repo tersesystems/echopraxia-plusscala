@@ -74,10 +74,10 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
       level: JLevel,
       attempt: => B
   ): B = {
-    if (!core.isEnabled(level)) {
-      attempt
-    } else {
+    if (core.isEnabled(level)) {
       execute(level, attempt)
+    } else {
+      attempt
     }
   }
 
@@ -86,15 +86,15 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
       condition: Condition,
       attempt: => B
   ): B = {
-    if (!core.isEnabled(level, condition.asJava)) {
-      attempt
-    } else {
+    if (core.isEnabled(level, condition.asJava)) {
       execute(level, attempt)
+    } else {
+      attempt
     }
   }
 
   @inline
-  protected def execute[B: ToValue](level: JLevel, attempt: => B) = {
+  protected def execute[B: ToValue](level: JLevel, attempt: => B): B = {
     core.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
 
     val result = Try(attempt)

@@ -473,7 +473,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
 
   @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
+    if (core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields.log(level, condition.asJava, message)
     }
   }
@@ -484,7 +484,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
+    if (core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields
         .log(level, condition.asJava, message, f.asJava, fieldBuilder)
     }
@@ -496,7 +496,7 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (condition != Condition.never && core.isEnabled(level, condition.asJava)) {
+    if (core.isEnabled(level, condition.asJava)) {
       coreLoggerWithFields
         .log(
           level,
