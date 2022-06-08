@@ -1,27 +1,28 @@
 # Benchmarks
 
 ```
-[info] Benchmark                                 Mode  Cnt     Score     Error  Units
-[info] AsyncLoggerBenchmarks.info                avgt    5    95.434 ±   3.797  ns/op
-[info] AsyncLoggerBenchmarks.infoWithBooleanArg  avgt    5   101.591 ±   0.726  ns/op
-[info] AsyncLoggerBenchmarks.infoWithIntegerArg  avgt    5   103.525 ±  14.103  ns/op
-[info] AsyncLoggerBenchmarks.infoWithSource      avgt    5   107.901 ±   9.406  ns/op
-[info] AsyncLoggerBenchmarks.infoWithStringArg   avgt    5   103.351 ±   1.196  ns/op
-[info] AsyncLoggerBenchmarks.neverInfo           avgt    5     1.254 ±   0.008  ns/op
-[info] AsyncLoggerBenchmarks.trace               avgt    5   109.861 ±   1.687  ns/op
-[info] AsyncLoggerBenchmarks.traceWithStringArg  avgt    5   111.784 ±  21.756  ns/op
-[info] FlowLoggerBenchmarks.info                 avgt    5   467.641 ±  66.188  ns/op
-[info] FlowLoggerBenchmarks.neverInfo            avgt    5     4.890 ±   0.036  ns/op
-[info] FlowLoggerBenchmarks.trace                avgt    5    11.426 ±   0.110  ns/op
-[info] LoggerBenchmarks.info                     avgt    5   191.060 ±   1.239  ns/op
-[info] LoggerBenchmarks.infoWithBooleanArg       avgt    5   260.669 ±  23.719  ns/op
-[info] LoggerBenchmarks.infoWithIntegerArg       avgt    5   263.737 ±  15.033  ns/op
-[info] LoggerBenchmarks.infoWithSource           avgt    5   385.463 ±  18.627  ns/op
-[info] LoggerBenchmarks.infoWithStringArg        avgt    5   274.432 ±   2.439  ns/op
-[info] LoggerBenchmarks.neverInfo                avgt    5     1.345 ±   0.012  ns/op
-[info] LoggerBenchmarks.trace                    avgt    5   117.077 ±   0.880  ns/op
-[info] LoggerBenchmarks.traceWithStringArg       avgt    5   118.577 ±   1.670  ns/op
-[info] TraceLoggerBenchmarks.info                avgt    5  1697.357 ± 184.190  ns/op
-[info] TraceLoggerBenchmarks.neverInfo           avgt    5    16.166 ±   0.206  ns/op
-[info] TraceLoggerBenchmarks.trace               avgt    5    25.556 ±   8.683  ns/op
+[info] Benchmark                                 Mode  Cnt     Score    Error  Units
+[info] AsyncLoggerBenchmarks.info                avgt   20    89.934 ±  1.344  ns/op
+[info] AsyncLoggerBenchmarks.infoWithBooleanArg  avgt   20   104.725 ±  2.377  ns/op
+[info] AsyncLoggerBenchmarks.infoWithIntegerArg  avgt   20   103.899 ±  3.197  ns/op
+[info] AsyncLoggerBenchmarks.infoWithSource      avgt   20   103.367 ±  2.734  ns/op
+[info] AsyncLoggerBenchmarks.infoWithStringArg   avgt   20   109.117 ±  3.096  ns/op
+[info] AsyncLoggerBenchmarks.neverInfo           avgt   20     1.255 ±  0.002  ns/op
+[info] AsyncLoggerBenchmarks.trace               avgt   20     7.177 ±  0.036  ns/op
+[info] AsyncLoggerBenchmarks.traceWithStringArg  avgt   20     7.613 ±  0.043  ns/op
+[info] FlowLoggerBenchmarks.info                 avgt   20   427.362 ±  3.829  ns/op
+[info] FlowLoggerBenchmarks.neverInfo            avgt   20     4.861 ±  0.157  ns/op
+[info] FlowLoggerBenchmarks.trace                avgt   20    10.365 ±  0.116  ns/op
+[info] LoggerBenchmarks.info                     avgt   20   193.176 ±  0.919  ns/op
+[info] LoggerBenchmarks.infoWithBooleanArg       avgt   20   340.025 ±  5.697  ns/op
+[info] LoggerBenchmarks.infoWithIntegerArg       avgt   20   336.608 ±  0.956  ns/op
+[info] LoggerBenchmarks.infoWithSource           avgt   20   441.175 ± 13.766  ns/op
+[info] LoggerBenchmarks.infoWithStringArg        avgt   20   294.614 ±  7.904  ns/op
+[info] LoggerBenchmarks.neverInfo                avgt   20     1.234 ±  0.007  ns/op
+[info] LoggerBenchmarks.trace                    avgt   20     8.005 ±  0.035  ns/op
+[info] LoggerBenchmarks.traceWithStringArg       avgt   20     7.757 ±  0.273  ns/op
+[info] TraceLoggerBenchmarks.info                avgt   20  1601.620 ±  7.476  ns/op
+[info] TraceLoggerBenchmarks.neverInfo           avgt   20    16.946 ±  0.377  ns/op
+[info] TraceLoggerBenchmarks.trace               avgt   20    23.205 ±  0.083  ns/op
 ```
+

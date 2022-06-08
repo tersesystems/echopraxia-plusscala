@@ -80,10 +80,10 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       level: JLevel,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (!core.isEnabled(level)) {
-      attempt
-    } else {
+    if (core.isEnabled(level)) {
       execute(level, attempt)
+    } else {
+      attempt
     }
   }
 
@@ -92,15 +92,15 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       condition: Condition,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (!core.isEnabled(level, condition.asJava)) {
-      attempt
-    } else {
+    if (core.isEnabled(level, condition.asJava)) {
       execute(level, attempt)
+    } else {
+      attempt
     }
   }
 
   @inline
-  protected def execute[B: ToValue](level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args) = {
+  protected def execute[B: ToValue](level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
     coreWithFields.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
 
