@@ -337,22 +337,18 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
 
   @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level)) {
-      val supplier = new Supplier[java.util.List[Field]] {
-        override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
-      }
-      core.asyncLog(level, supplier, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    val supplier = new Supplier[java.util.List[Field]] {
+      override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
     }
+    core.asyncLog(level, supplier, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
   }
 
   @inline
   private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level, condition.asJava)) {
-      val supplier = new Supplier[java.util.List[Field]] {
-        override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
-      }
-      core.asyncLog(level, supplier, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    val supplier = new Supplier[java.util.List[Field]] {
+      override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
     }
+    core.asyncLog(level, supplier, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
   }
 
   @inline

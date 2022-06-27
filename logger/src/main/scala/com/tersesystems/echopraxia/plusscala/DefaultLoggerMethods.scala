@@ -452,30 +452,22 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
 
   @inline
   private def handleMessage(level: Level, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level)) {
-      coreLoggerWithFields.log(level, message)
-    }
+    coreLoggerWithFields.log(level, message)
   }
 
   @inline
   private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level)) {
-      coreLoggerWithFields.log(level, message, f.asJava, fieldBuilder)
-    }
+    coreLoggerWithFields.log(level, message, f.asJava, fieldBuilder)
   }
 
   @inline
   private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level)) {
-      coreLoggerWithFields.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
-    }
+    coreLoggerWithFields.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
   }
 
   @inline
   private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    if (core.isEnabled(level, condition.asJava)) {
-      coreLoggerWithFields.log(level, condition.asJava, message)
-    }
+    coreLoggerWithFields.log(level, condition.asJava, message)
   }
 
   @inline
@@ -484,10 +476,8 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (core.isEnabled(level, condition.asJava)) {
-      coreLoggerWithFields
+    coreLoggerWithFields
         .log(level, condition.asJava, message, f.asJava, fieldBuilder)
-    }
   }
 
   @inline
@@ -496,16 +486,14 @@ trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[F
       file: File,
       enc: Enclosing
   ): Unit = {
-    if (core.isEnabled(level, condition.asJava)) {
-      coreLoggerWithFields
-        .log(
-          level,
-          condition.asJava,
-          message,
-          (_: FB) => onlyException(e),
-          fieldBuilder
-        )
-    }
+    coreLoggerWithFields
+      .log(
+        level,
+        condition.asJava,
+        message,
+        (_: FB) => onlyException(e),
+        fieldBuilder
+      )
   }
 
   @inline

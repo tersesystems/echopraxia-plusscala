@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{FieldBuilderResult, Level => JLevel}
+import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Level => JLevel}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode._
 
@@ -80,8 +80,9 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       level: JLevel,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (core.isEnabled(level)) {
-      execute(level, attempt)
+    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    if (coreWithFields.isEnabled(level)) {
+      execute(coreWithFields, level, attempt)
     } else {
       attempt
     }
@@ -92,18 +93,17 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       condition: Condition,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (core.isEnabled(level, condition.asJava)) {
-      execute(level, attempt)
+    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+    if (coreWithFields.isEnabled(level, condition.asJava)) {
+      execute(coreWithFields, level, attempt)
     } else {
       attempt
     }
   }
 
   @inline
-  protected def execute[B: ToValue](level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
+  protected def execute[B: ToValue](coreWithFields: CoreLogger, level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
     coreWithFields.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
-
     val result = Try(attempt)
     result match {
       case Success(ret) =>

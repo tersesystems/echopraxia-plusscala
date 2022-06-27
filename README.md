@@ -182,7 +182,7 @@ trait TraceFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
 ### Flow Logger
 
-The flow logger does not contains source code information, but simply renders enter and exit information.  This is usually more useful in flow situations like a `Future`, where the enclosing method name and arguments are not as useful:
+The flow logger does not contain source code information, but simply renders enter and exit information.  This is usually more useful in flow situations like a `Future`, where the enclosing method name and arguments are not as useful:
 
 ```scala
 import com.tersesystems.echopraxia.plusscala.flow._
