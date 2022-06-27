@@ -95,13 +95,9 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 }
 ```
 
-## Trace Logger
+## Trace and Flow Loggers
 
-You can use a trace logger to debug methods and interactions in your code.  
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace" % echopraxiaPlusScalaVersion
-```
+You can use a trace or flow logger to debug methods and interactions in your code.  The API between the trace and flow loggers is the same, but the trace logger is considerably more verbose than flow and includes source information that has a small (~28 nanosecond) runtime impact even when disabled with `Condition.never`.
 
 This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
 
@@ -113,40 +109,132 @@ def myMethod(arg1: String): Int = traceLogger.trace {
 }
 ```
 
+
+### Trace Logger
+
 Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.
 
-The behavior of the trace logger is determined by `TracingFieldBuilder`.  You can extend `DefaultTracingFieldBuilder` and override various bits of functionality, such as `argumentField`:
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace-logger" % echopraxiaPlusScalaVersion
+```
+
+The following program extends the DefaultTraceFieldBuilder to use automatic derivation, useful for mapping return values: 
 
 ```scala
+import com.tersesystems.echopraxia.plusscala.api.AutoDerivation
+import com.tersesystems.echopraxia.plusscala.trace._
+
 object TraceMain {
-
-  trait TraceFieldBuilder extends DefaultTracingFieldBuilder with AutoDerivation {
-    override def argumentField(txt: Text[_]): Field = {
-      // you can override how arguments are presented
-      value(txt.source, Objects.toString(txt.value))
-    }
-  }
-  object TraceFieldBuilder extends TraceFieldBuilder
-
-  private val traceLogger = TraceLoggerFactory.getLogger.withFieldBuilder(TraceFieldBuilder)
-
-  private def createFoo(barValue: String): Foo = traceLogger.trace {
+  trait AutoTraceFieldBuilder extends DefaultTraceFieldBuilder with AutoDerivation
+  object AutoTraceFieldBuilder extends AutoTraceFieldBuilder
+  
+  private val logger = TraceLoggerFactory.getLogger.withFieldBuilder(AutoTraceFieldBuilder)
+  
+  private def createFoo(barValue: String): Foo = logger.trace {
     Foo(Bar(barValue))
   }
 
+  private def getBar(foo: Foo): Bar = logger.trace {
+    foo.bar
+  }
+
+  private def noArgsBar: Bar = logger.trace {
+    Bar("noArgsBar")
+  }
+
   def main(args: Array[String]): Unit = {
-    val foo = createFoo("bar value")
-    println(s"foo = $foo")
+    val foo = createFoo("bar")
+    getBar(foo)
+    noArgsBar
   }
 }
 ```
 
-produces the following:
+This renders input and output automatically with arguments included:
 
 ```
-16:45:24.839 TRACE [main]: {method=com.example.TraceMain.createFoo, tag=entry, arguments=[[{bar value}]]}
-16:45:24.885 TRACE [main]: {com.example.TraceMain.createFoo, exit, result={bar=bar value}}
-foo = Foo(Bar(bar value))
+8:55:32.269 TRACE [main]: com.example.TraceMain.createFoo(barValue: String): entry(bar)
+8:55:32.284 TRACE [main]: com.example.TraceMain.createFoo(barValue: String): exit(bar) => {@type=com.example.Foo, bar=bar}
+8:55:32.288 TRACE [main]: com.example.TraceMain.getBar(foo: Foo): entry(Foo(Bar(bar)))
+8:55:32.289 TRACE [main]: com.example.TraceMain.getBar(foo: Foo): exit(Foo(Bar(bar))) => bar
+8:55:32.291 TRACE [main]: com.example.TraceMain.noArgsBar(): entry()
+8:55:32.291 TRACE [main]: com.example.TraceMain.noArgsBar(): exit() => noArgsBar
+```
+
+You can override the default behavior by implementing `TraceFieldBuilder`, which take implicit source code arguments -- this is the primary difference between the trace logger and the flow logger.
+
+```scala
+trait TraceFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+
+  def enteringTemplate: String
+
+  def exitingTemplate: String
+
+  def throwingTemplate: String
+
+  def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult
+
+  def exiting(value: Value[_])(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult
+
+  def throwing(ex: Throwable)(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult
+}
+```
+
+### Flow Logger
+
+The flow logger does not contains source code information, but simply renders enter and exit information.  This is usually more useful in flow situations like a `Future`, where the enclosing method name and arguments are not as useful:
+
+```scala
+import com.tersesystems.echopraxia.plusscala.flow._
+
+object FlowMain {
+  trait AutoFlowFieldBuilder extends DefaultFlowFieldBuilder with AutoDerivation
+  object AutoFlowFieldBuilder extends AutoFlowFieldBuilder
+
+  private val logger = FlowLoggerFactory.getLogger.withFieldBuilder(AutoFlowFieldBuilder)
+
+  private def someFuture: Future[Bar] = Future {
+    logger.trace { // trace input and output of futures 
+      Bar("futureBar")
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    Await.result(someFuture, Duration.Inf)
+  }
+}
+```
+
+To use the flow logger, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "flow-logger" % echopraxiaPlusScalaVersion
+```
+
+The above program produces the following output:
+
+```
+21:53:02.909 TRACE [scala-execution-context-global-15]: entry
+21:53:02.910 TRACE [scala-execution-context-global-15]: exit => futureBar
+```
+
+You can override the behavior of the logger by overriding the `FlowFieldBuilder` trait with your own implementation:
+
+```scala
+trait FlowFieldBuilder extends ValueTypeClasses {
+
+  def enteringTemplate: String
+
+  def exitingTemplate: String
+
+  def throwingTemplate: String
+
+  def entering: FieldBuilderResult
+
+  def exiting(value: Value[_]): FieldBuilderResult
+
+  def throwing(ex: Throwable): FieldBuilderResult
+}
 ```
 
 ## API

@@ -6,7 +6,6 @@ import sourcecode.{Enclosing, File, Line}
 
 import java.util.concurrent.Executor
 import scala.compat.java8.FunctionConverters._
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 /**
  * Async Logger with source code enabled.

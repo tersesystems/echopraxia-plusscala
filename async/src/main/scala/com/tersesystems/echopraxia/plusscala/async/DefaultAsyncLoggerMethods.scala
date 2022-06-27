@@ -2,11 +2,12 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, EmptySourceCodeFieldBuilder, SourceCodeFieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder}
 import sourcecode.{Enclosing, File, Line}
 
+import java.util
 import java.util.function
-import java.util.function.Function
+import java.util.function.{Function, Supplier}
 import scala.compat.java8.FunctionConverters._
 
 /**
@@ -335,20 +336,22 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
   }
 
   @inline
-  private def coreLoggerWithFields(implicit line: Line, file: File, enc: Enclosing): CoreLogger =
-    core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-
-  @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
     if (core.isEnabled(level)) {
-      coreLoggerWithFields.asyncLog(level, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+      val supplier = new Supplier[java.util.List[Field]] {
+        override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
+      }
+      core.asyncLog(level, supplier, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
     }
   }
 
   @inline
   private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
     if (core.isEnabled(level, condition.asJava)) {
-      coreLoggerWithFields.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+      val supplier = new Supplier[java.util.List[Field]] {
+        override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
+      }
+      core.asyncLog(level, supplier, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
     }
   }
 
