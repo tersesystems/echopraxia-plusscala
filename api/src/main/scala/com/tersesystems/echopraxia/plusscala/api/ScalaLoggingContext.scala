@@ -15,8 +15,16 @@ object ScalaLoggingContext {
  * A scala logging context.
  */
 class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
-  override def fields: Seq[Field] = {
+  override lazy val fields: Seq[Field] = {
     context.getFields.asScala.toSeq // needed for 2.13 since it's immutable
+  }
+
+  override lazy val argumentFields: Seq[Field] = {
+    context.getArgumentFields.asScala.toSeq
+  }
+
+  override lazy val loggerFields: Seq[Field] = {
+    context.getLoggerFields.asScala.toSeq
   }
 
   override def findString(jsonPath: String): Option[String] = {

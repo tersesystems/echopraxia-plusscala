@@ -24,5 +24,9 @@ trait FindPathMethods {
 trait LoggingContext extends FindPathMethods {
   def fields: Seq[Field]
 
+  def argumentFields: Seq[Field]
+
+  def loggerFields: Seq[Field]
+
   def asJava: JLoggingContext
 }
