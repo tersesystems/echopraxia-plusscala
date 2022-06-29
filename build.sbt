@@ -66,8 +66,6 @@ lazy val asyncLogger = (project in file("async"))
   .settings(
     name := "async-logger",
     //
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
-    //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
@@ -76,7 +74,7 @@ lazy val asyncLogger = (project in file("async"))
 lazy val flowLogger = (project in file("flow"))
   .settings(
   name := "flow-logger",
-
+  //
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
   libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
 ).dependsOn(api % "compile->compile;test->compile")

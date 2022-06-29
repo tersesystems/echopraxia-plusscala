@@ -53,9 +53,9 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
   }
 
   @inline
-  private def sourceInfoFields(line: Line, file: File, enc: Enclosing): Function[FB, FieldBuilderResult] = { fb: FB =>
+  private def sourceInfoFields(fb: FB)(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
     fb.sourceCodeFields(line.value, file.value, enc.value)
-  }.asJava
+  }
 
   @inline
   private def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): Function[FB, FieldBuilderResult] = { fb: FB =>
@@ -80,9 +80,8 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       level: JLevel,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-    if (coreWithFields.isEnabled(level)) {
-      execute(coreWithFields, level, attempt)
+    if (core.isEnabled(level)) {
+      execute(core, level, attempt)
     } else {
       attempt
     }
@@ -93,23 +92,23 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       condition: Condition,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    val coreWithFields = core.withFields(sourceInfoFields(line, file, enc), fieldBuilder)
-    if (coreWithFields.isEnabled(level, condition.asJava)) {
-      execute(coreWithFields, level, attempt)
+    if (core.isEnabled(level, condition.asJava)) {
+      execute(core, level, attempt)
     } else {
       attempt
     }
   }
 
   @inline
-  protected def execute[B: ToValue](coreWithFields: CoreLogger, level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    coreWithFields.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
+  private def execute[B: ToValue](core: CoreLogger, level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
+    val extraFields = sourceInfoFields(fieldBuilder).fields()
+    core.log(level, () => extraFields, fieldBuilder.enteringTemplate, entering, fieldBuilder)
     val result = Try(attempt)
     result match {
       case Success(ret) =>
-        coreWithFields.log(level, fieldBuilder.exitingTemplate, exiting(ret), fieldBuilder)
+        core.log(level, () => extraFields, fieldBuilder.exitingTemplate, exiting(ret), fieldBuilder)
       case Failure(ex) =>
-        coreWithFields.log(level, fieldBuilder.throwingTemplate, throwing(ex), fieldBuilder)
+        core.log(level, () => extraFields, fieldBuilder.throwingTemplate, throwing(ex), fieldBuilder)
     }
     result.get // rethrow the exception
   }

@@ -2,8 +2,7 @@ package com.tersesystems.echopraxia.plusscala.async
 
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport, SourceCodeFieldBuilder}
-import sourcecode.{Enclosing, File, Line}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 
 import java.util
 import java.util.function
@@ -13,16 +12,16 @@ import scala.compat.java8.FunctionConverters._
 /**
  * Default Async Logger Methods with source code implicits.
  */
-trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLoggerMethods[FB] {
+trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   self: DefaultMethodsSupport[FB] =>
 
   // ------------------------------------------------------------------------
   // TRACE
 
-  override def ifTraceEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifTraceEnabled(consumer: Handle => Unit): Unit =
     handleConsumer(TRACE, consumer)
 
-  override def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit): Unit =
     handleConsumer(TRACE, condition, consumer)
 
   /**
@@ -31,7 +30,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the given message.
    */
-  def trace(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(message: String): Unit =
     handleMessage(TRACE, message)
 
   /**
@@ -42,7 +41,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def trace(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(message: String, f: FB => FieldBuilderResult): Unit =
     handleMessageArgs(TRACE, message, f)
 
   /**
@@ -53,7 +52,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def trace(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(message: String, e: Throwable): Unit =
     handleMessageThrowable(TRACE, message, e)
 
   /**
@@ -64,7 +63,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the message.
    */
-  def trace(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(condition: Condition, message: String): Unit =
     handleConditionMessage(TRACE, condition, message)
 
   /**
@@ -77,7 +76,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit =
     handleConditionMessageArgs(TRACE, condition, message, f)
 
   /**
@@ -90,16 +89,16 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def trace(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def trace(condition: Condition, message: String, e: Throwable): Unit =
     handleConditionMessageThrowable(TRACE, condition, message, e)
 
   // -----------------------------------------------------------
   // DEBUG
 
-  override def ifDebugEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifDebugEnabled(consumer: Handle => Unit): Unit =
     handleConsumer(DEBUG, consumer)
 
-  override def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit): Unit =
     handleConsumer(DEBUG, condition, consumer)
 
   /**
@@ -108,7 +107,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the given message.
    */
-  def debug(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(message: String): Unit =
     handleMessage(DEBUG, message)
 
   /**
@@ -119,7 +118,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def debug(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(message: String, f: FB => FieldBuilderResult): Unit =
     handleMessageArgs(DEBUG, message, f)
 
   /**
@@ -130,7 +129,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def debug(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(message: String, e: Throwable): Unit =
     handleMessageThrowable(DEBUG, message, e)
 
   /**
@@ -141,7 +140,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the message.
    */
-  def debug(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(condition: Condition, message: String): Unit =
     handleConditionMessage(DEBUG, condition, message)
 
   /**
@@ -154,7 +153,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def debug(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(condition: Condition, message: String, e: Throwable): Unit =
     handleConditionMessageThrowable(DEBUG, condition, message, e)
 
   /**
@@ -167,16 +166,16 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit =
     handleConditionMessageArgs(DEBUG, condition, message, f)
 
   // -----------------------------------------------------------
   // INFO
 
-  override def ifInfoEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifInfoEnabled(consumer: Handle => Unit): Unit =
     handleConsumer(INFO, consumer)
 
-  override def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit): Unit =
     handleConsumer(INFO, condition, consumer)
 
   /**
@@ -185,7 +184,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the given message.
    */
-  def info(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(message: String): Unit =
     handleMessage(INFO, message)
 
   /**
@@ -196,7 +195,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def info(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(message: String, f: FB => FieldBuilderResult): Unit =
     handleMessageArgs(INFO, message, f)
 
   /**
@@ -207,7 +206,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def info(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(message: String, e: Throwable): Unit =
     handleMessageThrowable(INFO, message, e)
 
   /**
@@ -218,7 +217,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the message.
    */
-  def info(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(condition: Condition, message: String): Unit =
     handleConditionMessage(INFO, condition, message)
 
   /**
@@ -231,7 +230,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit =
     handleConditionMessageArgs(INFO, condition, message, f)
 
   /**
@@ -244,16 +243,16 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def info(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def info(condition: Condition, message: String, e: Throwable): Unit =
     handleConditionMessageThrowable(INFO, condition, message, e)
 
   // -----------------------------------------------------------
   // WARN
 
-  override def ifWarnEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifWarnEnabled(consumer: Handle => Unit): Unit =
     handleConsumer(WARN, consumer)
 
-  override def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit): Unit =
     handleConsumer(WARN, condition, consumer)
 
   /**
@@ -262,7 +261,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param message
    *   the given message.
    */
-  def warn(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(message: String): Unit =
     handleMessage(WARN, message)
 
   /**
@@ -273,7 +272,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param f
    *   the field builder function.
    */
-  def warn(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(message: String, f: FB => FieldBuilderResult): Unit =
     handleMessageArgs(WARN, message, f)
 
   /**
@@ -284,42 +283,42 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
    * @param e
    *   the given exception.
    */
-  def warn(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(message: String, e: Throwable): Unit =
     handleMessageThrowable(WARN, message, e)
 
-  def warn(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(condition: Condition, message: String): Unit =
     handleConditionMessage(WARN, condition, message)
 
-  def warn(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(condition: Condition, message: String, e: Throwable): Unit =
     handleConditionMessageThrowable(WARN, condition, message, e)
 
-  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit =
     handleConditionMessageArgs(WARN, condition, message, f)
 
   // -----------------------------------------------------------
   // ERROR
 
-  override def ifErrorEnabled(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifErrorEnabled(consumer: Handle => Unit): Unit =
     handleConsumer(ERROR, consumer)
 
-  override def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  override def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit): Unit =
     handleConsumer(ERROR, condition, consumer)
 
-  def error(message: String)(implicit line: Line, file: File, enc: Enclosing): Unit = { handleMessage(ERROR, message) }
+  def error(message: String): Unit = { handleMessage(ERROR, message) }
 
-  def error(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def error(message: String, f: FB => FieldBuilderResult): Unit =
     handleMessageArgs(ERROR, message, f)
 
-  def error(message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def error(message: String, e: Throwable): Unit =
     handleMessageThrowable(ERROR, message, e)
 
-  def error(condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def error(condition: Condition, message: String): Unit =
     handleConditionMessage(ERROR, condition, message)
 
-  def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def error(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit =
     handleConditionMessageArgs(ERROR, condition, message, f)
 
-  def error(condition: Condition, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  def error(condition: Condition, message: String, e: Throwable): Unit =
     handleConditionMessageThrowable(ERROR, condition, message, e)
 
   // -----------------------------------------------------------
@@ -336,7 +335,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
   }
 
   @inline
-  private def handleConsumer(level: Level, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
+  private def handleConsumer(level: Level, consumer: Handle => Unit): Unit = {
     val supplier = new Supplier[java.util.List[Field]] {
       override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
     }
@@ -344,7 +343,7 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
   }
 
   @inline
-  private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit)(implicit line: Line, file: File, enc: Enclosing): Unit = {
+  private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit): Unit = {
     val supplier = new Supplier[java.util.List[Field]] {
       override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
     }
@@ -366,19 +365,19 @@ trait DefaultAsyncLoggerMethods[FB <: SourceCodeFieldBuilder] extends AsyncLogge
   }
 
   @inline
-  private def handleMessage(level: Level, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  private def handleMessage(level: Level, message: String): Unit =
     handleConsumer(level, handle => handle(message))
 
   @inline
-  private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult): Unit =
     handleConsumer(level, handle => handle(message, f))
 
   @inline
-  private def handleMessageThrowable(level: Level, message: String, e: Throwable)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  private def handleMessageThrowable(level: Level, message: String, e: Throwable): Unit =
     handleConsumer(level, handle => handle(message, e))
 
   @inline
-  private def handleConditionMessage(level: Level, condition: Condition, message: String)(implicit line: Line, file: File, enc: Enclosing): Unit =
+  private def handleConditionMessage(level: Level, condition: Condition, message: String): Unit =
     handleConsumer(level, condition, handle => handle(message))
 
   @inline

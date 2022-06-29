@@ -24,23 +24,11 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the given message.
    */
-  def trace(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(message: String): Unit
 
-  def ifTraceEnabled(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifTraceEnabled(consumer: Handle => Unit): Unit
 
-  def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit): Unit
 
   /**
    * Logs statement at TRACE level using a field builder function.
@@ -50,11 +38,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def trace(message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Logs statement at TRACE level with exception.
@@ -64,11 +48,7 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def trace(message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(message: String, e: Throwable): Unit
 
   /**
    * Conditionally logs statement at TRACE level.
@@ -78,11 +58,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the message.
    */
-  def trace(condition: Condition, message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(condition: Condition, message: String): Unit
 
   /**
    * Conditionally logs statement at TRACE level using a field builder function.
@@ -94,11 +70,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -110,26 +82,14 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def trace(condition: Condition, message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def trace(condition: Condition, message: String, e: Throwable): Unit
 
   // ------------------------------------------------------------------------
   // DEBUG
 
-  def ifDebugEnabled(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifDebugEnabled(consumer: Handle => Unit): Unit
 
-  def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifDebugEnabled(condition: Condition)(consumer: Handle => Unit): Unit
 
   /**
    * Logs statement at DEBUG level.
@@ -137,11 +97,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the given message.
    */
-  def debug(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(message: String): Unit
 
   /**
    * Logs statement at DEBUG level using a field builder function.
@@ -151,11 +107,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def debug(message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Logs statement at DEBUG level with exception.
@@ -165,11 +117,7 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def debug(message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(message: String, e: Throwable): Unit
 
   /**
    * Conditionally logs statement at DEBUG level.
@@ -179,11 +127,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the message.
    */
-  def debug(condition: Condition, message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(condition: Condition, message: String): Unit
 
   /**
    * Conditionally logs statement at DEBUG level using a field builder function.
@@ -195,11 +139,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Conditionally logs statement at DEBUG level with exception.
@@ -211,26 +151,14 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def debug(condition: Condition, message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def debug(condition: Condition, message: String, e: Throwable): Unit
 
   // ------------------------------------------------------------------------
   // INFO
 
-  def ifInfoEnabled(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifInfoEnabled(consumer: Handle => Unit): Unit
 
-  def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifInfoEnabled(condition: Condition)(consumer: Handle => Unit): Unit
 
   /**
    * Logs statement at INFO level.
@@ -238,11 +166,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the given message.
    */
-  def info(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(message: String): Unit
 
   /**
    * Logs statement at INFO level using a field builder function.
@@ -252,11 +176,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def info(message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Logs statement at INFO level with exception.
@@ -266,11 +186,7 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def info(message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(message: String, e: Throwable): Unit
 
   /**
    * Conditionally logs statement at INFO level.
@@ -280,11 +196,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the message.
    */
-  def info(condition: Condition, message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(condition: Condition, message: String): Unit
 
   /**
    * Conditionally logs statement at INFO level using a field builder function.
@@ -296,11 +208,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -312,26 +220,14 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def info(condition: Condition, message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def info(condition: Condition, message: String, e: Throwable): Unit
 
   // ------------------------------------------------------------------------
   // WARN
 
-  def ifWarnEnabled(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifWarnEnabled(consumer: Handle => Unit): Unit
 
-  def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifWarnEnabled(condition: Condition)(consumer: Handle => Unit): Unit
 
   /**
    * Logs statement at WARN level.
@@ -339,11 +235,7 @@ trait AsyncLoggerMethods[FB] {
    * @param message
    *   the given message.
    */
-  def warn(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(message: String): Unit
 
   /**
    * Logs statement at WARN level using a field builder function.
@@ -353,11 +245,7 @@ trait AsyncLoggerMethods[FB] {
    * @param f
    *   the field builder function.
    */
-  def warn(message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(message: String, f: FB => FieldBuilderResult): Unit
 
   /**
    * Logs statement at WARN level with exception.
@@ -367,78 +255,30 @@ trait AsyncLoggerMethods[FB] {
    * @param e
    *   the given exception.
    */
-  def warn(message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(message: String, e: Throwable): Unit
 
-  def warn(condition: Condition, message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(condition: Condition, message: String): Unit
 
-  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit
 
-  def warn(condition: Condition, message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def warn(condition: Condition, message: String, e: Throwable): Unit
 
   // ------------------------------------------------------------------------
   // ERROR
 
-  def ifErrorEnabled(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifErrorEnabled(consumer: Handle => Unit): Unit
 
-  def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def ifErrorEnabled(condition: Condition)(consumer: Handle => Unit): Unit
 
-  def error(message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(message: String): Unit
 
-  def error(message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(message: String, f: FB => FieldBuilderResult): Unit
 
-  def error(message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(message: String, e: Throwable): Unit
 
-  def error(condition: Condition, message: String)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(condition: Condition, message: String): Unit
 
-  def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit
 
-  def error(condition: Condition, message: String, e: Throwable)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): Unit
+  def error(condition: Condition, message: String, e: Throwable): Unit
 }

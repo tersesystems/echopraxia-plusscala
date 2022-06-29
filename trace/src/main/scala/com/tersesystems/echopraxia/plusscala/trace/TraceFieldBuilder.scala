@@ -1,8 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
-import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCodeFieldBuilder, ValueTypeClasses}
+import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, ValueTypeClasses}
 import sourcecode._
+
+trait SourceCodeFieldBuilder {
+  def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult
+}
 
 trait TraceFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
 
@@ -19,7 +23,26 @@ trait TraceFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
   def throwing(ex: Throwable)(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult
 }
 
-trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
+trait DefaultSourceCodeFieldBuilder extends SourceCodeFieldBuilder {
+
+  override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = {
+    // XXX since sourcecode data is static, we could cache the result given the inputs
+    // and save on some allocation.  Or would it be possible to turn this into a macro at
+    // and point to constant fields and values?
+    Field
+      .keyValue(
+        "sourcecode",
+        Value.`object`(
+          Field.keyValue("file", Value.string(file)),
+          Field.keyValue("line", Value.number(line: java.lang.Integer)),
+          Field.keyValue("enclosing", Value.string(enc))
+        )
+      )
+      .asInstanceOf[FieldBuilderResult]
+  }
+}
+
+trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder with DefaultSourceCodeFieldBuilder {
   import DefaultTraceFieldBuilder._
 
   override val enteringTemplate: String = "{}: {}({})"
