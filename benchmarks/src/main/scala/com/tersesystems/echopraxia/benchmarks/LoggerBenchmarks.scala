@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultSourceCodeFieldBuilder, FieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.Condition
+import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -36,11 +36,6 @@ class LoggerBenchmarks {
   }
 
   @Benchmark
-  def infoWithSource(): Unit = {
-    sourceInfoLogger.info("Hello world")
-  }
-
-  @Benchmark
   def neverInfo(): Unit = {
     neverLogger.info("Hello world")
   }
@@ -59,11 +54,6 @@ class LoggerBenchmarks {
 
 object LoggerBenchmarks {
   private val logger = LoggerFactory.getLogger
-
-  trait SourceInfoBuilder  extends FieldBuilder with DefaultSourceCodeFieldBuilder
-  object SourceInfoBuilder extends SourceInfoBuilder
-
-  private val sourceInfoLogger = logger.withFieldBuilder(SourceInfoBuilder)
 
   private val neverLogger = LoggerFactory.getLogger.withCondition(Condition.never)
 }

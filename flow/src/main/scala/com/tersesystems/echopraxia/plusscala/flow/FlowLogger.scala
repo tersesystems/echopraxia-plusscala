@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
 import com.tersesystems.echopraxia.plusscala.api._
 
@@ -49,7 +48,15 @@ class FlowLogger[FB <: FlowFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
 object FlowLogger {
   final class NeverLogger[FB <: FlowFieldBuilder](core: CoreLogger, fieldBuilder: FB) extends FlowLogger[FB](core, fieldBuilder) {
-    override protected def handle[B: ToValue](level: api.Level, attempt: => B): B                                = attempt
-    override protected def handleCondition[B: ToValue](level: api.Level, condition: Condition, attempt: => B): B = attempt
+    override def trace[B: ToValue](attempt: => B): B = attempt
+    override def trace[B: ToValue](condition: Condition)(attempt: => B): B = attempt
+    override def debug[B: ToValue](attempt: => B): B = attempt
+    override def debug[B: ToValue](condition: Condition)(attempt: => B): B = attempt
+    override def info[B: ToValue](attempt: => B): B = attempt
+    override def info[B: ToValue](condition: Condition)(attempt: => B): B = attempt
+    override def warn[B: ToValue](attempt: => B): B = attempt
+    override def warn[B: ToValue](condition: Condition)(attempt: => B): B = attempt
+    override def error[B: ToValue](attempt: => B): B = attempt
+    override def error[B: ToValue](condition: Condition)(attempt: => B): B = attempt
   }
 }

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Level}
+import com.tersesystems.echopraxia.api.{Field, Level}
 import com.tersesystems.echopraxia.plusscala.api._
 
 import java.time.Instant
@@ -57,8 +57,6 @@ object Main {
     def book(name: String, i: Book): Field = keyValue(name, ToValue(i))
 
     implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = m => ToObjectValue(m.map(keyValue(_)))
-
-    override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = FieldBuilderResult.empty()
   }
 
   object MyFieldBuilder extends MyFieldBuilder

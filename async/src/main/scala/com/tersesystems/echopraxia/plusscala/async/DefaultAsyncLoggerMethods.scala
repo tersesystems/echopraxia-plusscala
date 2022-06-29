@@ -4,9 +4,7 @@ import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 
-import java.util
 import java.util.function
-import java.util.function.{Function, Supplier}
 import scala.compat.java8.FunctionConverters._
 
 /**
@@ -325,29 +323,18 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   // Internal methods
 
   @inline
-  private def sourceInfoFields(line: Line, file: File, enc: Enclosing): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.sourceCodeFields(line.value, file.value, enc.value)
-  }.asJava
-
-  @inline
   private def onlyException(e: Throwable): FieldBuilderResult = {
     Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e))
   }
 
   @inline
   private def handleConsumer(level: Level, consumer: Handle => Unit): Unit = {
-    val supplier = new Supplier[java.util.List[Field]] {
-      override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
-    }
-    core.asyncLog(level, supplier, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    core.asyncLog(level, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
   }
 
   @inline
   private def handleConsumer(level: Level, condition: Condition, consumer: Handle => Unit): Unit = {
-    val supplier = new Supplier[java.util.List[Field]] {
-      override def get(): util.List[Field] = sourceInfoFields(line, file, enc).apply(fieldBuilder).fields()
-    }
-    core.asyncLog(level, supplier, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
+    core.asyncLog(level, condition.asJava, (h: LoggerHandle[FB]) => consumer(h), fieldBuilder)
   }
 
   @inline
@@ -381,20 +368,12 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
     handleConsumer(level, condition, handle => handle(message))
 
   @inline
-  private def handleConditionMessageArgs(level: Level, condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-      line: Line,
-      file: File,
-      enc: Enclosing
-  ): Unit = {
+  private def handleConditionMessageArgs(level: Level, condition: Condition, message: String, f: FB => FieldBuilderResult): Unit = {
     handleConsumer(level, condition, handle => handle(message, f))
   }
 
   @inline
-  private def handleConditionMessageThrowable(level: Level, condition: Condition, message: String, e: Throwable)(implicit
-      line: Line,
-      file: File,
-      enc: Enclosing
-  ): Unit = {
+  private def handleConditionMessageThrowable(level: Level, condition: Condition, message: String, e: Throwable): Unit = {
     handleConsumer(level, condition, handle => handle(message, e))
   }
 

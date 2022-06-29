@@ -126,25 +126,13 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
 
     override def throwingTemplate: String = "throwing: {} ! {}"
 
-    override def entering(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
-      keyValue("method", enc.value)
-    }
+    override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields = ???
 
-    override def exiting(value: Value[_])(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
-      list(
-        this.keyValue("method", enc.value),
-        this.value("returning", value)
-      )
-    }
+    override def entering(signature: TraceFieldBuilder#SourceFields): FieldBuilderResult = ???
 
-    override def throwing(ex: Throwable)(implicit line: Line, file: File, enc: Enclosing, args: Args): FieldBuilderResult = {
-      this.list(
-        keyValue("method", enc.value),
-        this.exception(ex)
-      )
-    }
+    override def exiting(signature: TraceFieldBuilder#SourceFields, value: Value[_]): FieldBuilderResult = ???
 
-    override def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult = FieldBuilderResult.empty()
+    override def throwing(signature: TraceFieldBuilder#SourceFields, ex: Throwable): FieldBuilderResult = ???
   }
 
   object SimpleTraceFieldBuilder extends SimpleTraceFieldBuilder

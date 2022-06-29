@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
 import com.tersesystems.echopraxia.plusscala.api._
 import sourcecode.{Args, Enclosing, File, Line}
@@ -31,7 +30,7 @@ class TraceLogger[FB <: TraceFieldBuilder](core: CoreLogger, fieldBuilder: FB)
     )
   }
 
-  def withFieldBuilder[NEWFB <: TraceFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
+  override def withFieldBuilder[NEWFB <: TraceFieldBuilder](newFieldBuilder: NEWFB): TraceLogger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
@@ -50,14 +49,15 @@ class TraceLogger[FB <: TraceFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
 object TraceLogger {
   final class Never[FB <: TraceFieldBuilder](core: CoreLogger, fieldBuilder: FB) extends TraceLogger[FB](core, fieldBuilder) {
-    override protected def handle[B: ToValue](level: api.Level, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B =
-      attempt
-
-    override protected def handleCondition[B: ToValue](level: api.Level, condition: Condition, attempt: => B)(implicit
-        line: Line,
-        file: File,
-        enc: Enclosing,
-        args: Args
-    ): B = attempt
+    override def trace[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def trace[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def debug[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def debug[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def info[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def info[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def warn[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def warn[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def error[B: ToValue](attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
+    override def error[B: ToValue](condition: Condition)(attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = attempt
   }
 }

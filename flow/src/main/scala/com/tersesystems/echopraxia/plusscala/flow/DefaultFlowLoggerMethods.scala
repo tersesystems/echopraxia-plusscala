@@ -70,7 +70,8 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
     fb.throwing(ex)
   }.asJava
 
-  protected def handle[B: ToValue](
+  @inline
+  private def handle[B: ToValue](
       level: JLevel,
       attempt: => B
   ): B = {
@@ -81,7 +82,8 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
     }
   }
 
-  protected def handleCondition[B: ToValue](
+  @inline
+  private def handleCondition[B: ToValue](
       level: JLevel,
       condition: Condition,
       attempt: => B
@@ -94,7 +96,7 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
   }
 
   @inline
-  protected def execute[B: ToValue](level: JLevel, attempt: => B): B = {
+  private def execute[B: ToValue](level: JLevel, attempt: => B): B = {
     core.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
 
     val result = Try(attempt)
