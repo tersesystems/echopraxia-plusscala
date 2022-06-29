@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.plusscala.flow
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.plusscala.api._
 
-trait FlowFieldBuilder extends SourceCodeFieldBuilder with ValueTypeClasses {
+trait FlowFieldBuilder extends ValueTypeClasses {
 
   def enteringTemplate: String
 
@@ -28,11 +28,11 @@ trait DefaultFlowFieldBuilder extends FieldBuilder with FlowFieldBuilder {
   override val throwingTemplate: String = "{} ! {}"
 
   override def entering: FieldBuilderResult = {
-    keyValue(Tag, Entry)
+    entryTag
   }
 
   override def exiting(retValue: Value[_]): FieldBuilderResult = {
-    list(exitTag, keyValue(Result, retValue))
+    list(exitTag, value(Result, retValue))
   }
 
   override def throwing(ex: Throwable): FieldBuilderResult = {
@@ -48,7 +48,7 @@ object DefaultFlowFieldBuilder extends DefaultFlowFieldBuilder {
   val Throwing: String = "throwing"
   val Result: String   = "result"
 
-  val entryTag: Field    = keyValue(Tag, Entry)
-  val exitTag: Field     = keyValue(Tag, Exit)
-  val throwingTag: Field = keyValue(Tag, Throwing)
+  val entryTag: Field    = value(Tag, Entry)
+  val exitTag: Field     = value(Tag, Exit)
+  val throwingTag: Field = value(Tag, Throwing)
 }

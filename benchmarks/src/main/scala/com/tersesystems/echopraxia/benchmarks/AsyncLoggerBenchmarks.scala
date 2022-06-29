@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.benchmarks
 
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultSourceCodeFieldBuilder, FieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
-import org.openjdk.jmh.annotations.{Benchmark, BenchmarkMode, Fork, Measurement, Mode, OutputTimeUnit, Scope, State, Warmup}
+import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.{Executor, TimeUnit}
 
@@ -36,11 +36,6 @@ class AsyncLoggerBenchmarks {
   }
 
   @Benchmark
-  def infoWithSource(): Unit = {
-    sourceInfoLogger.info("Hello world")
-  }
-
-  @Benchmark
   def neverInfo(): Unit = {
     neverLogger.info("Hello world")
   }
@@ -61,11 +56,6 @@ object AsyncLoggerBenchmarks {
   private val logger = AsyncLoggerFactory.getLogger.withExecutor(new Executor {
     override def execute(command: Runnable): Unit = {}
   })
-
-  trait SourceInfoBuilder  extends FieldBuilder with DefaultSourceCodeFieldBuilder
-  object SourceInfoBuilder extends SourceInfoBuilder
-
-  private val sourceInfoLogger = logger.withFieldBuilder(SourceInfoBuilder)
 
   private val neverLogger = AsyncLoggerFactory.getLogger.withCondition(Condition.never)
 }
