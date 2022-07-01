@@ -16,7 +16,7 @@ A: Echopraxia makes your application more observable through structured logging 
 
 Q: Is this a replacement for SLF4J / Log4J / Logback?
 
-You can use Echopraxia and your usual logging framework side by side in the same application.  Echopraxia sends correctly formatted structured logging messages to the underlying framework and is well behaved, tracking the implementations enabled logging levels and filters.
+A: You can use Echopraxia and your usual logging framework side by side in the same application.  Echopraxia sends correctly formatted structured logging messages to the underlying framework and is well behaved, tracking the implementations enabled logging levels and filters.
 
 ## Logger
 
