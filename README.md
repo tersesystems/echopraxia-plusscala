@@ -1,8 +1,8 @@
 # Scala API for Echopraxia
 
-Echopraxia is a structured logging framework with plugins for Logback and Log4J.  The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types and has a number of features to make debugging even smoother, including a "trace" logger and automatic type class derivation.  
+[Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.  The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types and has a number of features to make debugging even smoother, including a "trace" logger and automatic type class derivation.  
 
-Echopraxia is compiled for Scala 2.12 and Scala 2.13.
+Echopraxia is compiled for Scala 2.12 and Scala 2.13.  Examples are available at [tersesystems/echopraxia-scala-example](https://github.com/tersesystems/echopraxia-scala-example) and [tersesystems/echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
 ## What Does It Mean?
 
@@ -13,6 +13,10 @@ A: You can write code faster and with fewer bugs by using Echopraxia for debuggi
 Q: What does this mean for operations?
 
 A: Echopraxia makes your application more observable through structured logging and automatic "call-by-name" methods that can capture request and trace contexts.  Echopraxia also targets managing logging on a budget -- determining "when to log" on an already deployed application.  All logging statements in Echopraxia are based around fields and values, and can incorporate complex conditional logic that can alter [logging at runtime](https://github.com/tersesystems/dynamic-debug-logging), down to individual statements.
+
+Q: Is this a replacement for SLF4J / Log4J / Logback?
+
+You can use Echopraxia and your usual logging framework side by side in the same application.  Echopraxia sends correctly formatted structured logging messages to the underlying framework and is well behaved, tracking the implementations enabled logging levels and filters.
 
 ## Logger
 
