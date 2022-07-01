@@ -19,6 +19,7 @@ and one of the underlying core logger providers, i.e.
 ```scala
 // uncomment only one of these
 // libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "2.0.1"
+// OR
 // libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "2.0.1"
 ```
 
@@ -112,7 +113,7 @@ def myMethod(arg1: String): Int = traceLogger.trace {
 
 ### Trace Logger
 
-Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.
+Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.  Trace logging includes source code information, **including arguments**, so it is only for use in a debugging situation.
 
 ```scala
 libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace-logger" % echopraxiaPlusScalaVersion
@@ -373,12 +374,19 @@ trait MapFieldBuilder extends FieldBuilder {
 
 Mapping individual case classes and value objects can get repetitive, so there's a shortcut you can use: [type class derivation](https://blog.kaizen-solutions.io/2020/typeclass-derivation-with-magnolia/). 
 
+To add derivation to your project, include the library dependency:
+
+```
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "generic" % echopraxiaPlusScalaVersion
+```
+
 You can incorporate automatic type class derivation by adding the `AutoDerivation` or `SemiAutoDerivation` trait.  This trait will set up fields and values in case classes and sealed traits appropriately, using [Magnolia](https://github.com/softwaremill/magnolia/tree/scala2).
 
 Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly:
 
 ```scala
 import com.tersesystems.echopraxia.plusscala.api._
+import com.tersesystems.echopraxia.plusscala.generic._
 
 trait AutoFieldBuilder extends FieldBuilder with AutoDerivation
 object AutoFieldBuilder extends AutoFieldBuilder
@@ -558,65 +566,6 @@ neverLogger.error("I will never log") // no-op
 ```
 
 Because the JVM is very good at optimizing out no-op methods, using `Condition.never` is only ~1ns overhead over a straight call.
-
-## Source Info
-
-Both the logger and the async logger take the source code location, file, and enclosing method as implicits, using [sourcefile](https://github.com/com-lihaoyi/sourcecode).  For example, the `DefaultLoggerMethods.error` method looks like this:
-
-```scala
-import sourcecode._
-trait DefaultLoggerMethods[FB <: SourceCodeFieldBuilder] extends LoggerMethods[FB] {
-  this: DefaultMethodsSupport[FB] =>
-  
-  def error(
-      message: String
-  )(implicit line: Line, file: File, enc: Enclosing): Unit = {
-    // ...
-  }
-  
-}
-```
-
-Internally, the source code fields delegate to `fb.sourceCodeFields`, which is defined by `SourceCodeFieldBuilder`:
-
-```scala
-trait SourceCodeFieldBuilder {
-  def sourceCodeFields(line: Int, file: String, enc: String): FieldBuilderResult
-}
-```
-
-The default `FieldBuilder` returns `FieldBuilderResult.empty` from the `sourceCodeFields` method.  There is an implementation called `DefaultSourceCodeFieldBuilder` which provides a `sourcecode` field containing an object with the line, file, and enclosing method that can be incorporated to override behavior.
-
-```scala
-trait SourceInfoBuilder extends FieldBuilder with DefaultSourceCodeFieldBuilder
-object SourceInfoBuilder extends SourceInfoBuilder 
-
-// now you have source info in JSON for free :-)
-val sourceInfoBuilder = LoggerFactory.getLogger.withFieldBuilder(SourceInfoBuilder)
-```
-
-You can use the source code fields in conditions transparently -- this can be useful in filters where you want to either show or suppress logging statements coming from a method.  For example:
-
-```scala
-import com.tersesystems.echopraxia.api.{CoreLogger, CoreLoggerFilter}
-import com.tersesystems.echopraxia.plusscala.api.Condition
-
-class MyLoggerFilter extends CoreLoggerFilter {
-  private val sourceCodeCondition = Condition { ctx =>
-    ctx.findString("$.sourcecode.enclosing").exists(_.endsWith("thisMethod"))
-  }
-
-  override def apply(coreLogger: CoreLogger): CoreLogger = coreLogger.withCondition(sourceCodeCondition.asJava)
-}
-```
-
-will only log if the method is `thisMethod`:
-
-```scala
-def thisMethod(): Unit = {
-  logger.info("I log if the method is called thisMethod")
-}
-```
 
 You can change these constants to have different names by overriding the resource bundle.  You can also override the `sourceInfoFields` using a custom logger to change or suppress source code fields entirely.
 

@@ -42,12 +42,21 @@ lazy val api = (project in file("api"))
   .settings(
     name := "api",
     //
-    libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
     libraryDependencies ++= compatLibraries(scalaVersion.value)
   )
+
+lazy val generic = (project in file("generic"))
+  .settings(
+    name := "generic",
+    //
+    libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+  ).dependsOn(api, logger % "test")
 
 lazy val logger = (project in file("logger"))
   .settings(
@@ -103,7 +112,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, logger, asyncLogger, flowLogger, traceLogger, benchmarks)
+  .aggregate(api, generic, logger, asyncLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
