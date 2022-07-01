@@ -48,15 +48,15 @@ class FlowLogger[FB <: FlowFieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
 object FlowLogger {
   final class NeverLogger[FB <: FlowFieldBuilder](core: CoreLogger, fieldBuilder: FB) extends FlowLogger[FB](core, fieldBuilder) {
-    override def trace[B: ToValue](attempt: => B): B = attempt
+    override def trace[B: ToValue](attempt: => B): B                       = attempt
     override def trace[B: ToValue](condition: Condition)(attempt: => B): B = attempt
-    override def debug[B: ToValue](attempt: => B): B = attempt
+    override def debug[B: ToValue](attempt: => B): B                       = attempt
     override def debug[B: ToValue](condition: Condition)(attempt: => B): B = attempt
-    override def info[B: ToValue](attempt: => B): B = attempt
-    override def info[B: ToValue](condition: Condition)(attempt: => B): B = attempt
-    override def warn[B: ToValue](attempt: => B): B = attempt
-    override def warn[B: ToValue](condition: Condition)(attempt: => B): B = attempt
-    override def error[B: ToValue](attempt: => B): B = attempt
+    override def info[B: ToValue](attempt: => B): B                        = attempt
+    override def info[B: ToValue](condition: Condition)(attempt: => B): B  = attempt
+    override def warn[B: ToValue](attempt: => B): B                        = attempt
+    override def warn[B: ToValue](condition: Condition)(attempt: => B): B  = attempt
+    override def error[B: ToValue](attempt: => B): B                       = attempt
     override def error[B: ToValue](condition: Condition)(attempt: => B): B = attempt
   }
 }

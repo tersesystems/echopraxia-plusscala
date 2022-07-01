@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.{FieldBuilderResult, Level => JLevel}
+import com.tersesystems.echopraxia.api.{FieldBuilderResult, LoggerHandle, Level => JLevel}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 
 import java.util.function.Function
@@ -97,14 +97,14 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
 
   @inline
   private def execute[B: ToValue](level: JLevel, attempt: => B): B = {
-    core.log(level, fieldBuilder.enteringTemplate, entering, fieldBuilder)
-
+    val handle: LoggerHandle[FB] = core.logHandle(level, fieldBuilder);
+    handle.log(fieldBuilder.enteringTemplate, entering)
     val result = Try(attempt)
     result match {
       case Success(ret) =>
-        core.log(level, fieldBuilder.exitingTemplate, exiting(ret), fieldBuilder)
+        handle.log(fieldBuilder.exitingTemplate, exiting(ret))
       case Failure(ex) =>
-        core.log(level, fieldBuilder.throwingTemplate, throwing(ex), fieldBuilder)
+        handle.log(fieldBuilder.throwingTemplate, throwing(ex))
     }
     result.get // rethrow the exception
   }

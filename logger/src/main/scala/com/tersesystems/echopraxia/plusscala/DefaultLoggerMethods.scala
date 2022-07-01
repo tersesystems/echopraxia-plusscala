@@ -337,7 +337,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
 
   // -----------------------------------------------------------
   // Internal methods
-  
+
   @inline
   private def handleMessage(level: Level, message: String): Unit = {
     core.log(level, message)
@@ -365,10 +365,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
 
   @inline
   private def handleConditionMessageThrowable(level: Level, condition: Condition, message: String, e: Throwable): Unit = {
-    core.log(level, condition.asJava, message,
-        (_: FB) => onlyException(e),
-        fieldBuilder
-      )
+    core.log(level, condition.asJava, message, (_: FB) => onlyException(e), fieldBuilder)
   }
 
   @inline
