@@ -1,11 +1,11 @@
-package com.tersesystems.echopraxia.plusscala.api
+package com.tersesystems.echopraxia.plusscala.generic
 
 import com.tersesystems.echopraxia.api.{Field, Value}
-
-import scala.language.experimental.macros
+import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import magnolia1._
 
 import java.util.Objects
+import scala.language.experimental.macros
 
 /**
  * This trait uses Magnolia to provide generic type class derivation for case classes and sealed traits. Note that you need to include the

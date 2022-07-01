@@ -1,5 +1,6 @@
-package com.tersesystems.echopraxia.plusscala
+package com.tersesystems.echopraxia.plusscala.generic
 
+import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
