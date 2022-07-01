@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.0.2-SNAPSHOT"
+val echopraxiaVersion = "2.1.0-SNAPSHOT"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
@@ -53,10 +53,6 @@ lazy val logger = (project in file("logger"))
   .settings(
     name := "logger",
     //
-    run / fork := true,
-    //
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
-    //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
@@ -82,7 +78,7 @@ lazy val flowLogger = (project in file("flow"))
 lazy val traceLogger = (project in file("trace"))
   .settings(
     name := "trace-logger",
-
+    //
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,

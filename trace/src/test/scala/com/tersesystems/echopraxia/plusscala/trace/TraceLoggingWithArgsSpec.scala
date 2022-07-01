@@ -5,14 +5,14 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import com.tersesystems.echopraxia.api.{FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder}
-import org.scalatest.{Assertion, BeforeAndAfterEach}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{Assertion, BeforeAndAfterEach}
 import sourcecode.{Args, Enclosing, File, Line}
 
 import java.util
-import scala.util.Try
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
@@ -26,8 +26,8 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
       doSomething
 
       logsContain("doSomething")
-      logsContain("tag=entry")
-      logsContain("tag=exit")
+      logsContain("entry:")
+      logsContain("exit:")
       logsContain("I return string")
     }
 
@@ -38,8 +38,8 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
 
       Try(divideByZero)
       logsContain("divideByZero")
-      logsContain("tag=entry")
-      logsContain("tag=throwing")
+      logsContain("entry:")
+      logsContain("throwing:")
     }
 
     it("should not log if disabled") {
@@ -120,21 +120,28 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
   }
 
   trait SimpleTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
-    override def enteringTemplate: String = "entering: {}"
+    override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields =
+      new DefaultSourceFields(line, file, enc, args)
 
-    override def exitingTemplate: String = "exiting: {} => {}"
+    override def entering(sourceFields: SourceFields): FieldBuilderResult = {
+      list(sourceFields.argumentFields)
+    }
 
-    override def throwingTemplate: String = "throwing: {} ! {}"
+    override def exiting(sourceFields: SourceFields, retValue: Value[_]): FieldBuilderResult = {
+      list(sourceFields.argumentFields :+ value("traceResult", retValue))
+    }
 
-    override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields = ???
-
-    override def entering(signature: TraceFieldBuilder#SourceFields): FieldBuilderResult = ???
-
-    override def exiting(signature: TraceFieldBuilder#SourceFields, value: Value[_]): FieldBuilderResult = ???
-
-    override def throwing(signature: TraceFieldBuilder#SourceFields, ex: Throwable): FieldBuilderResult = ???
+    override def throwing(sourceFields: SourceFields, ex: Throwable): FieldBuilderResult = {
+      list(sourceFields.argumentFields :+ exception(ex))
+    }
   }
 
-  object SimpleTraceFieldBuilder extends SimpleTraceFieldBuilder
+  object SimpleTraceFieldBuilder extends SimpleTraceFieldBuilder {
+    override def enteringTemplate: String = "entering: method={} args={}"
+
+    override def exitingTemplate: String = "exiting: method={} args={} result={}"
+
+    override def throwingTemplate: String = "throwing: method={} args={} exception={}"
+  }
 
 }

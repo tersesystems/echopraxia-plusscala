@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{CoreLogger, Field, FieldBuilderResult, Level => JLevel}
+import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Level => JLevel}
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode._
 
-import java.util.function.{Function, Supplier}
+import java.util.function.Function
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -53,24 +53,18 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
   }
 
   @inline
-  private def sourceLoggerFields(signature: fb.SourceFields): Supplier[java.util.List[Field]] = {
-    import scala.jdk.CollectionConverters._
-    () => signature.loggerFields.asJava
-  }
-
-  @inline
-  private def entering(signature: fb.SourceFields): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.entering(signature)
+  private def entering(sourceFields: SourceFields): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.entering(sourceFields)
   }.asJava
 
   @inline
-  private def exiting[B: ToValue](signature: fb.SourceFields, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.exiting(signature, implicitly[ToValue[B]].toValue(ret))
+  private def exiting[B: ToValue](sourceFields: SourceFields, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.exiting(sourceFields, implicitly[ToValue[B]].toValue(ret))
   }.asJava
 
   @inline
-  private def throwing(signature: fb.SourceFields, ex: Throwable): Function[FB, FieldBuilderResult] = { fb: FB =>
-    fb.throwing(signature, ex)
+  private def throwing(sourceFields: SourceFields, ex: Throwable): Function[FB, FieldBuilderResult] = { fb: FB =>
+    fb.throwing(sourceFields, ex)
   }.asJava
 
   @inline
@@ -78,8 +72,10 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       level: JLevel,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (core.isEnabled(level)) {
-      execute(core, level, attempt)
+    val sourceFields = fb.sourceFields
+    val extraFields  = (() => fb.list(sourceFields.loggerFields).fields()).asJava
+    if (core.isEnabled(level, extraFields)) {
+      execute(core, level, sourceFields, attempt)
     } else {
       attempt
     }
@@ -91,24 +87,25 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
       condition: Condition,
       attempt: => B
   )(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    if (core.isEnabled(level, condition.asJava)) {
-      execute(core, level, attempt)
+    val sourceFields = fb.sourceFields
+    val extraFields  = (() => fb.list(sourceFields.loggerFields).fields()).asJava
+    if (core.isEnabled(level, condition.asJava, extraFields)) {
+      execute(core, level, sourceFields, attempt)
     } else {
       attempt
     }
   }
 
   @inline
-  private def execute[B: ToValue](core: CoreLogger, level: JLevel, attempt: => B)(implicit line: Line, file: File, enc: Enclosing, args: Args): B = {
-    val sourceFields = fb.sourceFields
-    val extraFields = sourceLoggerFields(sourceFields)
-    core.log(level, extraFields, fb.enteringTemplate, entering(sourceFields), fb)
+  private def execute[B: ToValue](core: CoreLogger, level: JLevel, sourceFields: SourceFields, attempt: => B): B = {
+    val handle = core.logHandle(level, fb)
+    handle.log(fb.enteringTemplate, entering(sourceFields))
     val result = Try(attempt)
     result match {
       case Success(ret) =>
-        core.log(level, extraFields, fb.exitingTemplate, exiting(sourceFields, ret), fb)
+        handle.log(fb.exitingTemplate, exiting(sourceFields, ret))
       case Failure(ex) =>
-        core.log(level, extraFields, fb.throwingTemplate, throwing(sourceFields, ex), fb)
+        handle.log(fb.throwingTemplate, throwing(sourceFields, ex))
     }
     result.get // rethrow the exception
   }
