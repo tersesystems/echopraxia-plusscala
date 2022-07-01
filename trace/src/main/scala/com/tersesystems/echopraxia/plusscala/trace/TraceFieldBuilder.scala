@@ -25,6 +25,10 @@ trait TraceFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMe
 trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
   import DefaultTraceFieldBuilder._
 
+  override val enteringTemplate: String = "{}: {} - ({})"
+  override val exitingTemplate: String  = "{}: {} - ({}) => {}"
+  override val throwingTemplate: String = "{}: {} - ({}) ! {}"
+
   override def entering(sourceFields: SourceFields): FieldBuilderResult = {
     list(Seq(entryTag) ++ sourceFields.argumentFields)
   }
@@ -42,11 +46,6 @@ trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
 }
 
 object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder {
-
-  override val enteringTemplate: String = "{}: {} - ({})"
-  override val exitingTemplate: String  = "{}: {} - ({}) => {}"
-  override val throwingTemplate: String = "{}: {} - ({}) ! {}"
-
   val TraceTag: String = "traceTag"
   val Entry: String    = "entry"
   val Exit: String     = "exit"
