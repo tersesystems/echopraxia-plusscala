@@ -310,7 +310,7 @@ class Example {
     logger.info("{} {} {} {}", fb => {
       import fb._
       obj("person" -> 
-        array(
+        Seq(
           number("number" -> 1),
           bool("bool" -> true),
           array("ints" -> Seq(1, 2, 3)),
