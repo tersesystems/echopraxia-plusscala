@@ -352,43 +352,53 @@ store={book=[{category=reference, author=Nigel Rees, title=Sayings of the Centur
 
 ## Custom Field Builder
 
-Although using the default field builder is great for one-offs, if you want to log more complex objects it can be tedious to render a large object down to its component parts.  To make it easier, Echopraxia incorporates custom fields builders that can be domain specific.
+Although using the default field builder is great for one-offs, if you want to log more complex objects it can be tedious to render a large object down to its component parts.  To make it easier, Echopraxia incorporates custom fields builders that can be domain specific, and allows you to stack them together.
 
-You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.
+You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.  Using Scala 2.13, you can log arbitrary classes `Foo` and `Bar`:
 
 ```scala
-case class Book(category: String, author: String, title: String, price: Double)
+import com.tersesystems.echopraxia.plusscala.LoggerFactory
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 
-trait CustomFieldBuilder extends FieldBuilder {
-  implicit val instantToStringValue: ToValue[Instant] = 
-    (t: Instant) => ToValue(t.toString)
+object Main {
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
 
-  def instant(name: String, i: Instant): Field = 
-    keyValue(name, ToValue(i))
+  def main(args: Array[String]): Unit = {
+    logger.debug("Hello world!")
 
-  def instant(tuple: (String, Instant)): Field =
-    keyValue(tuple)
+    val foo = Foo("name", 1)
+    val bar = Bar(true, 0x1)
 
-  implicit val bookToObjectValue: ToObjectValue[Book] = { book =>
-    // use keyValue when you want to override the field to include the name
-    ToObjectValue(
-      keyValue("category", book.category),
-      keyValue("author", book.author),
-      keyValue("title", book.title),
-      keyValue("price", book.price)
+    logger.debug("{}", fb => fb.keyValue("foo", foo))
+    logger.debug("{}", fb => fb.keyValue("bar", bar))
+  }
+}
+
+case class Foo(name: String, age: Int)
+
+case class Bar(herp: Boolean, derp: Byte)
+
+trait FooBuilder extends FieldBuilder {
+  implicit val fooToObjectValue: ToObjectValue[Foo] = { value =>
+    com.tersesystems.echopraxia.api.Value.`object`(
+      keyValue("name", value.name),
+      keyValue("age", value.age)
     )
   }
-
-  def book(name: String, book: Book): Field = 
-    keyValue(name, ToValue(book))
 }
-object CustomFieldBuilder extends CustomFieldBuilder
-```
 
-And then you render an instant:
+trait BarBuilder extends FieldBuilder {
+  implicit val barToObjectValue: ToObjectValue[Bar] = { bar =>
+    com.tersesystems.echopraxia.api.Value.`object`(
+      keyValue("herp", bar.herp),
+      keyValue("derp", bar.derp)
+    )
+  }
+}
 
-```scala
-logger.info("time {}", fb.instant("current", Instant.now))
+trait MyFieldBuilder extends FooBuilder with BarBuilder
+
+object MyFieldBuilder extends MyFieldBuilder
 ```
 
 You can also extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
