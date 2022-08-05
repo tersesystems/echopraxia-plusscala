@@ -401,6 +401,39 @@ trait MyFieldBuilder extends FooBuilder with BarBuilder
 object MyFieldBuilder extends MyFieldBuilder
 ```
 
+If needed, you can also externalize utility methods as functions and methods, although you must use `MyFieldBuilder.type` if you want to avoid the implicit tax. Again, using 2.13:
+
+```scala
+object Main {
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
+
+  def main(args: Array[String]): Unit = {
+    logger.debug("Hello world!")
+
+    val foo = Foo("name", 1)
+    val bar = Bar(true, 0x1)
+    
+    // Need to use MyFieldBuilder.type here
+    val function: MyFieldBuilder.type => FieldBuilderResult = { fb =>
+      fb.list(
+        fb.obj("foo", foo),
+        fb.obj("bar", bar)
+      )
+    }
+
+    // Need to use MyFieldBuilder.type here
+    def method(fb: MyFieldBuilder.type): FieldBuilderResult = {
+      fb.list(
+        fb.obj("foo", foo),
+        fb.obj("bar", bar)
+      )
+    }
+    logger.debug("using method {} {}", fb => method(fb))
+    logger.debug("using function {} {}", function)
+  }
+}
+```
+
 You can also extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
 
 ```scala
