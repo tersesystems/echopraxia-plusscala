@@ -22,12 +22,16 @@ object Main {
       }
     )
 
-    logger.info(
-      "{}",
-      fb => {
-        fb.book("thisbook", refBook)
-      }
-    )
+    logger.info("{}", _.keyValue("thisbook" -> refBook))
+
+    logger.info("testing {} {}", fb => fb.list(
+      //fb.keyValue("foo", fb.book(refBook)),
+      fb.keyValue("foo", refBook),
+      // https://stackoverflow.com/questions/5598085/where-does-scala-look-for-implicits/5598107#5598107
+      //fb.keyValue("foo" -> refBook),
+      //fb.keyValue("foo", refBook),
+    ))
+    logger.info("{}", _.keyValue("instant", Instant.now()))
 
     logger.info("array of throwables {}", fb => fb.array("ex" -> Seq(new RuntimeException())))
 
@@ -53,8 +57,6 @@ object Main {
         keyValue("price", book.price)
       )
     }
-
-    def book(name: String, i: Book): Field = keyValue(name, ToValue(i))
 
     implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = m => ToObjectValue(m.map(keyValue(_)))
   }

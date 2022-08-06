@@ -354,13 +354,14 @@ store={book=[{category=reference, author=Nigel Rees, title=Sayings of the Centur
 
 Although using the default field builder is great for one-offs, if you want to log more complex objects it can be tedious to render a large object down to its component parts.  To make it easier, Echopraxia incorporates custom fields builders that can be domain specific, and allows you to stack them together.
 
-You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.  Using Scala 2.13, you can log arbitrary classes `Foo` and `Bar`:
+You can create your own field builder and define type class instances, using `ToValue` and `ToObjectValue`.  You can log arbitrary classes `Foo` and `Bar`:
 
 ```scala
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 
 object Main {
+  // Logger[MyFieldBuilder.type] can use implicits w/o import tax  
   private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
 
   def main(args: Array[String]): Unit = {
