@@ -380,7 +380,7 @@ case class Bar(herp: Boolean, derp: Byte)
 
 trait FooBuilder extends FieldBuilder {
   implicit val fooToObjectValue: ToObjectValue[Foo] = { value =>
-    com.tersesystems.echopraxia.api.Value.`object`(
+    ToObjectValue(
       keyValue("name", value.name),
       keyValue("age", value.age)
     )
@@ -389,7 +389,7 @@ trait FooBuilder extends FieldBuilder {
 
 trait BarBuilder extends FieldBuilder {
   implicit val barToObjectValue: ToObjectValue[Bar] = { bar =>
-    com.tersesystems.echopraxia.api.Value.`object`(
+    ToObjectValue(
       keyValue("herp", bar.herp),
       keyValue("derp", bar.derp)
     )
@@ -401,11 +401,28 @@ trait MyFieldBuilder extends FooBuilder with BarBuilder
 object MyFieldBuilder extends MyFieldBuilder
 ```
 
-If needed, you can also externalize utility methods as functions and methods, although you must use `MyFieldBuilder.type` if you want to avoid the implicit tax. Again, using 2.13:
+Note that the implicits will only be visible in the singleton object scope, so you must have an `object` handy.  If you want to add some one-off methods or functions, it's easiest to create a one-time object and use `withFieldBuilder`:
 
 ```scala
 object Main {
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
+
+  object SomeObjectBuilder extends MyFieldBuilder {    
+    val function: (Foo, Bar) => FieldBuilderResult = { case (foo, bar) =>
+      fb.list(
+        fb.obj("foo", foo),
+        fb.obj("bar", bar)
+      )
+    }
+
+    def method(foo: Foo, bar: Bar): FieldBuilderResult = {
+      fb.list(
+        fb.obj("foo", foo),
+        fb.obj("bar", bar)
+      )
+    }
+  }
+
+  private val logger = LoggerFactory.getLogger.withFieldBuilder(SomeObjectBuilder)
 
   def main(args: Array[String]): Unit = {
     logger.debug("Hello world!")
@@ -413,23 +430,8 @@ object Main {
     val foo = Foo("name", 1)
     val bar = Bar(true, 0x1)
     
-    // Need to use MyFieldBuilder.type here
-    val function: MyFieldBuilder.type => FieldBuilderResult = { fb =>
-      fb.list(
-        fb.obj("foo", foo),
-        fb.obj("bar", bar)
-      )
-    }
-
-    // Need to use MyFieldBuilder.type here
-    def method(fb: MyFieldBuilder.type): FieldBuilderResult = {
-      fb.list(
-        fb.obj("foo", foo),
-        fb.obj("bar", bar)
-      )
-    }
-    logger.debug("using method {} {}", fb => method(fb))
-    logger.debug("using function {} {}", function)
+    logger.debug("using method {} {}", fb => fb.method(foo, bar))
+    logger.debug("using function {} {}", fb.function(foo, bar))
   }
 }
 ```
