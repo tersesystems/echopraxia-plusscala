@@ -408,16 +408,16 @@ object Main {
 
   object SomeObjectBuilder extends MyFieldBuilder {    
     val function: (Foo, Bar) => FieldBuilderResult = { case (foo, bar) =>
-      fb.list(
-        fb.obj("foo", foo),
-        fb.obj("bar", bar)
+      list(
+        obj("foo", foo),
+        obj("bar", bar)
       )
     }
 
     def method(foo: Foo, bar: Bar): FieldBuilderResult = {
-      fb.list(
-        fb.obj("foo", foo),
-        fb.obj("bar", bar)
+      list(
+        obj("foo", foo),
+        obj("bar", bar)
       )
     }
   }
@@ -430,8 +430,8 @@ object Main {
     val foo = Foo("name", 1)
     val bar = Bar(true, 0x1)
     
-    logger.debug("using method {} {}", fb => fb.method(foo, bar))
-    logger.debug("using function {} {}", fb.function(foo, bar))
+    logger.debug("using method {} {}", _.method(foo, bar))
+    logger.debug("using function {} {}", _.function(foo, bar))
   }
 }
 ```
