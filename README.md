@@ -268,6 +268,27 @@ The above program produces the following output:
 
 The flow logger is not as detailed, but works well in FP situations, where the logger name is unique and there is only one method to call.
 
+## Dump Logger
+
+The dump logger is alogger that uses the the name of the variable or field as the field's name, using a macro.  It is useful for debugging.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
+
+For example:
+
+```scala
+val logger = DumpLoggerFactory.getLogger
+
+val emptySeq = Seq.empty[Int]
+logger.debug(emptySeq)
+```
+
+outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
+
+To use the dump logger, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "dump-logger" % echopraxiaPlusScalaVersion
+```
+
 ## API
 
 You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.

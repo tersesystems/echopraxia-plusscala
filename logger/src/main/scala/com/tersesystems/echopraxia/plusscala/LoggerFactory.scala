@@ -9,7 +9,7 @@ import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 object LoggerFactory {
   val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
 
-  val fieldBuilder: FieldBuilder = new FieldBuilder {}
+  val fieldBuilder: FieldBuilder = FieldBuilder
 
   def getLogger(name: String): Logger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
