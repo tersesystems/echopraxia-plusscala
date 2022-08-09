@@ -16,12 +16,20 @@ class DumpFieldBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Match
 
   describe("logging") {
 
-    it("should log a person") {
+    it("should log a person as keyValue") {
       val person = Person("thisperson", 13)
       val field = fb.dumpKeyValue(person)
 
       field.name() must be("person")      
     }
+
+    it("should log a person as value") {
+      val person = Person("thisperson", 13)
+      val field = fb.dumpValue(person)
+
+      field.name() must be("person")      
+    }
+    
   }
 
   trait MyFieldBuilder extends DumpFieldBuilder with FieldBuilder {
