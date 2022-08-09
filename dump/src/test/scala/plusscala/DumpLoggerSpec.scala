@@ -5,7 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api._
-import com.tersesystems.echopraxia.plusscala.dump.DumpLoggerFactory
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
