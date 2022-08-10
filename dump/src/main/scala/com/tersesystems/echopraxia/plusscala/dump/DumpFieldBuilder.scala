@@ -22,7 +22,7 @@ object DumpFieldBuilder extends DumpFieldBuilder {
 
     def keyValue[A: c.WeakTypeTag](expr: c.Tree): c.Tree = {
       val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
-            // taken from https://github.com/dwickern/scala-nameof
+      // taken from https://github.com/dwickern/scala-nameof
       @tailrec def extract(tree: c.Tree): String = tree match {
         case Ident(n) => n.decodedName.toString
         case Select(_, n) => n.decodedName.toString

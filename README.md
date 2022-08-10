@@ -114,6 +114,47 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 }
 ```
 
+## Dump Logger and Field Builders
+
+In cases where you want to "dump" a variable or field for debugging, the variable name is the field name.  Echopraxia can use macros to source the field name automatically.
+
+To use the dump logger or field builder, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "dump-logger" % echopraxiaPlusScalaVersion
+```
+
+### Dump Logger
+
+The dump logger will log a single variable at a time, with no arguments.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
+
+For example:
+
+```scala
+val logger = DumpLoggerFactory.getLogger
+
+val emptySeq = Seq.empty[Int]
+logger.debug(emptySeq)
+```
+
+outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
+
+### Dump Field Builder
+
+The dump field builder adds `dumpKeyValue` and `dumpValue` as methods on the field builder.  You can use this to render multiple variables at once:
+
+```scala
+val foo: Foo = ...
+val bar: Bar = ...
+val logger = LoggerFactory.getLogger.withFieldBuilder(DumpFieldBuilder)
+logger.debug("{} {}", fb => fb.list(
+  fb.dumpKeyValue(foo),
+  fb.dumpValue(bar)
+))
+```
+
+Please see the field builder section that explains the details of field builders.
+
 ## Trace and Flow Loggers
 
 You can use a trace or flow logger to debug methods and interactions in your code.  The API between the trace and flow loggers is the same, but the trace logger is considerably more verbose than flow.
@@ -268,26 +309,6 @@ The above program produces the following output:
 
 The flow logger is not as detailed, but works well in FP situations, where the logger name is unique and there is only one method to call.
 
-## Dump Logger
-
-The dump logger is alogger that uses the the name of the variable or field as the field's name, using a macro.  It is useful for debugging.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
-
-For example:
-
-```scala
-val logger = DumpLoggerFactory.getLogger
-
-val emptySeq = Seq.empty[Int]
-logger.debug(emptySeq)
-```
-
-outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
-
-To use the dump logger, add the following dependency:
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "dump-logger" % echopraxiaPlusScalaVersion
-```
 
 ## API
 
