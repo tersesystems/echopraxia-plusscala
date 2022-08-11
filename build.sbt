@@ -84,9 +84,9 @@ lazy val flowLogger = (project in file("flow"))
   libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
 ).dependsOn(api % "compile->compile;test->compile")
 
-lazy val dumpLogger = (project in file("dump"))
+lazy val nameOfLogger = (project in file("nameof"))
   .settings(
-    name := "dump-logger",
+    name := "nameof-logger",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
@@ -120,7 +120,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, generic, logger, asyncLogger, dumpLogger, flowLogger, traceLogger, benchmarks)
+  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

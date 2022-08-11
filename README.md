@@ -114,24 +114,24 @@ asyncLogger.ifDebugEnabled { log => // condition evaluation
 }
 ```
 
-## Dump Logger and Field Builders
+## NameOf Logger and Field Builders
 
-In cases where you want to "dump" a variable or field for debugging, the variable name is the field name.  Echopraxia can use macros to source the field name automatically.
+The "NameOf" logger and field builder will take the name of the variable passed in as the field name, using a macro, following [dwickern/scala-nameof](https://github.com/dwickern/scala-nameof).  These tools can be very helpful paired with IntelliJ [live templates](https://www.jetbrains.com/help/idea/using-live-templates.html) or [Custom Postfix Templates](https://github.com/xylo/intellij-postfix-templates).
 
-To use the dump logger or field builder, add the following dependency:
+To use the NameOf logger or field builder, add the following dependency:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "dump-logger" % echopraxiaPlusScalaVersion
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "nameof-logger" % echopraxiaPlusScalaVersion
 ```
 
-### Dump Logger
+### NameOf Logger
 
-The dump logger will log a single variable at a time, with no arguments.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
+The NameOf logger will log a single variable at a time, with no arguments.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
 
 For example:
 
 ```scala
-val logger = DumpLoggerFactory.getLogger
+val logger = NameOfLoggerFactory.getLogger
 
 val emptySeq = Seq.empty[Int]
 logger.debug(emptySeq)
@@ -139,17 +139,19 @@ logger.debug(emptySeq)
 
 outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
 
-### Dump Field Builder
+### NameOf Field Builder
 
-The dump field builder adds `dumpKeyValue` and `dumpValue` as methods on the field builder.  You can use this to render multiple variables at once:
+The NameOf field builder adds `nameOfKeyValue`, `nameOfValue`, and `nameOf`.  You can use this to render multiple variables at once:
 
 ```scala
 val foo: Foo = ...
 val bar: Bar = ...
-val logger = LoggerFactory.getLogger.withFieldBuilder(DumpFieldBuilder)
+val quux: Quux = ...
+val logger = LoggerFactory.getLogger.withFieldBuilder(NameOfFieldBuilder)
 logger.debug("{} {}", fb => fb.list(
-  fb.dumpKeyValue(foo),
-  fb.dumpValue(bar)
+  fb.nameOfKeyValue(foo),
+  fb.nameOfValue(bar),
+  fb.nameOf(quux) -> quux
 ))
 ```
 

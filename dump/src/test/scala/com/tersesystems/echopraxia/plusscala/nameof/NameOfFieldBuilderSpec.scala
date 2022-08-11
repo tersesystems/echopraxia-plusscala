@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.dump
+package com.tersesystems.echopraxia.plusscala.nameof
 
 
 import com.tersesystems.echopraxia.api.Field
@@ -9,7 +9,7 @@ import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
 
-class DumpFieldBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+class NameOfFieldBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   
   private val fb = MyFieldBuilder
 
@@ -31,7 +31,7 @@ class DumpFieldBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Match
     
   }
 
-  trait MyFieldBuilder extends DumpFieldBuilder with FieldBuilder {
+  trait MyFieldBuilder extends NameOfFieldBuilder$ with FieldBuilder {
     // Instant type
     implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
     def instant(name: String, i: Instant): Field        = keyValue(name, ToValue(i))
