@@ -17,21 +17,21 @@ class NameOfFieldBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Mat
 
     it("should log a person as keyValue") {
       val person = Person("thisperson", 13)
-      val field = fb.dumpKeyValue(person)
+      val field = fb.nameOfKeyValue(person)
 
       field.name() must be("person")      
     }
 
     it("should log a person as value") {
       val person = Person("thisperson", 13)
-      val field = fb.dumpValue(person)
+      val field = fb.nameOfValue(person)
 
       field.name() must be("person")      
     }
     
   }
 
-  trait MyFieldBuilder extends NameOfFieldBuilder$ with FieldBuilder {
+  trait MyFieldBuilder extends NameOfFieldBuilder with FieldBuilder {
     // Instant type
     implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
     def instant(name: String, i: Instant): Field        = keyValue(name, ToValue(i))
