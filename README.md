@@ -479,13 +479,22 @@ object Main {
 }
 ```
 
-You can also extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
+You can extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
 
 ```scala
 trait MapFieldBuilder extends FieldBuilder {
   implicit def mapToObjectValue[V: ToValue]: ToObjectValue[Map[String, V]] = 
     m => ToObjectValue(m.map(keyValue))
 }
+```
+
+You can also create fields outside the context of a logging statement, and append or prepend them as necessary, by using the singleton factory directly, and using the FieldBuilderResult `concat` or `++` operator:
+
+```scala
+import com.tersesystems.echopraxia.plusscala.api._ // for `++` append operation
+
+val fields: FieldBuilderResult = MyFieldBuilder.keyValue("foo" -> foo)
+logger.info("external {} {}", fb => fields ++ fb.keyValue("true" -> true))
 ```
 
 ## Automatic Type Class Derivation
