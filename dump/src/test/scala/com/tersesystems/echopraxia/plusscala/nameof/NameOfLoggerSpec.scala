@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.dump
+package com.tersesystems.echopraxia.plusscala.nameof
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -12,9 +12,9 @@ import org.scalatest.matchers.must.Matchers
 import java.time.Instant
 import java.util
 
-class DumpLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+class NameOfLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = DumpLoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
+  private val logger = NameOfLoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
 
   describe("logging") {
 

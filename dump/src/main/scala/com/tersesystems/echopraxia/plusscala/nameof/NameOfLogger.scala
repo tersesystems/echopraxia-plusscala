@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.dump
+package com.tersesystems.echopraxia.plusscala.nameof
 
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
 import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, FieldBuilder, LoggerSupport}
@@ -18,9 +18,9 @@ import scala.language.experimental.macros
  * @param fieldBuilder the field builder
  * @tparam FB the field builder type.
  */
-class DumpLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
+class NameOfLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   extends AbstractLoggerSupport(core, fieldBuilder) with LoggerSupport[FB] {
-  import DumpLogger.impl
+  import NameOfLogger.impl
 
   def trace[A](expr: A): Unit = macro impl.trace[A]
   def debug[A](expr: A): Unit = macro impl.debug[A]
@@ -28,7 +28,7 @@ class DumpLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   def warn[A](expr: A): Unit = macro impl.warn[A]
   def error[A](expr: A): Unit = macro impl.error[A]
 
-  def withCondition(condition: Condition): DumpLogger[FB] = {
+  def withCondition(condition: Condition): NameOfLogger[FB] = {
     condition match {
       case Condition.always =>
         this
@@ -39,17 +39,17 @@ class DumpLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
     }
   }
 
-  def withFields(f: FB => FieldBuilderResult): DumpLogger[FB] = {
+  def withFields(f: FB => FieldBuilderResult): NameOfLogger[FB] = {
     newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
 
-  def withThreadContext: DumpLogger[FB] = {
+  def withThreadContext: NameOfLogger[FB] = {
     newLogger(
       newCoreLogger = core.withThreadContext(Utilities.threadContext())
     )
   }
 
-  def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): DumpLogger[NEWFB] = {
+  def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): NameOfLogger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
@@ -57,10 +57,10 @@ class DumpLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   private def newLogger[T <: FieldBuilder](
                             newCoreLogger: CoreLogger = core,
                             newFieldBuilder: T = fieldBuilder
-                          ): DumpLogger[T] =
-    new DumpLogger[T](newCoreLogger, newFieldBuilder)
+                          ): NameOfLogger[T] =
+    new NameOfLogger[T](newCoreLogger, newFieldBuilder)
 
-  class NeverLogger(core: CoreLogger, fieldBuilder: FB) extends DumpLogger[FB](core: CoreLogger, fieldBuilder: FB) {
+  class NeverLogger(core: CoreLogger, fieldBuilder: FB) extends NameOfLogger[FB](core: CoreLogger, fieldBuilder: FB) {
     override def trace[A](expr: A): Unit = macro impl.nothing[A]
     override def debug[A](expr: A): Unit = macro impl.nothing[A]
     override def info[A](expr: A): Unit = macro impl.nothing[A]
@@ -69,7 +69,7 @@ class DumpLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   }
 }
 
-object DumpLogger {
+object NameOfLogger {
 
   private class impl(val c: blackbox.Context) {
     import c.universe._
