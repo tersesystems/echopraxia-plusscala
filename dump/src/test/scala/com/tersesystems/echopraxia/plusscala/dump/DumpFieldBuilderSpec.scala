@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.plusscala.dump
 
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api._
-
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
