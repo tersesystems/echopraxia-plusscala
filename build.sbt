@@ -86,7 +86,7 @@ lazy val flowLogger = (project in file("flow"))
 
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
-    name := "nameof-logger",
+    name := "nameof",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
@@ -95,6 +95,18 @@ lazy val nameOfLogger = (project in file("nameof"))
 lazy val dump = (project in file("dump"))
   .settings(
     name := "dump",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+  ).dependsOn(api % "compile->compile;test->compile")
+
+lazy val diff = (project in file("diff"))
+  .settings(
+    name := "diff",
+    // https://mvnrepository.com/artifact/com.flipkart.zjsonpatch/zjsonpatch
+    libraryDependencies += "com.flipkart.zjsonpatch" % "zjsonpatch" % "0.4.12",
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.3",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
@@ -128,7 +140,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, dump, flowLogger, traceLogger, benchmarks)
+  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, dump, diff, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

@@ -121,7 +121,7 @@ The "NameOf" logger and field builder will take the name of the variable passed 
 To use the NameOf logger or field builder, add the following dependency:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "nameof-logger" % echopraxiaPlusScalaVersion
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "nameof" % echopraxiaPlusScalaVersion
 ```
 
 ### NameOf Logger
