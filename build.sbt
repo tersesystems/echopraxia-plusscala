@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.1.0"
+val echopraxiaVersion = "2.2.0"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
@@ -105,8 +105,7 @@ lazy val diff = (project in file("diff"))
     name := "diff",
     // https://mvnrepository.com/artifact/com.flipkart.zjsonpatch/zjsonpatch
     libraryDependencies += "com.flipkart.zjsonpatch" % "zjsonpatch" % "0.4.12",
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.3",
+    libraryDependencies += "com.tersesystems.echopraxia" % "jackson"  % echopraxiaVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
