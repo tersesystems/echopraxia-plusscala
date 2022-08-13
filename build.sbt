@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.1.0"
+val echopraxiaVersion = "2.2.0"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
@@ -86,7 +86,7 @@ lazy val flowLogger = (project in file("flow"))
 
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
-    name := "nameof-logger",
+    name := "nameof",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
@@ -95,6 +95,17 @@ lazy val nameOfLogger = (project in file("nameof"))
 lazy val dump = (project in file("dump"))
   .settings(
     name := "dump",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+  ).dependsOn(api % "compile->compile;test->compile")
+
+lazy val diff = (project in file("diff"))
+  .settings(
+    name := "diff",
+    // https://mvnrepository.com/artifact/com.flipkart.zjsonpatch/zjsonpatch
+    libraryDependencies += "com.flipkart.zjsonpatch" % "zjsonpatch" % "0.4.12",
+    libraryDependencies += "com.tersesystems.echopraxia" % "jackson"  % echopraxiaVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
@@ -128,7 +139,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, dump, flowLogger, traceLogger, benchmarks)
+  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, dump, diff, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
