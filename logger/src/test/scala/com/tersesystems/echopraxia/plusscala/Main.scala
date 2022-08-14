@@ -24,7 +24,7 @@ object Main {
 
     logger.info("{}", _.keyValue("thisbook" -> refBook))
 
-    logger.info("testing {} {}", fb => fb.list(
+    logger.info("testing {} {}", fb => (
       //fb.keyValue("foo", fb.book(refBook)),
       fb.keyValue("foo", refBook),
       // https://stackoverflow.com/questions/5598085/where-does-scala-look-for-implicits/5598107#5598107
