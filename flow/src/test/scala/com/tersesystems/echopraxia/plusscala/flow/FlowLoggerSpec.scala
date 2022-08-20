@@ -46,6 +46,17 @@ class FlowLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       noLogging
       logsNotContain("noLogging")
     }
+
+    it("should log unit") {
+      def logging: Unit = logger.trace {
+        println("hello")
+      }
+
+      logging
+
+      logsContain("entry")
+      logsContain("exit")
+    }
   }
 
   private def logsContain(message: String): Assertion = {

@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
+import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.api._
 
 import scala.annotation.implicitNotFound
@@ -63,6 +64,8 @@ trait ValueTypeClasses {
 
     implicit val booleanToBoolValue: ToValue[Boolean]            = bool => Value.bool(bool)
     implicit val javaBoolToBoolValue: ToValue[java.lang.Boolean] = bool => Value.bool(bool)
+
+    implicit val unitToValue: ToValue[Unit] = _ => ObjectValue.EMPTY
 
     // Allowing fb.nullValue as fb.keyValue("foo" -> null) is dangerous.
     // use fb.nullField("foo") instead.
