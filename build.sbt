@@ -1,9 +1,9 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.2.0"
+val echopraxiaVersion = "2.2.1"
 
 val scala213      = "2.13.8"
-val scala212      = "2.12.14"
+val scala212      = "2.12.16"
 val scalaVersions = Seq(scala212, scala213)
 
 initialize := {
