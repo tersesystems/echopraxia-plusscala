@@ -53,286 +53,39 @@ class Example {
 }
 ```
 
-The Scala logger (technically, the default field builder) has some enhancements over the Java logger, notably the ability to add tuples.  
+The Scala logger (technically, the default field builder) has some enhancements over the Java logger, notably the ability to add fields that have a name and value.  
 
 ```scala
 logger.info("hi {}", _.string("name", "will")) // two args
 logger.info("hi {}", _.string("name" -> "will")) // tuple
 ```
 
-This can come in very handy when using collections of tuples, because you can map them directly to fields:
+If you want to add several fields, you can use `fb.list` to return the fields:
+
+```scala
+logger.info("{} {}", fb => fb.list(
+  fb.string("name" -> "will"),
+  fb.bool("admin" -> true)
+))
+```
+
+You can map sequences of tuples into arguments by mapping them:
 
 ```scala
 val seq = Seq("first" -> 1, "second" -> 2)
 logger.info("seq = {}", fb => fb.list(seq.map(fb.number)))
 ```
 
-Please see the custom field builder section for more details on building fields.
-
-## Async Logger
-
-There is an asynchronous logger variant which has the same API, but logs messages asynchronously.  By default, this uses `ForkJoin.commonPool()`.
+You can also compose loggers with [context](https://github.com/tersesystems/echopraxia#context) using `withFields` and the context fields will render in JSON:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "async" % echopraxiaPlusScalaVersion
+val loggerWithField = logger.withFields(fb => fb.keyValue("correlationId" -> correlationId))
+loggerWithField.info("renders with correlationId in JSON")
 ```
 
-You can create an async logger using the `AsyncLoggerFactory`:
+This is "call by name" i.e. the function defined is evaluated on every logging statement and may change between logging statements.
 
-```scala
-import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
-
-val asyncLogger = AsyncLoggerFactory.getLogger
-asyncLogger.info("async message {}", _.string("name" -> "value"))
-```
-
-And it will produce a message showing the ForkJoinPool as the calling thread:
-
-```
-22:53:27.415 [ForkJoinPool.commonPool-worker-19] INFO com.example.Main$ - async message value
-```
-
-Because conditional logging takes place in a different thread and can be dynamic, async logging is not compatible with the `if (logger.isDebugEnabled())` style of logging, especially when an expensive operations or thread local condition are being evaluated:
-
-```scala
-val asyncLogger = AsyncLoggerFactory.getLogger.withCondition(expensiveCondition)
-
-if (asyncLogger.isDebugEnabled()) { // evaluate condition in this thread?
-  // put expensive debug statement together in this thread or other thread?
-  val expensiveResult = expensiveDebugLoggingQuery()
-  // evaluate condition again?  Is condition still valid?
-  asyncLogger.debug("expensive but worth it {}", _.string("result", expensiveResult))
-}
-```
-
-To account for this, async logging handles conditions and expensive queries by returning a handle that ensures all computation happens in the logging thread.  (This is a little different from the Java API, because IntelliJ's Scala mode will get confused by overloaded methods and parameterized types.)
-
-```scala
-asyncLogger.ifDebugEnabled { log => // condition evaluation
-  val result = expensiveDebugLoggingQuery() // queries in logging thread
-  log("async expensive result {}", _.string("result", result)) // handle does not evaluate
-}
-```
-
-## NameOf Logger and Field Builders
-
-The "NameOf" logger and field builder will take the name of the variable passed in as the field name, using a macro, following [dwickern/scala-nameof](https://github.com/dwickern/scala-nameof).  These tools can be very helpful paired with IntelliJ [live templates](https://www.jetbrains.com/help/idea/using-live-templates.html) or [Custom Postfix Templates](https://github.com/xylo/intellij-postfix-templates).
-
-To use the NameOf logger or field builder, add the following dependency:
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "nameof" % echopraxiaPlusScalaVersion
-```
-
-### NameOf Logger
-
-The NameOf logger will log a single variable at a time, with no arguments.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
-
-For example:
-
-```scala
-val logger = NameOfLoggerFactory.getLogger
-
-val emptySeq = Seq.empty[Int]
-logger.debug(emptySeq)
-```
-
-outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
-
-### NameOf Field Builder
-
-The NameOf field builder adds `nameOfKeyValue`, `nameOfValue`, and `nameOf`.  You can use this to render multiple variables at once:
-
-```scala
-val foo: Foo = ...
-val bar: Bar = ...
-val quux: Quux = ...
-val logger = LoggerFactory.getLogger.withFieldBuilder(NameOfFieldBuilder)
-logger.debug("{} {}", fb => fb.list(
-  fb.nameOfKeyValue(foo),
-  fb.nameOfValue(bar),
-  fb.nameOf(quux) -> quux
-))
-```
-
-Please see the field builder section that explains the details of field builders.
-
-## Trace and Flow Loggers
-
-You can use a trace or flow logger to debug methods and interactions in your code.  The API between the trace and flow loggers is the same, but the trace logger is considerably more verbose than flow.
-
-This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
-
-```scala
-import com.tersesystems.echopraxia.plusscala.trace._
-val traceLogger = TraceLoggerFactory.getLogger
-def myMethod(arg1: String): Int = traceLogger.trace {
-  // ... logic
-}
-```
-
-The trace logger includes source information that has a small (~28 nanosecond) runtime impact even when disabled with `Condition.never`.  The flow logger will pass through and has virtually no impact when disabled, either by using `Condition.never` or by logging below threshold.
-
-### Trace Logger
-
-Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.  Trace logging includes source code information, **including arguments**, so it is only for use in a debugging situation.
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace-logger" % echopraxiaPlusScalaVersion
-```
-
-The following program extends the DefaultTraceFieldBuilder to use automatic derivation, useful for mapping return values: 
-
-```scala
-import com.tersesystems.echopraxia.plusscala.generic._
-import com.tersesystems.echopraxia.plusscala.trace._
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
-
-object TraceMain {
-  import ExecutionContext.Implicits._
-
-  trait AutoTraceFieldBuilder extends DefaultTraceFieldBuilder with AutoDerivation
-  object AutoTraceFieldBuilder extends AutoTraceFieldBuilder
-
-  private val logger = TraceLoggerFactory.getLogger.withFieldBuilder(AutoTraceFieldBuilder)
-
-  private def createFoo(barValue: String): Foo = logger.trace {
-    Foo(Bar(barValue))
-  }
-
-  private def getBar(foo: Foo): Bar = logger.trace {
-    foo.bar
-  }
-
-  private def noArgsBar: Bar = logger.trace {
-    Bar("noArgsBar")
-  }
-
-  private def someFuture: Future[Bar] = Future {
-    logger.trace {
-      Bar("futureBar")
-    }
-  }
-
-  def main(args: Array[String]): Unit = {
-    val foo = createFoo("bar")
-    getBar(foo)
-    noArgsBar
-
-    Await.result(someFuture, Duration.Inf)
-  }
-}
-```
-
-This renders input and output automatically with arguments included:
-
-```
-13:41:35.430 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.createFoo(barValue: String) - (bar)
-13:41:35.443 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.createFoo(barValue: String) - (bar) => {@type=com.example.Foo, bar=bar}
-13:41:35.446 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.getBar(foo: Foo) - (Foo(Bar(bar)))
-13:41:35.447 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.getBar(foo: Foo) - (Foo(Bar(bar))) => bar
-13:41:35.449 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.noArgsBar() - ()
-13:41:35.449 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.noArgsBar() - () => noArgsBar
-13:41:35.489 com.example.TraceMain$ TRACE [scala-execution-context-global-15]: entry: com.example.TraceMain.someFuture() - ()
-13:41:35.490 com.example.TraceMain$ TRACE [scala-execution-context-global-15]: exit: com.example.TraceMain.someFuture() - () => futureBar
-```
-
-You can override the default behavior by implementing `TraceFieldBuilder`, which takes implicit source code arguments -- this is the primary difference between the trace logger and the flow logger.
-
-### Flow Logger
-
-The flow logger does not contain source code information, but simply renders enter and exit information.  
-
-To add the flow logger to your project, add the following dependency:
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "flow-logger" % echopraxiaPlusScalaVersion
-```
-
-This is usually more useful in flow situations like a `Future`, where the enclosing method name and arguments are not as useful:
-
-```scala
-object FlowMain {
-  import ExecutionContext.Implicits._
-
-  trait AutoFlowFieldBuilder extends DefaultFlowFieldBuilder with AutoDerivation
-  object AutoFlowFieldBuilder extends AutoFlowFieldBuilder
-
-  private val logger = FlowLoggerFactory.getLogger.withFieldBuilder(AutoFlowFieldBuilder)
-
-  private def createFoo(barValue: String): Foo = logger.trace {
-    Foo(Bar(barValue))
-  }
-
-  private def getBar(foo: Foo): Bar = logger.trace {
-    foo.bar
-  }
-
-  private def noArgsBar: Bar = logger.trace {
-    Bar("noArgsBar")
-  }
-
-  private def someFuture: Future[Bar] = Future {
-    logger.trace {
-      Bar("futureBar")
-    }
-  }
-
-  def main(args: Array[String]): Unit = {
-    val foo = createFoo("bar")
-    getBar(foo)
-    noArgsBar
-
-    Await.result(someFuture, Duration.Inf)
-  }
-}
-```
-
-To use the flow logger, add the following dependency:
-
-```scala
-libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "flow-logger" % echopraxiaPlusScalaVersion
-```
-
-The above program produces the following output:
-
-```
-13:39:55.665 com.example.FlowMain$ TRACE [main]: entry
-13:39:55.691 com.example.FlowMain$ TRACE [main]: exit => {@type=com.example.Foo, bar=bar}
-13:39:55.694 com.example.FlowMain$ TRACE [main]: entry
-13:39:55.694 com.example.FlowMain$ TRACE [main]: exit => bar
-13:39:55.696 com.example.FlowMain$ TRACE [main]: entry
-13:39:55.696 com.example.FlowMain$ TRACE [main]: exit => noArgsBar
-13:39:55.735 com.example.FlowMain$ TRACE [scala-execution-context-global-15]: entry
-13:39:55.735 com.example.FlowMain$ TRACE [scala-execution-context-global-15]: exit => futureBar
-```
-
-The flow logger is not as detailed, but works well in FP situations, where the logger name is unique and there is only one method to call.
-
-
-## API
-
-You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.
-
-Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
-
-To enable type enrichment, import the `api` package,
-
-```scala
-import com.tersesystems.echopraxia.plusscala.api._
-```
-
-or 
-
-```scala
-import com.tersesystems.echopraxia.plusscala.api.Implicits._
-```
-
-explicitly if you only want the implicits.
-
-This is useful when using the [condition scripts](https://github.com/tersesystems/echopraxia#dynamic-conditions-with-scripts) module of Echopraxia, for example.
+Composition works like you'd expect with fields and conditions (see the Conditions section), but field building is the important bit so we'll go through that first.
 
 ## Field Builder
 
@@ -344,6 +97,8 @@ A `Field` is defined as a `name: String` and a `value: com.tersesystems.echoprax
 * `fb.nullValue`: creates a field with a null as a value, same as `fb.value(name, Value.nullValue())`
 * `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
 * `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
+* `fb.keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
+* `fb.value`: renders a field with `value` when rendered in logfmt line oriented text.
 
 When rendering using a line oriented encoder, `fb.array` and `fb.obj` render in logfmt style `key=value` format, and the other methods use the `value` format.
 
@@ -670,6 +425,271 @@ produces the following logs:
 ```
 
 You can also use `EitherValueTypes` and `OptionValueTypes` in regular field builders for the implicits.
+
+## NameOf Logger and Field Builders
+
+The "NameOf" logger and field builder will take the name of the variable passed in as the field name, using a macro, following [dwickern/scala-nameof](https://github.com/dwickern/scala-nameof).  These tools can be very helpful paired with IntelliJ [live templates](https://www.jetbrains.com/help/idea/using-live-templates.html) or [Custom Postfix Templates](https://github.com/xylo/intellij-postfix-templates).
+
+To use the NameOf logger or field builder, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "nameof" % echopraxiaPlusScalaVersion
+```
+
+### NameOf Logger
+
+The NameOf logger will log a single variable at a time, with no arguments.  It has the same effect as `core.log(level, "{}", _.keyValue(variableName, ToValue(variable)))` -- you must have a `ToValue` type class in scope for the logger to work.
+
+For example:
+
+```scala
+val logger = NameOfLoggerFactory.getLogger
+
+val emptySeq = Seq.empty[Int]
+logger.debug(emptySeq)
+```
+
+outputs `emptySeq=[]`: the `emptySeq` identifier is used as the field name, and an empty array as the value.
+
+### NameOf Field Builder
+
+The NameOf field builder adds `nameOfKeyValue`, `nameOfValue`, and `nameOf`.  You can use this to render multiple variables at once:
+
+```scala
+val foo: Foo = ...
+val bar: Bar = ...
+val quux: Quux = ...
+val logger = LoggerFactory.getLogger.withFieldBuilder(NameOfFieldBuilder)
+logger.debug("{} {}", fb => fb.list(
+  fb.nameOfKeyValue(foo),
+  fb.nameOfValue(bar),
+  fb.nameOf(quux) -> quux
+))
+```
+
+Please see the field builder section that explains the details of field builders.
+
+## Async Logger
+
+There is an asynchronous logger variant which has the same API, but logs messages asynchronously.  By default, this uses `ForkJoin.commonPool()`.
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "async" % echopraxiaPlusScalaVersion
+```
+
+You can create an async logger using the `AsyncLoggerFactory`:
+
+```scala
+import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
+
+val asyncLogger = AsyncLoggerFactory.getLogger
+asyncLogger.info("async message {}", _.string("name" -> "value"))
+```
+
+And it will produce a message showing the ForkJoinPool as the calling thread:
+
+```
+22:53:27.415 [ForkJoinPool.commonPool-worker-19] INFO com.example.Main$ - async message value
+```
+
+Because conditional logging takes place in a different thread and can be dynamic, async logging is not compatible with the `if (logger.isDebugEnabled())` style of logging, especially when an expensive operations or thread local condition are being evaluated:
+
+```scala
+val asyncLogger = AsyncLoggerFactory.getLogger.withCondition(expensiveCondition)
+
+if (asyncLogger.isDebugEnabled()) { // evaluate condition in this thread?
+  // put expensive debug statement together in this thread or other thread?
+  val expensiveResult = expensiveDebugLoggingQuery()
+  // evaluate condition again?  Is condition still valid?
+  asyncLogger.debug("expensive but worth it {}", _.string("result", expensiveResult))
+}
+```
+
+To account for this, async logging handles conditions and expensive queries by returning a handle that ensures all computation happens in the logging thread.  (This is a little different from the Java API, because IntelliJ's Scala mode will get confused by overloaded methods and parameterized types.)
+
+```scala
+asyncLogger.ifDebugEnabled { log => // condition evaluation
+  val result = expensiveDebugLoggingQuery() // queries in logging thread
+  log("async expensive result {}", _.string("result", result)) // handle does not evaluate
+}
+```
+
+## Trace and Flow Loggers
+
+You can use a trace or flow logger to debug methods and interactions in your code.  The API between the trace and flow loggers is the same, but the trace logger is considerably more verbose than flow.
+
+This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
+
+```scala
+import com.tersesystems.echopraxia.plusscala.trace._
+val traceLogger = TraceLoggerFactory.getLogger
+def myMethod(arg1: String): Int = traceLogger.trace {
+  // ... logic
+}
+```
+
+The trace logger includes source information that has a small (~28 nanosecond) runtime impact even when disabled with `Condition.never`.  The flow logger will pass through and has virtually no impact when disabled, either by using `Condition.never` or by logging below threshold.
+
+### Trace Logger
+
+Trace logging usually involves a custom field builder that has additional type classes to handle the return type -- this works particularly well with automatic derivation.  Trace logging includes source code information, **including arguments**, so it is only for use in a debugging situation.
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace-logger" % echopraxiaPlusScalaVersion
+```
+
+The following program extends the DefaultTraceFieldBuilder to use automatic derivation, useful for mapping return values: 
+
+```scala
+import com.tersesystems.echopraxia.plusscala.generic._
+import com.tersesystems.echopraxia.plusscala.trace._
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+
+object TraceMain {
+  import ExecutionContext.Implicits._
+
+  trait AutoTraceFieldBuilder extends DefaultTraceFieldBuilder with AutoDerivation
+  object AutoTraceFieldBuilder extends AutoTraceFieldBuilder
+
+  private val logger = TraceLoggerFactory.getLogger.withFieldBuilder(AutoTraceFieldBuilder)
+
+  private def createFoo(barValue: String): Foo = logger.trace {
+    Foo(Bar(barValue))
+  }
+
+  private def getBar(foo: Foo): Bar = logger.trace {
+    foo.bar
+  }
+
+  private def noArgsBar: Bar = logger.trace {
+    Bar("noArgsBar")
+  }
+
+  private def someFuture: Future[Bar] = Future {
+    logger.trace {
+      Bar("futureBar")
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val foo = createFoo("bar")
+    getBar(foo)
+    noArgsBar
+
+    Await.result(someFuture, Duration.Inf)
+  }
+}
+```
+
+This renders input and output automatically with arguments included:
+
+```
+13:41:35.430 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.createFoo(barValue: String) - (bar)
+13:41:35.443 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.createFoo(barValue: String) - (bar) => {@type=com.example.Foo, bar=bar}
+13:41:35.446 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.getBar(foo: Foo) - (Foo(Bar(bar)))
+13:41:35.447 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.getBar(foo: Foo) - (Foo(Bar(bar))) => bar
+13:41:35.449 com.example.TraceMain$ TRACE [main]: entry: com.example.TraceMain.noArgsBar() - ()
+13:41:35.449 com.example.TraceMain$ TRACE [main]: exit: com.example.TraceMain.noArgsBar() - () => noArgsBar
+13:41:35.489 com.example.TraceMain$ TRACE [scala-execution-context-global-15]: entry: com.example.TraceMain.someFuture() - ()
+13:41:35.490 com.example.TraceMain$ TRACE [scala-execution-context-global-15]: exit: com.example.TraceMain.someFuture() - () => futureBar
+```
+
+You can override the default behavior by implementing `TraceFieldBuilder`, which takes implicit source code arguments -- this is the primary difference between the trace logger and the flow logger.
+
+### Flow Logger
+
+The flow logger does not contain source code information, but simply renders enter and exit information.  
+
+To add the flow logger to your project, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "flow-logger" % echopraxiaPlusScalaVersion
+```
+
+This is usually more useful in flow situations like a `Future`, where the enclosing method name and arguments are not as useful:
+
+```scala
+object FlowMain {
+  import ExecutionContext.Implicits._
+
+  trait AutoFlowFieldBuilder extends DefaultFlowFieldBuilder with AutoDerivation
+  object AutoFlowFieldBuilder extends AutoFlowFieldBuilder
+
+  private val logger = FlowLoggerFactory.getLogger.withFieldBuilder(AutoFlowFieldBuilder)
+
+  private def createFoo(barValue: String): Foo = logger.trace {
+    Foo(Bar(barValue))
+  }
+
+  private def getBar(foo: Foo): Bar = logger.trace {
+    foo.bar
+  }
+
+  private def noArgsBar: Bar = logger.trace {
+    Bar("noArgsBar")
+  }
+
+  private def someFuture: Future[Bar] = Future {
+    logger.trace {
+      Bar("futureBar")
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val foo = createFoo("bar")
+    getBar(foo)
+    noArgsBar
+
+    Await.result(someFuture, Duration.Inf)
+  }
+}
+```
+
+To use the flow logger, add the following dependency:
+
+```scala
+libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "flow-logger" % echopraxiaPlusScalaVersion
+```
+
+The above program produces the following output:
+
+```
+13:39:55.665 com.example.FlowMain$ TRACE [main]: entry
+13:39:55.691 com.example.FlowMain$ TRACE [main]: exit => {@type=com.example.Foo, bar=bar}
+13:39:55.694 com.example.FlowMain$ TRACE [main]: entry
+13:39:55.694 com.example.FlowMain$ TRACE [main]: exit => bar
+13:39:55.696 com.example.FlowMain$ TRACE [main]: entry
+13:39:55.696 com.example.FlowMain$ TRACE [main]: exit => noArgsBar
+13:39:55.735 com.example.FlowMain$ TRACE [scala-execution-context-global-15]: entry
+13:39:55.735 com.example.FlowMain$ TRACE [scala-execution-context-global-15]: exit => futureBar
+```
+
+The flow logger is not as detailed, but works well in FP situations, where the logger name is unique and there is only one method to call.
+
+
+## API
+
+You can convert levels, conditions, and logging contexts to Java using the `.asJava` suffix.
+
+Conversion of Java levels, conditions, and logging contexts are handled through type enrichment adding `.asScala` methods to the classes.
+
+To enable type enrichment, import the `api` package,
+
+```scala
+import com.tersesystems.echopraxia.plusscala.api._
+```
+
+or 
+
+```scala
+import com.tersesystems.echopraxia.plusscala.api.Implicits._
+```
+
+explicitly if you only want the implicits.
+
+This is useful when using the [condition scripts](https://github.com/tersesystems/echopraxia#dynamic-conditions-with-scripts) module of Echopraxia, for example.
 
 ## Conditions
 
