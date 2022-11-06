@@ -13,17 +13,17 @@ object LoggerFactory {
 
   def getLogger(name: String): Logger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
-    new Logger(core, fieldBuilder)
+    Logger(core, fieldBuilder)
   }
 
   def getLogger(clazz: Class[_]): Logger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
-    new Logger(core, fieldBuilder)
+    Logger(core, fieldBuilder)
   }
 
   def getLogger: Logger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
-    new Logger(core, fieldBuilder)
+    Logger(core, fieldBuilder)
   }
 
 }
