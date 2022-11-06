@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.nameof
 
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
-import com.tersesystems.echopraxia.plusscala.api.{AbstractLoggerSupport, Condition, FieldBuilder, LoggerSupport}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder, LoggerSupport}
 
 import scala.annotation.tailrec
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
@@ -9,17 +9,18 @@ import scala.reflect.macros.blackbox
 import scala.language.experimental.macros
 
 /**
- * This class dumps a variable or field that has a `fieldBuilder.ToValue[A]` type class with it,
- * using the name of the field.
+ * This class dumps a variable or field that has a `fieldBuilder.ToValue[A]` type class with it, using the name of the field.
  *
  * It's useful for debugging situations where you just want to log some internal state ASAP.
  *
- * @param core the core logger
- * @param fieldBuilder the field builder
- * @tparam FB the field builder type.
+ * @param core
+ *   the core logger
+ * @param fieldBuilder
+ *   the field builder
+ * @tparam FB
+ *   the field builder type.
  */
-class NameOfLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
-  extends AbstractLoggerSupport(core, fieldBuilder) with LoggerSupport[FB] {
+class NameOfLogger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: FB) extends LoggerSupport[FB, NameOfLogger] {
   import NameOfLogger.impl
 
   def trace[A](expr: A): Unit = macro impl.trace[A]
@@ -55,9 +56,9 @@ class NameOfLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
 
   @inline
   private def newLogger[T <: FieldBuilder](
-                            newCoreLogger: CoreLogger = core,
-                            newFieldBuilder: T = fieldBuilder
-                          ): NameOfLogger[T] =
+      newCoreLogger: CoreLogger = core,
+      newFieldBuilder: T = fieldBuilder
+  ): NameOfLogger[T] =
     new NameOfLogger[T](newCoreLogger, newFieldBuilder)
 
   class NeverLogger(core: CoreLogger, fieldBuilder: FB) extends NameOfLogger[FB](core: CoreLogger, fieldBuilder: FB) {
@@ -79,35 +80,35 @@ object NameOfLogger {
     }
 
     def error[A: c.WeakTypeTag](expr: c.Tree) = {
-      val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
+      val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.ERROR"
 
       handle(tpeA, level, expr)
     }
 
     def warn[A: c.WeakTypeTag](expr: c.Tree) = {
-      val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
+      val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.WARN"
 
       handle(tpeA, level, expr)
     }
 
     def info[A: c.WeakTypeTag](expr: c.Tree) = {
-      val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
+      val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.INFO"
 
       handle(tpeA, level, expr)
     }
 
     def debug[A: c.WeakTypeTag](expr: c.Tree) = {
-      val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
+      val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.DEBUG"
 
       handle(tpeA, level, expr)
     }
 
     def trace[A: c.WeakTypeTag](expr: c.Tree) = {
-      val tpeA: Type = implicitly[WeakTypeTag[A]].tpe
+      val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.TRACE"
 
       handle(tpeA, level, expr)
@@ -116,11 +117,11 @@ object NameOfLogger {
     private def handle(tpeA: Type, level: Select, expr: c.Tree) = {
       // taken from https://github.com/dwickern/scala-nameof
       @tailrec def extract(tree: c.Tree): String = tree match {
-        case Ident(n) => n.decodedName.toString
-        case Select(_, n) => n.decodedName.toString
-        case Function(_, body) => extract(body)
-        case Block(_, expr) => extract(expr)
-        case Apply(func, _) => extract(func)
+        case Ident(n)           => n.decodedName.toString
+        case Select(_, n)       => n.decodedName.toString
+        case Function(_, body)  => extract(body)
+        case Block(_, expr)     => extract(expr)
+        case Apply(func, _)     => extract(func)
         case TypeApply(func, _) => extract(func)
         case _ =>
           c.abort(c.enclosingPosition, s"Unsupported expression: ${expr}")
@@ -128,10 +129,10 @@ object NameOfLogger {
 
       val name = expr match {
         case Literal(Constant(_)) => c.abort(c.enclosingPosition, "Cannot provide name to static constant!")
-        case _ => extract(expr)
+        case _                    => extract(expr)
       }
 
-      val logger = c.prefix
+      val logger           = c.prefix
       val fieldBuilderType = tq"$logger.fieldBuilder.type"
       val function = q"""new java.util.function.Function[$fieldBuilderType, com.tersesystems.echopraxia.api.FieldBuilderResult]() {
         def apply(fb: $fieldBuilderType) = fb.keyValue($name, fb.ToValue[$tpeA]($expr))

@@ -9,17 +9,17 @@ object FlowLoggerFactory {
 
   def getLogger(name: String): FlowLogger[FlowFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
-    new FlowLogger(core, fieldBuilder)
+    FlowLogger(core, fieldBuilder)
   }
 
   def getLogger(clazz: Class[_]): FlowLogger[FlowFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
-    new FlowLogger(core, fieldBuilder)
+    FlowLogger(core, fieldBuilder)
   }
 
   def getLogger: FlowLogger[FlowFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
-    new FlowLogger(core, fieldBuilder)
+    FlowLogger(core, fieldBuilder)
   }
 
 }

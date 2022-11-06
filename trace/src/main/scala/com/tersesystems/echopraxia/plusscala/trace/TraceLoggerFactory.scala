@@ -9,17 +9,17 @@ object TraceLoggerFactory {
 
   def getLogger(name: String): TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
-    new TraceLogger(core, fieldBuilder)
+    TraceLogger(core, fieldBuilder)
   }
 
   def getLogger(clazz: Class[_]): TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
-    new TraceLogger(core, fieldBuilder)
+    TraceLogger(core, fieldBuilder)
   }
 
   def getLogger: TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
-    new TraceLogger(core, fieldBuilder)
+    TraceLogger(core, fieldBuilder)
   }
 
 }

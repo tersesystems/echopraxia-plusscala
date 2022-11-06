@@ -13,17 +13,17 @@ object AsyncLoggerFactory {
 
   def getLogger(name: String): AsyncLogger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
-    new AsyncLogger(core, fieldBuilder)
+    AsyncLogger(core, fieldBuilder)
   }
 
   def getLogger(clazz: Class[_]): AsyncLogger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
-    new AsyncLogger(core, fieldBuilder)
+    AsyncLogger(core, fieldBuilder)
   }
 
   def getLogger: AsyncLogger[FieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
-    new AsyncLogger(core, fieldBuilder)
+    AsyncLogger(core, fieldBuilder)
   }
 
 }

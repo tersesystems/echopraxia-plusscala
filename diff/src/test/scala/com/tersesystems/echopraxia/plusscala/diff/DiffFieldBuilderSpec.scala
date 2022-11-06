@@ -17,8 +17,8 @@ class DiffBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   describe("logging") {
 
     it("should diff correctly") {
-      val person1 = Person("person1", 13)
-      val person2 = Person("person2", 13)
+      val person1   = Person("person1", 13)
+      val person2   = Person("person2", 13)
       val diffField = fb.diff("personDiff", person1, person2)
 
       val obj = diffField.value.asInstanceOf[Value.ArrayValue]
@@ -60,7 +60,6 @@ class DiffBuilderSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 }
 
 case class Person(name: String, age: Int)
-
 
 case class User(name: String, id: Int)
 
