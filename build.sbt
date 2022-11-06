@@ -168,7 +168,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Xlint",
         "-Ywarn-dead-code",
         "-Yrangepos",
-        "-Xsource:2.13",
         "-release",
         "8"
       )
@@ -186,7 +185,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Xlint",
         "-Ywarn-dead-code",
         "-Yrangepos",
-        "-Xsource:2.12",
         "-Yno-adapted-args",
         "-release",
         "8"
