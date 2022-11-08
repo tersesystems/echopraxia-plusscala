@@ -76,6 +76,15 @@ val seq = Seq("first" -> 1, "second" -> 2)
 logger.info("seq = {}", fb => fb.list(seq.map(fb.number)))
 ```
 
+And you can log exceptions, which will render stacktraces and also as toString:
+
+```scala
+logger.error("something went wrong: {} threw {}", fb.list(
+  fb.keyValue("messageId" -> messageId),
+  fb.exception(e)
+))
+```
+
 You can also compose loggers with [context](https://github.com/tersesystems/echopraxia#context) using `withFields` and the context fields will render in JSON:
 
 ```scala
@@ -99,6 +108,7 @@ A `Field` is defined as a `name: String` and a `value: com.tersesystems.echoprax
 * `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
 * `fb.keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
 * `fb.value`: renders a field with `value` when rendered in logfmt line oriented text.
+* `fb.exception`: renders exception field and sets throwable on logging event.
 
 When rendering using a line oriented encoder, `fb.array` and `fb.obj` render in logfmt style `key=value` format, and the other methods use the `value` format.
 
