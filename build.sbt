@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.2.2"
+val echopraxiaVersion = "2.2.4"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.16"
@@ -135,6 +135,7 @@ lazy val benchmarks = (project in file("benchmarks")).enablePlugins(JmhPlugin).s
 
 lazy val root = (project in file("."))
   .settings(
+    name                                   := "echopraxia-plusscala",
     Compile / doc / sources                := Seq.empty,
     Compile / packageDoc / publishArtifact := false,
     publishArtifact                        := false,
