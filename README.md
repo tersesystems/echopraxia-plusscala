@@ -765,7 +765,7 @@ You can change these constants to have different names by overriding the resourc
 
 ## Custom Logger
 
-You can create a custom logger which has your own methods and field builders by extending `AbstractLoggerSupport` with `DefaultLoggerMethods`.
+You can create a custom logger which has your own methods and field builders by extending `DefaultLoggerMethods`.
 
 ```scala
 import com.tersesystems.echopraxia.api.{CoreLogger, Caller, CoreLoggerFactory, FieldBuilderResult, Utilities}
@@ -792,24 +792,42 @@ object CustomLoggerFactory {
   }
 }
 
-final class CustomLogger(core: CoreLogger, fieldBuilder: CustomFieldBuilder)
-  extends AbstractLoggerSupport(core, fieldBuilder)
-    with DefaultLoggerMethods[CustomFieldBuilder] {
+class CustomLogger[FB](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] with DefaultLoggerMethods[FB] {
 
-  private def newLogger(coreLogger: CoreLogger): CustomLogger = 
-    new CustomLogger(coreLogger, fieldBuilder)
+  override def name: String = core.getName
 
-  def withCondition(scalaCondition: Condition): CustomLogger =
-    newLogger(core.withCondition(scalaCondition.asJava))
-
-  def withFields(f: CustomFieldBuilder => FieldBuilderResult): CustomLogger = {
-    import scala.compat.java8.FunctionConverters._
-    newLogger(core.withFields(f.asJava, fieldBuilder))
+  override def withCondition(condition: Condition): CustomLogger[FB] = {
+    condition match {
+      case Condition.always =>
+        this
+      case Condition.never =>
+        NoOp(core, fieldBuilder)
+      case other =>
+        newLogger(newCoreLogger = core.withCondition(other.asJava))
+    }
   }
 
-  def withThreadContext: CustomLogger = {
-    newLogger(core.withThreadContext(Utilities.threadContext()))
+  override def withFields(f: FB => FieldBuilderResult): CustomLogger[FB] = {
+    newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
+
+  override def withThreadContext: CustomLogger[FB] = {
+    newLogger(
+      newCoreLogger = core.withThreadContext(Utilities.threadContext())
+    )
+  }
+
+  override def withFieldBuilder[NEWFB](newFieldBuilder: NEWFB): CustomLogger[NEWFB] = {
+    newLogger(newFieldBuilder = newFieldBuilder)
+  }
+
+  @inline
+  private def newLogger[T](
+                            newCoreLogger: CoreLogger = core,
+                            newFieldBuilder: T = fieldBuilder
+                          ): CustomLogger[T] =
+    new CustomLogger[T](newCoreLogger, newFieldBuilder)
+
 }
 ```
 
