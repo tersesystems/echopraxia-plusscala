@@ -774,19 +774,19 @@ import com.tersesystems.echopraxia.plusscala.api._
 
 object CustomLoggerFactory {
   private val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
-  private val fieldBuilder: CustomFieldBuilder = CustomFieldBuilder
+  private val fieldBuilder: FooBuilder.type = FooBuilder
 
-  def getLogger(name: String): CustomLogger = {
+  def getLogger(name: String): CustomLogger[FooBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     new CustomLogger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): CustomLogger = {
+  def getLogger(clazz: Class[_]): CustomLogger[FooBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     new CustomLogger(core, fieldBuilder)
   }
 
-  def getLogger: CustomLogger = {
+  def getLogger: CustomLogger[FooBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     new CustomLogger(core, fieldBuilder)
   }
@@ -801,7 +801,7 @@ class CustomLogger[FB](val core: CoreLogger, val fieldBuilder: FB) extends Logge
       case Condition.always =>
         this
       case Condition.never =>
-        NoOp(core, fieldBuilder)
+        newLogger(newCoreLogger = core.withCondition(Condition.never.asJava), fieldBuilder)
       case other =>
         newLogger(newCoreLogger = core.withCondition(other.asJava))
     }
