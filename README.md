@@ -795,6 +795,15 @@ object CustomLoggerFactory {
 class CustomLogger[FB](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] with DefaultLoggerMethods[FB] {
 
   override def name: String = core.getName
+  
+  // add a custom method here for logger.debug(msg, "foo" -> foo, "bar" -> bar)   
+  def debug[A1: fieldBuilder.ToValue, A2: fieldBuilder.ToValue](message: String, a1: (String, A1), a2: (String, A2)): Unit = {
+    debug(message, fb => fb.list(
+      fieldBuilder.keyValue(a1._1, a1._2),
+      fieldBuilder.keyValue(a2._1, a2._2)
+    ))
+  }
+
 
   override def withCondition(condition: Condition): CustomLogger[FB] = {
     condition match {
