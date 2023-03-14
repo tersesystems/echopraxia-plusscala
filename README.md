@@ -6,6 +6,8 @@ Echopraxia is compiled for Scala 2.12 and Scala 2.13.
 
 ## Examples
 
+For the fastest possible way to try out Echopraxia, download and run the [Ammonite script](https://github.com/tersesystems/smallest-dynamic-logging-example/blob/main/ammonite/script.sc).
+
 Examples are available at [tersesystems/echopraxia-scala-example](https://github.com/tersesystems/echopraxia-scala-example) and [tersesystems/echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
 ## What Does It Mean?
