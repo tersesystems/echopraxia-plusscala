@@ -248,6 +248,53 @@ object Main {
 }
 ```
 
+You should only have one type class instance for the type you are handling.  If you are interested in subclassing objects in different modules, you can call the `super` value of the parent field builder.  
+
+For example, imagine you have an `animal` module that contains the `Animal` class:
+
+```scala
+class Animal(val name: String, val color: String)
+
+trait AnimalFieldBuilder extends FieldBuilder {
+  // this must be a method so we can call super
+  implicit def animalToValue: ToValue[Animal] = { a =>
+    ToObjectValue(keyValue("name" -> a.name), keyValue("color" -> a.color))
+  }
+}
+```
+
+And in another module, we want to subclass `Animal` and leverage the field builder logic from `AnimalFieldBuilder`:
+
+```scala
+class Cat(name: String, color: String, val goodCat: Boolean) extends Animal(name, color)
+
+// Special case cat as an animal by overriding animalToValue
+trait CatFieldBuilder extends AnimalFieldBuilder {
+  override implicit val animalToValue: ToValue[Animal] = { animal =>
+    // enrich Value[_]
+    import com.tersesystems.echopraxia.plusscala.api.Implicits._
+    // call super method and cast to ObjectValue
+    val animalValue = super.animalToValue.toValue(animal).asObject
+    animal match {
+      case cat: Cat =>
+        // Add fields to object value
+        animalValue.add(keyValue("goodCat" -> cat.isGoodCat))
+      case _ =>
+        animalValue
+    }
+  }
+}
+object CatFieldBuilder extends CatFieldBuilder
+```
+
+Now we can call the `ToValue[Animal]` in `CatFieldBuilder` and it will contain the `goodCat` field.
+
+```scala
+val fb = CatFieldBuilder
+val cat = new Cat("indra", "black", goodCat = true)
+val field = fb.keyValue("cat", cat)
+```
+
 You can extend the field builder for more general purposes, for example to treat all `Map[String, V]` as objects:
 
 ```scala
