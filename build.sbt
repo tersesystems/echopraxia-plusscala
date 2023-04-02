@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.3.0-RC1"
+val echopraxiaVersion = "2.3.0-RC2"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.16"
@@ -45,7 +45,8 @@ lazy val api = (project in file("api"))
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
-    libraryDependencies ++= compatLibraries(scalaVersion.value)
+    libraryDependencies ++= compatLibraries(scalaVersion.value),
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
 
 lazy val generic = (project in file("generic"))
