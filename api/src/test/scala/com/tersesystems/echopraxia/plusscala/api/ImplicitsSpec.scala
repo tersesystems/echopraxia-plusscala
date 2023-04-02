@@ -47,9 +47,9 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with Seq") {
-      val fb = CatFieldBuilder
-      val cat = new Cat("indra", "black", goodCat = true)
-      val field = fb.keyValue("cat", cat)
+      val fb                             = CatFieldBuilder
+      val cat                            = new Cat("indra", "black", goodCat = true)
+      val field                          = fb.keyValue("cat", cat)
       val objectValue: Value.ObjectValue = field.value().asObject
       val fields = Seq(
         fb.string("stringField", "foo"),
@@ -61,9 +61,9 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with util.Collections") {
-      val fb = CatFieldBuilder
-      val cat = new Cat("indra", "black", goodCat = true)
-      val field = fb.keyValue("cat", cat)
+      val fb                             = CatFieldBuilder
+      val cat                            = new Cat("indra", "black", goodCat = true)
+      val field                          = fb.keyValue("cat", cat)
       val objectValue: Value.ObjectValue = field.value().asObject
       val fields: util.List[Field] = util.Arrays.asList(
         fb.string("stringField", "foo"),
@@ -77,17 +77,17 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("rich ArrayValue") {
     it("should work with a field builder") {
-      val fb = CatFieldBuilder
-      val cat = new Cat("indra", "black", goodCat = true)
-      val cats = Seq(cat)
-      val fields = fb.array("array", cats).value.asArray.raw
-      val catValue = fields.get(0).asObject
+      val fb        = CatFieldBuilder
+      val cat       = new Cat("indra", "black", goodCat = true)
+      val cats      = Seq(cat)
+      val fields    = fb.array("array", cats).value.asArray.raw
+      val catValue  = fields.get(0).asObject
       val catFields = catValue.raw
       catFields.stream().anyMatch(f => f.name == "name" && f.value().raw == "indra") must be(true)
     }
 
     it("should append extra values") {
-      val arrayValue = Value.array("one", "two")
+      val arrayValue    = Value.array("one", "two")
       val newArrayValue = arrayValue.add(Value.string("three"))
       newArrayValue.raw().size() must be(3)
     }
