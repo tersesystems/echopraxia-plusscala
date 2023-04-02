@@ -9,7 +9,6 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.util
-import scala.annotation.nowarn
 
 class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
