@@ -1,24 +1,13 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.{Field, Value}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
-class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+import java.util
 
-  // If in same module...
-  trait CatAwareFieldBuilder extends FieldBuilder {
-    implicit def animalValue[A <: Animal]: ToValue[A] = { p: A =>
-      val fields = Seq(keyValue("name" -> p.name), keyValue("color" -> p.color))
-      p match {
-        case cat: Cat =>
-          ToObjectValue(fields :+ keyValue("goodCat" -> cat.goodCat))
-        case _ =>
-          ToObjectValue(fields)
-      }
-    }
-  }
+class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   trait AnimalFieldBuilder extends FieldBuilder {
     // this must be a method so we can call super:
@@ -46,8 +35,8 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   class Animal(val name: String, val color: String)
   class Cat(name: String, color: String, val goodCat: Boolean) extends Animal(name, color)
 
-  describe("rich object value") {
-    it("should work with single field") {
+  describe("rich ObjectValue") {
+    it("should work with a field builder") {
       val fb    = CatFieldBuilder
       val cat   = new Cat("indra", "black", goodCat = true)
       val field = fb.keyValue("cat", cat)
@@ -55,6 +44,52 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val objectValue: Value.ObjectValue = field.value().asObject
       val catField                       = objectValue.raw()
       catField.stream().anyMatch(_.name == "goodCat") must be(true)
+    }
+
+    it("should work with Seq") {
+      val fb = CatFieldBuilder
+      val cat = new Cat("indra", "black", goodCat = true)
+      val field = fb.keyValue("cat", cat)
+      val objectValue: Value.ObjectValue = field.value().asObject
+      val fields = Seq(
+        fb.string("stringField", "foo"),
+        fb.number("numField", 1L)
+      )
+      val extra = objectValue.append(fields).asObject.raw
+
+      extra.stream().anyMatch(_.name == "stringField") must be(true)
+    }
+
+    it("should work with util.Collections") {
+      val fb = CatFieldBuilder
+      val cat = new Cat("indra", "black", goodCat = true)
+      val field = fb.keyValue("cat", cat)
+      val objectValue: Value.ObjectValue = field.value().asObject
+      val fields: util.List[Field] = util.Arrays.asList(
+        fb.string("stringField", "foo"),
+        fb.number("numField", 1L)
+      )
+      val extra = objectValue.append(fields).asObject.raw
+
+      extra.stream().anyMatch(_.name == "stringField") must be(true)
+    }
+  }
+
+  describe("rich ArrayValue") {
+    it("should work with a field builder") {
+      val fb = CatFieldBuilder
+      val cat = new Cat("indra", "black", goodCat = true)
+      val cats = Seq(cat)
+      val fields = fb.array("array", cats).value.asArray.raw
+      val catValue = fields.get(0).asObject
+      val catFields = catValue.raw
+      catFields.stream().anyMatch(f => f.name == "name" && f.value().raw == "indra") must be(true)
+    }
+
+    it("should append extra values") {
+      val arrayValue = Value.array("one", "two")
+      val newArrayValue = arrayValue.add(Value.string("three"))
+      newArrayValue.raw().size() must be(3)
     }
   }
 

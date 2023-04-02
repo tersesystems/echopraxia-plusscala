@@ -41,19 +41,18 @@ trait LowPriorityImplicits {
     def asNumber[N <: Number with Comparable[N]: Numeric]: Value.NumberValue[N] = value.asInstanceOf[Value.NumberValue[N]]
   }
 
-  final implicit class RichArrayValue(value: Value[util.List[Value[_]]]) {
+  final implicit class RichArrayValue(values: Value[util.List[Value[_]]]) {
     def add(value: Value[_]): Value[util.List[Value[_]]] = {
-      val original     = value.asArray.raw()
-      val joinedFields = new util.ArrayList[Value[_]](original)
+      val joinedFields = new util.ArrayList(values.raw())
       joinedFields.add(value)
       Value.array(joinedFields)
     }
 
     def +(value: Value[_]): Value[util.List[Value[_]]] = add(value)
 
-    def append(values: Traversable[Value[_]]): Value[util.List[Value[_]]] = {
-      val joinedValues = new util.ArrayList(value.raw)
-      for (f <- values) {
+    def append(newValues: Traversable[Value[_]]): Value[util.List[Value[_]]] = {
+      val joinedValues = new util.ArrayList(values.raw())
+      for (f <- newValues) {
         joinedValues.add(f)
       }
       Value.array(joinedValues)
@@ -61,9 +60,9 @@ trait LowPriorityImplicits {
 
     def ++(values: Traversable[Value[_]]): Value[util.List[Value[_]]] = append(values)
 
-    def append(values: util.Collection[Value[_]]): Value[util.List[Value[_]]] = {
-      val joinedValues = new util.ArrayList(value.raw)
-      joinedValues.addAll(values)
+    def append(newValues: util.Collection[Value[_]]): Value[util.List[Value[_]]] = {
+      val joinedValues = new util.ArrayList(values.raw)
+      joinedValues.addAll(newValues)
       Value.array(joinedValues)
     }
 
