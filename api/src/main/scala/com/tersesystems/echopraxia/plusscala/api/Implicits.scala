@@ -2,9 +2,8 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.{Field, Value, Condition => JCondition, FieldBuilderResult => JFieldBuilderResult, Level => JLevel, LoggingContext => JLoggingContext}
 
-import java.lang.Number
 import java.util
-import java.util.{List, stream}
+import java.util.stream
 import java.util.stream.Collectors
 import scala.jdk.CollectionConverters.seqAsJavaListConverter
 
