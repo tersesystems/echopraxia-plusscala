@@ -55,7 +55,7 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         fb.string("stringField", "foo"),
         fb.number("numField", 1L)
       )
-      val extra = objectValue.append(fields).asObject.raw
+      val extra = objectValue.addAll(fields).asObject.raw
 
       extra.stream().anyMatch(_.name == "stringField") must be(true)
     }
@@ -69,7 +69,7 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         fb.string("stringField", "foo"),
         fb.number("numField", 1L)
       )
-      val extra = objectValue.append(fields).asObject.raw
+      val extra = objectValue.addAll(fields).asObject.raw
 
       extra.stream().anyMatch(_.name == "stringField") must be(true)
     }
