@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "2.3.0-RC2"
+val echopraxiaVersion = "2.3.0"
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.16"
