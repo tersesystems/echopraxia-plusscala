@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.plusscala.api
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.api._
 
+import java.math.BigInteger
 import scala.annotation.implicitNotFound
 
 trait ValueTypeClasses {
@@ -62,7 +63,17 @@ trait ValueTypeClasses {
     implicit val bigIntToValue: ToValue[BigInt]         = (bigInt: BigInt) => Value.number(bigInt.bigInteger)
     implicit val bigDecimalToValue: ToValue[BigDecimal] = (bigDec: BigDecimal) => Value.number(bigDec.bigDecimal)
 
-    implicit val booleanToBoolValue: ToValue[Boolean]            = bool => Value.bool(bool)
+    implicit val javaByteToValue: ToValue[java.lang.Byte]             = (byte: java.lang.Byte) => Value.number(byte)
+    implicit val javaShortToValue: ToValue[java.lang.Short]           = (short: java.lang.Short) => Value.number(short)
+    implicit val javaIntegerToValue: ToValue[java.lang.Integer]       = (int: java.lang.Integer) => Value.number(int)
+    implicit val javaLongToValue: ToValue[java.lang.Long]             = (long: java.lang.Long) => Value.number(long)
+    implicit val javaDoubleToValue: ToValue[java.lang.Double]         = (double: java.lang.Double) => Value.number(double)
+    implicit val javaFloatToValue: ToValue[java.lang.Float]           = (float: java.lang.Float) => Value.number(float)
+    implicit val javaBigIntegerToValue: ToValue[java.math.BigInteger] = (bigInt: java.math.BigInteger) => Value.number(bigInt)
+    implicit val javaBigDecimalToValue: ToValue[java.math.BigDecimal] = (bigDec: java.math.BigDecimal) => Value.number(bigDec)
+
+    implicit val booleanToBoolValue: ToValue[Boolean] = bool => Value.bool(bool)
+
     implicit val javaBoolToBoolValue: ToValue[java.lang.Boolean] = bool => Value.bool(bool)
 
     implicit val unitToValue: ToValue[Unit] = _ => ObjectValue.EMPTY
