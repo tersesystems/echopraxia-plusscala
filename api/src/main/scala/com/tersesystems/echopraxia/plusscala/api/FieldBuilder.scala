@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.plusscala.api
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.api._
 
-import java.math.BigInteger
 import scala.annotation.implicitNotFound
 
 trait ValueTypeClasses {
