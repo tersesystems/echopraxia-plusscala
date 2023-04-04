@@ -46,7 +46,17 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       catField.stream().anyMatch(_.name == "goodCat") must be(true)
     }
 
-    it("should work with Seq") {
+    it("should add a field") {
+      val fb = CatFieldBuilder
+      val cat = new Cat("indra", "black", goodCat = true)
+      val field = fb.keyValue("cat", cat)
+      val objectValue: Value.ObjectValue = field.value().asObject
+      val extra = objectValue.add(fb.string("stringField", "foo")).asObject.raw
+
+      extra.stream().anyMatch(_.name == "stringField") must be(true)
+    }
+
+    it("should addAll with Seq") {
       val fb                             = CatFieldBuilder
       val cat                            = new Cat("indra", "black", goodCat = true)
       val field                          = fb.keyValue("cat", cat)
@@ -60,7 +70,7 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       extra.stream().anyMatch(_.name == "stringField") must be(true)
     }
 
-    it("should work with util.Collections") {
+    it("should addAll with util.Collections") {
       val fb                             = CatFieldBuilder
       val cat                            = new Cat("indra", "black", goodCat = true)
       val field                          = fb.keyValue("cat", cat)
