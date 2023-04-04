@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
+import com.tersesystems.echopraxia.api.Value.{ArrayValue, ObjectValue}
 import com.tersesystems.echopraxia.api.{
   Field,
   Value,
@@ -30,55 +31,28 @@ trait LowPriorityImplicits {
     def asScala: Level = Level.asScala(level)
   }
 
-  final implicit class RichValue[A](value: Value[A]) {
+  final implicit class RichArrayValue(arrayValue: ArrayValue) {
 
-    def asObject: Value.ObjectValue = value.asInstanceOf[Value.ObjectValue]
+    def +(value: Value[_]): ArrayValue = arrayValue.add(value)
 
-    def asArray: Value.ArrayValue     = value.asInstanceOf[Value.ArrayValue]
-    def asBoolean: Value.BooleanValue = value.asInstanceOf[Value.BooleanValue]
-    def asString: Value.StringValue   = value.asInstanceOf[Value.StringValue]
+    def ++(values: Traversable[Value[_]]): ArrayValue = addAll(values)
 
-    def asNumber[N <: Number with Comparable[N]: Numeric]: Value.NumberValue[N] = value.asInstanceOf[Value.NumberValue[N]]
-  }
-
-  final implicit class RichArrayValue(values: Value[util.List[Value[_]]]) {
-    def add(value: Value[_]): Value[util.List[Value[_]]] = {
-      val joinedFields = new util.ArrayList(values.raw())
-      joinedFields.add(value)
-      Value.array(joinedFields)
-    }
-
-    def +(value: Value[_]): Value[util.List[Value[_]]] = add(value)
-
-    def append(newValues: Traversable[Value[_]]): Value[util.List[Value[_]]] = {
-      val joinedValues = new util.ArrayList(values.raw())
+    def addAll(newValues: Traversable[Value[_]]): ArrayValue = {
+      val joinedValues = new util.ArrayList(arrayValue.raw())
       for (f <- newValues) {
         joinedValues.add(f)
       }
       Value.array(joinedValues)
     }
 
-    def ++(values: Traversable[Value[_]]): Value[util.List[Value[_]]] = append(values)
-
-    def append(newValues: util.Collection[Value[_]]): Value[util.List[Value[_]]] = {
-      val joinedValues = new util.ArrayList(values.raw)
-      joinedValues.addAll(newValues)
-      Value.array(joinedValues)
-    }
-
-    def ++(values: util.Collection[Value[_]]): Value[util.List[Value[_]]] = append(values)
+    def ++(newValues: util.Collection[Value[_]]): ArrayValue = arrayValue.addAll(newValues)
   }
 
-  final implicit class RichObjectValue(value: Value[util.List[Field]]) {
-    def add(field: Field): Value[util.List[Field]] = {
-      val joinedFields = new util.ArrayList(value.raw)
-      joinedFields.add(field)
-      Value.`object`(joinedFields)
-    }
+  final implicit class RichObjectValue(value: ObjectValue) {
 
-    def +(field: Field): Value[util.List[Field]] = add(field)
+    def +(field: Field): ObjectValue = value.add(field)
 
-    def append(fields: Traversable[Field]): Value[util.List[Field]] = {
+    def addAll(fields: Traversable[Field]): ObjectValue = {
       val joinedFields = new util.ArrayList(value.raw)
       for (f <- fields) {
         joinedFields.add(f)
@@ -86,15 +60,9 @@ trait LowPriorityImplicits {
       Value.`object`(joinedFields)
     }
 
-    def ++(fields: Traversable[Field]): Value[util.List[Field]] = append(fields)
+    def ++(fields: Traversable[Field]): ObjectValue = addAll(fields)
 
-    def append(fields: util.Collection[Field]): Value[util.List[Field]] = {
-      val joinedFields = new util.ArrayList(value.raw)
-      joinedFields.addAll(fields)
-      Value.`object`(joinedFields)
-    }
-
-    def ++(fields: util.Collection[Field]): Value[util.List[Field]] = append(fields)
+    def ++(fields: util.Collection[Field]): ObjectValue = value.addAll(fields)
   }
 
   final implicit class RichFieldBuilderResult(result: JFieldBuilderResult) {
