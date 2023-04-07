@@ -5,6 +5,10 @@ import com.tersesystems.echopraxia.api._
 
 import scala.annotation.implicitNotFound
 
+trait HasName {
+  type Name = String
+}
+
 trait ValueTypeClasses {
 
   /**
@@ -212,89 +216,89 @@ trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
 
 }
 
-trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
-  def keyValue[V: ToValue](tuple: (String, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
+trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName {
+  def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
 
-  def value[V: ToValue](tuple: (String, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
+  def value[V: ToValue](tuple: (Name, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
 
-  def string(tuple: (String, String)): Field = value(tuple)
+  def string(tuple: (Name, String)): Field = value(tuple)
 
-  def number[N: ToValue: Numeric](tuple: (String, N)): Field = value(tuple)
+  def number[N: ToValue: Numeric](tuple: (Name, N)): Field = value(tuple)
 
-  def bool(tuple: (String, Boolean)): Field = value(tuple)
+  def bool(tuple: (Name, Boolean)): Field = value(tuple)
 
-  def exception(tuple: (String, Throwable)): Field = keyValue(tuple)
+  def exception(tuple: (Name, Throwable)): Field = keyValue(tuple)
 
-  def array[AV: ToArrayValue](tuple: (String, AV)): Field = keyValue(tuple)
+  def array[AV: ToArrayValue](tuple: (Name, AV)): Field = keyValue(tuple)
 
-  def obj[OV: ToObjectValue](tuple: (String, OV)): Field = keyValue(tuple)
+  def obj[OV: ToObjectValue](tuple: (Name, OV)): Field = keyValue(tuple)
 }
 
 /**
  * A field builder that is enhanced with ToValue, ToObjectValue, and ToArrayValue.
  */
-trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
+trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName {
 
   // ------------------------------------------------------------------
   // keyValue
 
-  def keyValue[V: ToValue](key: String, value: V): Field = Field.keyValue(key, ToValue(value))
+  def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key, ToValue(value))
 
   // ------------------------------------------------------------------
   // value
 
-  def value[V: ToValue](key: String, value: V): Field = Field.value(key, ToValue(value))
+  def value[V: ToValue](key: Name, value: V): Field = Field.value(key, ToValue(value))
 
   // ------------------------------------------------------------------
   // string
 
-  def string(name: String, string: String): Field = value(name, string)
+  def string(name: Name, string: String): Field = value(name, string)
 
   // ------------------------------------------------------------------
   // number
 
-  def number(name: String, number: Byte): Field = value(name, number)
+  def number(name: Name, number: Byte): Field = value(name, number)
 
-  def number(name: String, number: Short): Field = value(name, number)
+  def number(name: Name, number: Short): Field = value(name, number)
 
-  def number(name: String, number: Int): Field = value(name, number)
+  def number(name: Name, number: Int): Field = value(name, number)
 
-  def number(name: String, number: Long): Field = value(name, number)
+  def number(name: Name, number: Long): Field = value(name, number)
 
-  def number(name: String, number: Float): Field = value(name, number)
+  def number(name: Name, number: Float): Field = value(name, number)
 
-  def number(name: String, number: Double): Field = value(name, number)
+  def number(name: Name, number: Double): Field = value(name, number)
 
-  def number(name: String, number: BigDecimal): Field = value(name, number)
+  def number(name: Name, number: BigDecimal): Field = value(name, number)
 
-  def number(name: String, number: BigInt): Field = value(name, number)
+  def number(name: Name, number: BigInt): Field = value(name, number)
 
   // ------------------------------------------------------------------
   // boolean
 
-  def bool(name: String, boolean: Boolean): Field = value(name, boolean)
+  def bool(name: Name, boolean: Boolean): Field = value(name, boolean)
 
   // ------------------------------------------------------------------
   // null
 
-  def nullField(name: String): Field = Field.keyValue(name, Value.nullValue())
+  def nullField(name: Name): Field = Field.keyValue(name, Value.nullValue())
 
   // ------------------------------------------------------------------
   // exception
 
   def exception(ex: Throwable): Field               = value(FieldConstants.EXCEPTION, ex)
-  def exception(name: String, ex: Throwable): Field = keyValue(name, ex)
+  def exception(name: Name, ex: Throwable): Field = keyValue(name, ex)
 
   // ------------------------------------------------------------------
   // array
 
-  def array[AV: ToArrayValue](name: String, value: AV): Field =
+  def array[AV: ToArrayValue](name: Name, value: AV): Field =
     keyValue(name, ToArrayValue[AV](value))
 
   // ------------------------------------------------------------------
   // object
 
-  def obj[OV: ToObjectValue](name: String, value: OV): Field =
+  def obj[OV: ToObjectValue](name: Name, value: OV): Field =
     keyValue(name, ToObjectValue[OV](value))
 
 }
