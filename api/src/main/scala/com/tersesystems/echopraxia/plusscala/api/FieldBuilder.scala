@@ -6,7 +6,7 @@ import com.tersesystems.echopraxia.api._
 import scala.annotation.implicitNotFound
 
 trait HasName {
-  type Name = String
+  type Name
 }
 
 trait ValueTypeClasses {
@@ -217,9 +217,9 @@ trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
 }
 
 trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName {
-  def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
+  def keyValue[V: ToValue](tuple: (Name, V)): Field
 
-  def value[V: ToValue](tuple: (Name, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
+  def value[V: ToValue](tuple: (Name, V)): Field
 
   def string(tuple: (Name, String)): Field = value(tuple)
 
@@ -242,12 +242,12 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // keyValue
 
-  def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key, ToValue(value))
+  def keyValue[V: ToValue](key: Name, value: V): Field
 
   // ------------------------------------------------------------------
   // value
 
-  def value[V: ToValue](key: Name, value: V): Field = Field.value(key, ToValue(value))
+  def value[V: ToValue](key: Name, value: V): Field
 
   // ------------------------------------------------------------------
   // string
@@ -281,12 +281,13 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // null
 
-  def nullField(name: Name): Field = Field.keyValue(name, Value.nullValue())
+  def nullField(name: Name): Field = keyValue(name, Value.nullValue())
 
   // ------------------------------------------------------------------
   // exception
 
-  def exception(ex: Throwable): Field               = value(FieldConstants.EXCEPTION, ex)
+  def exception(ex: Throwable): Field = Field.value(FieldConstants.EXCEPTION, Value.exception(ex))
+
   def exception(name: Name, ex: Throwable): Field = keyValue(name, ex)
 
   // ------------------------------------------------------------------
@@ -303,6 +304,22 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
 
 }
 
-trait FieldBuilder extends TupleFieldBuilder with ArgsFieldBuilder
+trait StringArgsFieldBuilder extends ArgsFieldBuilder with HasName {
+  override type Name = String
+
+  override def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key, ToValue(value))
+
+  override def value[V: ToValue](key: Name, value: V): Field = Field.value(key, ToValue(value))
+}
+
+trait StringNameTupleFieldBuilder extends TupleFieldBuilder {
+  override type Name = String
+
+  override def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
+
+  override def value[V: ToValue](tuple: (Name, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
+}
+
+trait FieldBuilder extends StringArgsFieldBuilder with StringNameTupleFieldBuilder
 
 object FieldBuilder extends FieldBuilder
