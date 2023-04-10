@@ -1,5 +1,4 @@
-
-## Trace and Flow Loggers
+## Trace Logger
 
 You can use a trace or flow logger to debug methods and interactions in your code.  The API between the trace and flow loggers is the same, but the trace logger is considerably more verbose than flow.
 
