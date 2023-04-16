@@ -9,7 +9,6 @@ import java.time.Instant
 
 object Main {
 
-
   sealed trait Names extends EnumEntry with Snakecase
 
   object Names extends Enum[Names] {
@@ -18,21 +17,21 @@ object Main {
      `findValues` is a protected method that invokes a macro to find all `Greeting` object declarations inside an `Enum`
 
      You use it to implement the `val values` member
-    */
+     */
     val values = findValues
 
     case object ExpirationDate extends Names
 
-    case object Number extends Names
+    case object Number     extends Names
     case object CreditCard extends Names
 
     case object Book extends Names
 
-    case object Instant extends Names
-    case object Title extends Names
-    case object Author extends Names
+    case object Instant  extends Names
+    case object Title    extends Names
+    case object Author   extends Names
     case object Category extends Names
-    case object Price extends Names
+    case object Price    extends Names
 
     case object Store extends Names
   }
@@ -50,7 +49,6 @@ object Main {
     // value
 
     def value[V: ToValue](key: Name, value: V): Field = Field.value(key.entryName, ToValue(value))
-
 
     implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {
       ToObjectValue(
@@ -81,9 +79,10 @@ object Main {
       )
     }
 
-    implicit def mapToObjectValue[N <: Name, V: ToValue]: ToObjectValue[Map[N, V]] = m => ToObjectValue(m.map {
-      case (k, v) => keyValue(k, v)
-    })
+    implicit def mapToObjectValue[N <: Name, V: ToValue]: ToObjectValue[Map[N, V]] = m =>
+      ToObjectValue(m.map { case (k, v) =>
+        keyValue(k, v)
+      })
   }
 
   object MyFieldBuilder extends MyFieldBuilder
@@ -127,6 +126,5 @@ object Main {
   case object Censored extends Sensitive
 
   case object Explicit extends Sensitive
-
 
 }

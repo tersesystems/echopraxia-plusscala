@@ -47,11 +47,11 @@ class ImplicitsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should add a field") {
-      val fb = CatFieldBuilder
-      val cat = new Cat("indra", "black", goodCat = true)
-      val field = fb.keyValue("cat", cat)
+      val fb                             = CatFieldBuilder
+      val cat                            = new Cat("indra", "black", goodCat = true)
+      val field                          = fb.keyValue("cat", cat)
       val objectValue: Value.ObjectValue = field.value().asObject
-      val extra = objectValue.add(fb.string("stringField", "foo")).asObject.raw
+      val extra                          = objectValue.add(fb.string("stringField", "foo")).asObject.raw
 
       extra.stream().anyMatch(_.name == "stringField") must be(true)
     }

@@ -28,9 +28,9 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
     override type Name = String Refined NonEmpty
 
     override def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key.value, ToValue(value))
-    override def value[V: ToValue](key: Name, value: V): Field = Field.keyValue(key.value, ToValue(value))
+    override def value[V: ToValue](key: Name, value: V): Field    = Field.keyValue(key.value, ToValue(value))
 
-    override def value[V: ToValue](tuple: (Name, V)): Field = Field.value(tuple._1.value, ToValue(tuple._2))
+    override def value[V: ToValue](tuple: (Name, V)): Field    = Field.value(tuple._1.value, ToValue(tuple._2))
     override def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1.value, ToValue(tuple._2))
   }
 
