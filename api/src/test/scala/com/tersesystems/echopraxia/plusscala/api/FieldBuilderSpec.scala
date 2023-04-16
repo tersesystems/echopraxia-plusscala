@@ -15,6 +15,48 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       fb.keyValue("byte", byte)
     }
 
+    it("should work with java.lang.Byte as a tuple") {
+      val fb   = FieldBuilder
+      val byte = java.lang.Byte.MIN_VALUE
+      fb.keyValue("byte" -> byte)
+    }
+
+    it("should work with java.lang.Byte using fb.number") {
+      val fb   = FieldBuilder
+      val byte = java.lang.Byte.MIN_VALUE
+      fb.number("byte", byte)
+    }
+
+    it("should work with java.lang.Byte using fb.number as tuple") {
+      val fb   = FieldBuilder
+      val byte = java.lang.Byte.MIN_VALUE
+      fb.number("byte" -> byte)
+    }
+
+    it("should work with scala.Byte") {
+      val fb   = FieldBuilder
+      val byte = Byte.MinValue
+      fb.keyValue("byte", byte)
+    }
+
+    it("should work with scala.Byte as a tuple") {
+      val fb   = FieldBuilder
+      val byte = Byte.MinValue
+      fb.keyValue("byte" -> byte)
+    }
+
+    it("should work with scala.Byte using fb.number") {
+      val fb   = FieldBuilder
+      val byte = Byte.MinValue
+      fb.number("byte", byte)
+    }
+
+    it("should work with scala.Byte using fb.number as a tuple") {
+      val fb   = FieldBuilder
+      val byte = Byte.MinValue
+      fb.number("byte" -> byte)
+    }
+
     it("should work with java.lang.Short") {
       val fb    = FieldBuilder
       val short = java.lang.Short.MIN_VALUE
