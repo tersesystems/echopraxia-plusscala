@@ -66,7 +66,11 @@ lazy val logger = (project in file("logger"))
     name := "logger",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+    libraryDependencies += "eu.timepit" %% "refined" % "0.10.3" % Test,
+    libraryDependencies += "eu.timepit" %% "singleton-ops" % "0.5.0" % Test,
+    libraryDependencies += "com.beachape" %% "enumeratum" % "1.7.2" % Test,
+
   )
   .dependsOn(api % "compile->compile;test->compile")
 
