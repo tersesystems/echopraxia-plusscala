@@ -292,7 +292,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     it("should match a subclass of throwable with arg") {
       val t = new Exception()
       logger.info("matches on throwable {}", _.exception(t))
-      matchThis("matches on throwable java.lang.Exception")
+      matchThis("matches on throwable exception=java.lang.Exception")
     }
 
   }

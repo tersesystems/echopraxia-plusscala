@@ -1,111 +1,142 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value.ObjectValue
-import com.tersesystems.echopraxia.api._
-
-import scala.annotation.implicitNotFound
+import com.tersesystems.echopraxia.api.{DefaultField, Field, FieldConstants, Value}
 
 trait HasName {
   type Name
 }
 
-trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName {
-  def keyValue[V: ToValue](tuple: (Name, V)): Field
-
-  def value[V: ToValue](tuple: (Name, V)): Field
-
-  def exception(tuple: (Name, Throwable)): Field = keyValue(tuple)
-
-  def array[AV: ToArrayValue](tuple: (Name, AV)): Field = keyValue(tuple)
-
-  def obj[OV: ToObjectValue](tuple: (Name, OV)): Field = keyValue(tuple)
+trait HasFieldClass[+F <: Field] {
+  protected def fieldClass: Class[_ <: F] // concrete traits have to implement this
 }
 
-trait PrimitiveTupleFieldBuilder extends TupleFieldBuilder {
+trait TupleFieldBuilder[+F <: Field] extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName with HasFieldClass[F] {
 
-  def string(tuple: (Name, String)): Field = value(tuple)
+  def keyValue[V: ToValue](tuple: (Name, V)): F
 
-  def number[N: ToValue: Numeric](tuple: (Name, N)): Field = value(tuple)
+  def value[V: ToValue](tuple: (Name, V)): F
 
-  def bool(tuple: (Name, Boolean)): Field = value(tuple)
+  def exception(tuple: (Name, Throwable)): F = keyValue(tuple)
+
+  def array[AV: ToArrayValue](tuple: (Name, AV)): F = keyValue(tuple)
+
+  def obj[OV: ToObjectValue](tuple: (Name, OV)): F = keyValue(tuple)
+}
+
+trait PrimitiveTupleFieldBuilder[+F <: Field] extends TupleFieldBuilder[F] {
+
+  def string(tuple: (Name, String)): F = keyValue(tuple)
+
+  def number[N: ToValue: Numeric](tuple: (Name, N)): F = keyValue(tuple)
+
+  def bool(tuple: (Name, Boolean)): F = keyValue(tuple)
 
 }
 
 /**
  * A field builder that is enhanced with ToValue, ToObjectValue, and ToArrayValue.
  */
-trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName {
-
+trait ArgsFieldBuilder[+F <: Field] extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName with HasFieldClass[F] {
   // ------------------------------------------------------------------
   // keyValue
 
-  def keyValue[V: ToValue](key: Name, value: V): Field
+  def keyValue[V: ToValue](key: Name, value: V): F
 
   // ------------------------------------------------------------------
   // value
 
-  def value[V: ToValue](key: Name, value: V): Field
+  def value[V: ToValue](key: Name, value: V): F
 
   // ------------------------------------------------------------------
   // null
 
-  def nullField(name: Name): Field = keyValue(name, Value.nullValue())
+  def nullField(name: Name): F = keyValue(name, Value.nullValue())
 
   // ------------------------------------------------------------------
   // exception
 
-  def exception(ex: Throwable): Field = Field.value(FieldConstants.EXCEPTION, Value.exception(ex))
+  def exception(name: Name, ex: Throwable): F = keyValue(name, ex)
 
-  def exception(name: Name, ex: Throwable): Field = keyValue(name, ex)
+  def exception(ex: Throwable): F = Field.keyValue(FieldConstants.EXCEPTION, ToValue(ex), fieldClass)
 
   // ------------------------------------------------------------------
   // array
 
-  def array[AV: ToArrayValue](name: Name, value: AV): Field =
+  def array[AV: ToArrayValue](name: Name, value: AV): F =
     keyValue(name, ToArrayValue[AV](value))
 
   // ------------------------------------------------------------------
   // object
 
-  def obj[OV: ToObjectValue](name: Name, value: OV): Field =
+  def obj[OV: ToObjectValue](name: Name, value: OV): F =
     keyValue(name, ToObjectValue[OV](value))
 
 }
 
-trait PrimitiveArgsFieldBuilder extends ArgsFieldBuilder {
+trait PrimitiveArgsFieldBuilder[+F <: Field] extends ArgsFieldBuilder[F] {
 
   // ------------------------------------------------------------------
   // string
 
-  def string(name: Name, string: String): Field = value(name, string)
+  def string(name: Name, string: String): F = keyValue(name, string)
 
   // ------------------------------------------------------------------
   // number
 
-  def number[N: ToValue: Numeric](name: Name, number: N): Field = value(name, number)
+  def number[N: ToValue: Numeric](name: Name, number: N): F = keyValue(name, number)
 
   // ------------------------------------------------------------------
   // boolean
 
-  def bool(name: Name, boolean: Boolean): Field = value(name, boolean)
+  def bool(name: Name, boolean: Boolean): F = keyValue(name, boolean)
 }
 
-trait StringNameArgsFieldBuilder extends ArgsFieldBuilder with HasName {
+trait StringNameArgsFieldBuilder[+F <: Field] extends ArgsFieldBuilder[F] with HasName {
   override type Name = String
 
-  override def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key, ToValue(value))
+  override def keyValue[V: ToValue](key: Name, value: V): F = Field.keyValue(key, ToValue(value), fieldClass)
 
-  override def value[V: ToValue](key: Name, value: V): Field = Field.value(key, ToValue(value))
+  override def value[V: ToValue](key: Name, value: V): F = Field.value(key, ToValue(value), fieldClass)
 }
 
-trait StringNameTupleFieldBuilder extends TupleFieldBuilder {
+trait StringNameTupleFieldBuilder[+F <: Field] extends TupleFieldBuilder[F] {
   override type Name = String
 
-  override def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1, ToValue(tuple._2))
+  override def keyValue[V: ToValue](tuple: (Name, V)): F = Field.keyValue(tuple._1, ToValue(tuple._2), fieldClass)
 
-  override def value[V: ToValue](tuple: (Name, V)): Field = Field.value(tuple._1, ToValue(tuple._2))
+  override def value[V: ToValue](tuple: (Name, V)): F = Field.value(tuple._1, ToValue(tuple._2), fieldClass)
+
 }
 
-trait FieldBuilder extends StringNameArgsFieldBuilder with StringNameTupleFieldBuilder with PrimitiveTupleFieldBuilder with PrimitiveArgsFieldBuilder
+/**
+ * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
+ *
+ * @tparam F
+ *   the field type
+ */
+trait FieldBuilderBase[+F <: Field]
+    extends StringNameArgsFieldBuilder[F]
+    with StringNameTupleFieldBuilder[F]
+    with PrimitiveTupleFieldBuilder[F]
+    with PrimitiveArgsFieldBuilder[F]
 
+/**
+ * A field builder that uses DefaultField explicitly. Use this if you want the default behavior.
+ */
+trait DefaultFieldBuilder extends FieldBuilderBase[DefaultField] {
+  override protected def fieldClass: Class[DefaultField] = classOf[DefaultField]
+}
+
+/**
+ * Singleton object for DefaultFieldBuilder.
+ */
+object DefaultFieldBuilder extends DefaultFieldBuilder
+
+trait FieldBuilder extends FieldBuilderBase[Field] {
+  override protected def fieldClass: Class[Field] = classOf[Field]
+}
+
+/**
+ * Singleton object for FieldBuilder
+ */
 object FieldBuilder extends FieldBuilder

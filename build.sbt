@@ -48,7 +48,9 @@ lazy val api = (project in file("api"))
     libraryDependencies ++= compatLibraries(scalaVersion.value),
     // tests
     libraryDependencies += "eu.timepit"                 %% "refined" % "0.10.3" % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+    // use logstash for testing
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % echopraxiaVersion     % Test
   )
 
 lazy val generic = (project in file("generic"))

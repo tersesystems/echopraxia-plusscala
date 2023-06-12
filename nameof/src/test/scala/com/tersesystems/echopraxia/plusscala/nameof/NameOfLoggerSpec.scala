@@ -22,7 +22,7 @@ class NameOfLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
       val person = Person("thisperson", 13)
       logger.info(person)
 
-      matchThis("person={thisperson, 13}")
+      matchThis("person={name=thisperson, age=13}")
     }
   }
 

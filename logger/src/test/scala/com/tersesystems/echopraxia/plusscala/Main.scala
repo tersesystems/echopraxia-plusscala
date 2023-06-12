@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.{CoreLoggerFactory, Field, Level}
+import com.tersesystems.echopraxia.api.{CoreLoggerFactory, DefaultField, Field, Level}
 import com.tersesystems.echopraxia.plusscala.api._
 import enumeratum.EnumEntry._
 import enumeratum._
@@ -36,19 +36,19 @@ object Main {
     case object Store extends Names
   }
 
-  trait CreditCardFieldBuilder extends ArgsFieldBuilder with HasName {
+  trait CreditCardFieldBuilder extends ArgsFieldBuilder[DefaultField] with HasName {
     import Names._
     type Name = Names
 
     type Id[A] = A
     implicit def narrow[T <: Singleton](t: T): Id[T] = t
 
-    def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key.entryName, ToValue(value))
+    def keyValue[V: ToValue](key: Name, value: V): DefaultField = Field.keyValue(key.entryName, ToValue(value), fieldClass)
 
     // ------------------------------------------------------------------
     // value
 
-    def value[V: ToValue](key: Name, value: V): Field = Field.value(key.entryName, ToValue(value))
+    def value[V: ToValue](key: Name, value: V): DefaultField = Field.value(key.entryName, ToValue(value), fieldClass)
 
     implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {
       ToObjectValue(
@@ -68,6 +68,8 @@ object Main {
   }
 
   trait MyFieldBuilder extends CreditCardFieldBuilder {
+    override protected val fieldClass: Class[DefaultField] = classOf[DefaultField]
+
     implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
 
     implicit val bookToObjectValue: ToObjectValue[Book] = { book =>
