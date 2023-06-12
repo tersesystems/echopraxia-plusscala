@@ -36,7 +36,10 @@ object Main {
     case object Store extends Names
   }
 
-  trait CreditCardFieldBuilder extends ArgsFieldBuilder[DefaultField] with HasName {
+  trait CreditCardFieldBuilder extends ArgsFieldBuilder with HasName {
+    override type FieldType = DefaultField
+    protected val fieldClass: Class[DefaultField] = classOf[DefaultField]
+
     import Names._
     type Name = Names
 

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.{DefaultField, Field}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 import eu.timepit.refined._
@@ -24,16 +24,16 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
     }
   }
 
-  trait RefinedFieldBuilder extends ArgsFieldBuilder[Field] with TupleFieldBuilder[Field] {
+  trait RefinedFieldBuilder extends ArgsFieldBuilder with TupleFieldBuilder {
     override type Name = String Refined NonEmpty
+    override type FieldType = DefaultField
+    protected val fieldClass: Class[DefaultField] = classOf[DefaultField]
 
-    protected val fieldClass: Class[Field] = classOf[Field]
+    override def keyValue[V: ToValue](key: Name, value: V): DefaultField = Field.keyValue(key.value, ToValue(value), fieldClass)
+    override def value[V: ToValue](key: Name, value: V): DefaultField = Field.value(key.value, ToValue(value), fieldClass)
 
-    override def keyValue[V: ToValue](key: Name, value: V): Field = Field.keyValue(key.value, ToValue(value), fieldClass)
-    override def value[V: ToValue](key: Name, value: V): Field    = Field.value(key.value, ToValue(value), fieldClass)
-
-    override def keyValue[V: ToValue](tuple: (Name, V)): Field = Field.keyValue(tuple._1.value, ToValue(tuple._2), fieldClass)
-    override def value[V: ToValue](tuple: (Name, V)): Field    = Field.value(tuple._1.value, ToValue(tuple._2), fieldClass)
+    override def keyValue[V: ToValue](tuple: (Name, V)): DefaultField = Field.keyValue(tuple._1.value, ToValue(tuple._2), fieldClass)
+    override def value[V: ToValue](tuple: (Name, V)): DefaultField = Field.value(tuple._1.value, ToValue(tuple._2), fieldClass)
   }
 
   object RefinedFieldBuilder extends RefinedFieldBuilder
