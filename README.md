@@ -6,7 +6,7 @@ Echopraxia is compiled for Scala 2.12 and Scala 2.13.
 
 ## Examples
 
-For the fastest possible way to try out Echopraxia, download and run the [Ammonite script](https://github.com/tersesystems/smallest-dynamic-logging-example/blob/main/ammonite/script.sc).
+For the fastest possible way to try out Echopraxia, download and run the [Scala CLI script](https://github.com/tersesystems/smallest-dynamic-logging-example/).
 
 Examples are available at [tersesystems/echopraxia-scala-example](https://github.com/tersesystems/echopraxia-scala-example) and [tersesystems/echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
@@ -102,14 +102,17 @@ Composition works like you'd expect with fields and conditions (see the Conditio
 
 A `Field` is defined as a `name: String` and a `value: com.tersesystems.echopraxia.api.Value`.  The field builder has methods to create fields. 
 
-* `fb.string`: creates a field with a string as a value, same as `fb.value(name, Value.string(str))`.
-* `fb.number`: creates a field with a number as a value, same as `fb.value(name, Value.number(num))`.
-* `fb.bool`: creates a field with a boolean as a value, same as `fb.value(name, Value.bool(b))`.
-* `fb.nullValue`: creates a field with a null as a value, same as `fb.value(name, Value.nullValue())`
-* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
-* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
 * `fb.keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
 * `fb.value`: renders a field with `value` when rendered in logfmt line oriented text.
+
+The out-of-the-box field builder comes with some additional methods for common types, i.e.
+
+* `fb.string`: creates a field with a string as a value, same as `fb.keyValue(name, Value.string(str))`.
+* `fb.number`: creates a field with a number as a value, same as `fb.keyValue(name, Value.number(num))`.
+* `fb.bool`: creates a field with a boolean as a value, same as `fb.keyValue(name, Value.bool(b))`.
+* `fb.nullValue`: creates a field with a null as a value, same as `fb.keyValue(name, Value.nullValue())`
+* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
+* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
 * `fb.exception`: renders exception field and sets throwable on logging event.
 
 When rendering using a line oriented encoder, `fb.array` and `fb.obj` render in logfmt style `key=value` format, and the other methods use the `value` format.
@@ -126,10 +129,10 @@ class Example {
       import fb._
       obj("person" -> 
         Seq(
-          number("number" -> 1),
-          bool("bool" -> true),
-          array("ints" -> Seq(1, 2, 3)),
-          string("strName" -> "bar")
+          keyValue("number" -> 1),
+          keyValue("bool" -> true),
+          keyValue("ints" -> Seq(1, 2, 3)),
+          keyValue("strName" -> "bar")
         )
       )
     })
@@ -145,10 +148,10 @@ logger.info("{}", fb => {
   fb.obj("store" ->
     fb.array("book" -> Seq(
       ToObjectValue(
-        fb.string("category", "reference"),
-        fb.string("author", "Nigel Rees"),
-        fb.string("title", "Sayings of the Century"),
-        fb.number("price", 8.95)
+        fb.keyValue("category", "reference"),
+        fb.keyValue("author", "Nigel Rees"),
+        fb.keyValue("title", "Sayings of the Century"),
+        fb.keyValue("price", 8.95)
       )
     ))
   )
