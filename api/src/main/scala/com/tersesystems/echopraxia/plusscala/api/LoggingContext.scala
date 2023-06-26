@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
+import com.tersesystems.echopraxia.spi.{LoggingContext => JLoggingContext}
 
 trait FindPathMethods {
   def findString(jsonPath: String): Option[String]

@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.{CoreLoggerFactory, DefaultField, Field, Level}
+import com.tersesystems.echopraxia.api.{Field, Level}
+import com.tersesystems.echopraxia.spi.{CoreLoggerFactory, DefaultField}
 import com.tersesystems.echopraxia.plusscala.api._
 import enumeratum.EnumEntry._
 import enumeratum._

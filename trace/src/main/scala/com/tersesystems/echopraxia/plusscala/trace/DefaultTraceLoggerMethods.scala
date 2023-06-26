@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Level => JLevel}
+import com.tersesystems.echopraxia.api.{FieldBuilderResult, Level => JLevel}
+import com.tersesystems.echopraxia.spi.CoreLogger
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
 import sourcecode._
 

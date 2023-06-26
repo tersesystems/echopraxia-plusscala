@@ -6,9 +6,9 @@ import com.tersesystems.echopraxia.api.{
   Value,
   Condition => JCondition,
   FieldBuilderResult => JFieldBuilderResult,
-  Level => JLevel,
-  LoggingContext => JLoggingContext
+  Level => JLevel
 }
+import com.tersesystems.echopraxia.spi.{LoggingContext => JLoggingContext}
 
 import java.util
 import java.util.stream

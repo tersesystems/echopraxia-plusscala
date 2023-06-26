@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.plusscala
 import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
+import com.tersesystems.echopraxia.spi.FieldConstants
 
 import scala.compat.java8.FunctionConverters._
 

@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{DefaultField, Field, FieldConstants, Value}
+import com.tersesystems.echopraxia.api._
+import com.tersesystems.echopraxia.spi.{DefaultField, FieldConstants}
 
 trait HasName {
   type Name

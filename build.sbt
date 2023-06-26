@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion = "3.0.0-SNAPSHOT"
+val echopraxiaVersion = "3.0.0"
 
 val scala213      = "2.13.10"
 val scala212      = "2.12.17"
@@ -50,7 +50,9 @@ lazy val api = (project in file("api"))
     libraryDependencies += "eu.timepit"                 %% "refined" % "0.10.3" % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
     // use logstash for testing
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % echopraxiaVersion     % Test
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % echopraxiaVersion     % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test,
   )
 
 lazy val generic = (project in file("generic"))
@@ -60,7 +62,10 @@ lazy val generic = (project in file("generic"))
     libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % "1.1.2",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test,
+
   ).dependsOn(api, logger % "test")
 
 lazy val logger = (project in file("logger"))
@@ -72,7 +77,8 @@ lazy val logger = (project in file("logger"))
     libraryDependencies += "eu.timepit" %% "refined" % "0.10.3" % Test,
     libraryDependencies += "eu.timepit" %% "singleton-ops" % "0.5.0" % Test,
     libraryDependencies += "com.beachape" %% "enumeratum" % "1.7.2" % Test,
-
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
 
@@ -90,15 +96,19 @@ lazy val flowLogger = (project in file("flow"))
   name := "flow-logger",
   //
   libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-  libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
-).dependsOn(api % "compile->compile;test->compile")
+  libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+  libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test,
+  ).dependsOn(api % "compile->compile;test->compile")
 
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
     name := "nameof",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test
   ).dependsOn(api % "compile->compile;test->compile")
 
 // don't include dump for now
@@ -118,7 +128,10 @@ lazy val diff = (project in file("diff"))
     libraryDependencies += "com.tersesystems.echopraxia" % "jackson"  % echopraxiaVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
+    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test,
+
   ).dependsOn(api % "compile->compile;test->compile")
 
 lazy val traceLogger = (project in file("trace"))
@@ -128,6 +141,8 @@ lazy val traceLogger = (project in file("trace"))
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+    libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
   )
   .dependsOn(api % "compile->compile;test->compile")

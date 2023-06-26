@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{DefaultField, Field}
+import com.tersesystems.echopraxia.spi.DefaultField
+import com.tersesystems.echopraxia.api.Field
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 import eu.timepit.refined._

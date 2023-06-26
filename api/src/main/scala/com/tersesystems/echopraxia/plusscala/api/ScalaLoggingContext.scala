@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, FieldConstants, LoggingContext => JLoggingContext}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.spi.{FieldConstants, LoggingContext => JLoggingContext}
 
 import java.util
 import scala.compat.java8.OptionConverters._
