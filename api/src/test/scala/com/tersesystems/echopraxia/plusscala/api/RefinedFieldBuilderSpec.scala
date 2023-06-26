@@ -26,15 +26,15 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
   }
 
   trait RefinedFieldBuilder extends ArgsFieldBuilder with TupleFieldBuilder {
-    override type Name = String Refined NonEmpty
+    override type Name      = String Refined NonEmpty
     override type FieldType = DefaultField
     protected val fieldClass: Class[DefaultField] = classOf[DefaultField]
 
     override def keyValue[V: ToValue](key: Name, value: V): DefaultField = Field.keyValue(key.value, ToValue(value), fieldClass)
-    override def value[V: ToValue](key: Name, value: V): DefaultField = Field.value(key.value, ToValue(value), fieldClass)
+    override def value[V: ToValue](key: Name, value: V): DefaultField    = Field.value(key.value, ToValue(value), fieldClass)
 
     override def keyValue[V: ToValue](tuple: (Name, V)): DefaultField = Field.keyValue(tuple._1.value, ToValue(tuple._2), fieldClass)
-    override def value[V: ToValue](tuple: (Name, V)): DefaultField = Field.value(tuple._1.value, ToValue(tuple._2), fieldClass)
+    override def value[V: ToValue](tuple: (Name, V)): DefaultField    = Field.value(tuple._1.value, ToValue(tuple._2), fieldClass)
   }
 
   object RefinedFieldBuilder extends RefinedFieldBuilder

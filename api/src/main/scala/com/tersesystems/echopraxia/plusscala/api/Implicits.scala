@@ -1,13 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Value.{ArrayValue, ObjectValue}
-import com.tersesystems.echopraxia.api.{
-  Field,
-  Value,
-  Condition => JCondition,
-  FieldBuilderResult => JFieldBuilderResult,
-  Level => JLevel
-}
+import com.tersesystems.echopraxia.api.{Field, Value, Condition => JCondition, FieldBuilderResult => JFieldBuilderResult, Level => JLevel}
 import com.tersesystems.echopraxia.spi.{LoggingContext => JLoggingContext}
 
 import java.util
