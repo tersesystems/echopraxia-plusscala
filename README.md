@@ -183,7 +183,7 @@ import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 
 object Main {
   // Logger[MyFieldBuilder.type] can use implicits w/o import tax  
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger(MyFieldBuilder)
 
   def main(args: Array[String]): Unit = {
     logger.debug("Hello world!")
@@ -244,7 +244,7 @@ object Main {
     }
   }
 
-  private val logger = LoggerFactory.getLogger.withFieldBuilder(SomeObjectBuilder)
+  private val logger = LoggerFactory.getLogger(SomeObjectBuilder)
 
   def main(args: Array[String]): Unit = {
     logger.debug("Hello world!")
