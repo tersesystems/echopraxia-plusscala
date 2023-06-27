@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Condition => JCondition, Level => JLevel, LoggingContext => JLoggingContext}
+import com.tersesystems.echopraxia.api.{Condition => JCondition, Level => JLevel}
+import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
 
 trait Condition {
 

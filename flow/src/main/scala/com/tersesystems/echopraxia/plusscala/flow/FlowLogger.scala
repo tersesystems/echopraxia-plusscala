@@ -1,7 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
+import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.plusscala.api._
+import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport}
+import com.tersesystems.echopraxia.spi.CoreLogger
+import com.tersesystems.echopraxia.spi.Utilities
 
 import scala.compat.java8.FunctionConverters._
 

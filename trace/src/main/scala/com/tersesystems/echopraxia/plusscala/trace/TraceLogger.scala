@@ -1,7 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult, Utilities}
+import com.tersesystems.echopraxia.api.FieldBuilderResult
+import com.tersesystems.echopraxia.spi.{CoreLogger, Utilities}
 import com.tersesystems.echopraxia.plusscala.api._
+import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport}
 import sourcecode.{Args, Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._

@@ -12,7 +12,7 @@ import java.util
 
 class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = LoggerFactory.getLogger(getClass)
+  private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
   describe("findBoolean") {
 
@@ -209,7 +209,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("age") == 1
     }
-    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+    logger.debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
 
     matchThis("match list")
   }
@@ -292,7 +292,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     it("should match a subclass of throwable with arg") {
       val t = new Exception()
       logger.info("matches on throwable {}", _.exception(t))
-      matchThis("matches on throwable java.lang.Exception")
+      matchThis("matches on throwable exception=java.lang.Exception")
     }
 
   }

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
+import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
 
 object FlowLoggerFactory {
   val FQCN: String = classOf[DefaultFlowLoggerMethods[_]].getName

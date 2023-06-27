@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.{Caller, CoreLoggerFactory}
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
+import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 
 /**
  * LoggerFactory for a logger with source code enabled.
@@ -9,19 +9,34 @@ import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 object LoggerFactory {
   val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
 
-  val fieldBuilder: FieldBuilder = FieldBuilder
+  val fieldBuilder: PresentationFieldBuilder = PresentationFieldBuilder
 
-  def getLogger(name: String): Logger[FieldBuilder] = {
+  def getLogger(name: String): Logger[PresentationFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     Logger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): Logger[FieldBuilder] = {
+  def getLogger(clazz: Class[_]): Logger[PresentationFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     Logger(core, fieldBuilder)
   }
 
-  def getLogger: Logger[FieldBuilder] = {
+  def getLogger[FB](name: String, fieldBuilder: FB): Logger[FB] = {
+    val core = CoreLoggerFactory.getLogger(FQCN, name)
+    Logger(core, fieldBuilder)
+  }
+
+  def getLogger[FB](clazz: Class[_], fieldBuilder: FB): Logger[FB] = {
+    val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
+    Logger(core, fieldBuilder)
+  }
+
+  def getLogger: Logger[PresentationFieldBuilder] = {
+    val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
+    Logger(core, fieldBuilder)
+  }
+
+  def getLogger[FB](fieldBuilder: FB): Logger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     Logger(core, fieldBuilder)
   }
