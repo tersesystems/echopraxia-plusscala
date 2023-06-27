@@ -4,14 +4,11 @@ import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import com.tersesystems.echopraxia.spi.FieldConstants
-
-import scala.compat.java8.FunctionConverters._
 
 /**
  * Default Logger methods with source code implicits.
  */
-trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
+trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] with LoggerMethodSupport[FB] {
   this: DefaultMethodsSupport[FB] =>
 
   // -----------------------------------------------------------
@@ -335,44 +332,6 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
 
   def error(condition: Condition, message: String, e: Throwable): Unit = {
     handleConditionMessageThrowable(ERROR, condition, message, e)
-  }
-
-  // -----------------------------------------------------------
-  // Internal methods
-
-  @inline
-  private def handleMessage(level: Level, message: String): Unit = {
-    core.log(level, message)
-  }
-
-  @inline
-  private def handleMessageArgs(level: Level, message: String, f: FB => FieldBuilderResult): Unit = {
-    core.log(level, message, f.asJava, fieldBuilder)
-  }
-
-  @inline
-  private def handleMessageThrowable(level: Level, message: String, e: Throwable): Unit = {
-    core.log(level, message, (_: FB) => onlyException(e), fieldBuilder)
-  }
-
-  @inline
-  private def handleConditionMessage(level: Level, condition: Condition, message: String): Unit = {
-    core.log(level, condition.asJava, message)
-  }
-
-  @inline
-  private def handleConditionMessageArgs(level: Level, condition: Condition, message: String, f: FB => FieldBuilderResult): Unit = {
-    core.log(level, condition.asJava, message, f.asJava, fieldBuilder)
-  }
-
-  @inline
-  private def handleConditionMessageThrowable(level: Level, condition: Condition, message: String, e: Throwable): Unit = {
-    core.log(level, condition.asJava, message, (_: FB) => onlyException(e), fieldBuilder)
-  }
-
-  @inline
-  private def onlyException(e: Throwable): FieldBuilderResult = {
-    Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e))
   }
 
 }

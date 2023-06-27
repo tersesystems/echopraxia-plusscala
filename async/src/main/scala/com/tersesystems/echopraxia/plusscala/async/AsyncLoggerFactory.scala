@@ -36,7 +36,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB](fieldBuilder: FB) : AsyncLogger[FB] = {
+  def getLogger[FB](fieldBuilder: FB): AsyncLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     AsyncLogger(core, fieldBuilder)
   }
