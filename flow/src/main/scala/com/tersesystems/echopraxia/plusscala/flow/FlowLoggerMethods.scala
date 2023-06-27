@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.plusscala.api.{Condition, DefaultMethodsSupport}
+import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
 
 trait FlowLoggerMethods[FB <: FlowFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 

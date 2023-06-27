@@ -9,6 +9,7 @@ trait HasName {
 
 trait HasFieldClass {
   type FieldType <: Field
+
   protected def fieldClass: Class[_ <: FieldType] // concrete traits have to implement this
 }
 
@@ -121,17 +122,17 @@ trait FieldBuilderBase
     with PrimitiveArgsFieldBuilder
 
 /**
- * A field builder that uses DefaultField explicitly. Use this if you want the default behavior.
+ * A field builder that uses PresentationField.
  */
-trait DefaultFieldBuilder extends FieldBuilderBase {
-  override type FieldType = DefaultField
-  override protected def fieldClass: Class[DefaultField] = classOf[DefaultField]
+trait PresentationFieldBuilder extends FieldBuilderBase {
+  override type FieldType = PresentationField
+  override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
 }
 
 /**
- * Singleton object for DefaultFieldBuilder.
+ * Singleton object for PresentationFieldBuilder.
  */
-object DefaultFieldBuilder extends DefaultFieldBuilder
+object PresentationFieldBuilder extends PresentationFieldBuilder
 
 trait FieldBuilder extends FieldBuilderBase {
   override type FieldType = Field

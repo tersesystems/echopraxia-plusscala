@@ -55,10 +55,9 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   trait ShortOption extends AutoDerivation with OptionValueTypes
 
-  private val logger = LoggerFactory.getLogger(getClass)
+  private val autoLogger = LoggerFactory.getLogger(getClass, AutoFieldBuilder)
 
   describe("automatic derivation") {
-    val autoLogger = logger.withFieldBuilder(AutoFieldBuilder)
 
     it("should derive a case class") {
       val paymentInfo  = PaymentInfo("41111111", Instant.now())
@@ -84,7 +83,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   describe("semi automatic derivation") {
-    val semiAutoLogger = logger.withFieldBuilder(SemiAutoFieldBuilder)
+    val semiAutoLogger = LoggerFactory.getLogger(getClass, SemiAutoFieldBuilder)
 
     it("should derive a case class") {
       val paymentInfo  = PaymentInfo("41111111", Instant.now())

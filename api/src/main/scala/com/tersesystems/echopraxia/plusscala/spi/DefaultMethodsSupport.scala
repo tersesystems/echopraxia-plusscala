@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.api
+package com.tersesystems.echopraxia.plusscala.spi
 
 import com.tersesystems.echopraxia.spi.CoreLogger
 

@@ -14,7 +14,7 @@ import java.util
 
 class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = LoggerFactory.getLogger(getClass).withFieldBuilder(MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
   describe("withCondition") {
 
