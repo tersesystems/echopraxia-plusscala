@@ -32,13 +32,20 @@ Add the following to your `build.sbt` file:
 libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "logger" % echopraxiaPlusScalaVersion
 ```
 
-and one of the underlying core logger providers, i.e.
+and one of the underlying core logger providers and frameworks, i.e. for `logstash-logback-encoder`:
 
 ```scala
-// uncomment only one of these
-// libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "2.1.0"
-// OR
-// libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "2.1.0"
+libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "2.1.0" // provides core logger
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" // logback 1.2, 1.3, or 1.4 are supported
+libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
+```
+
+or for log4j2:
+
+```
+libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "2.1.0"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.20.0"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json" % "2.20.0"
 ```
 
 To import the Scala API, add the following:
