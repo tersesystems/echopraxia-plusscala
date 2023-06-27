@@ -4,7 +4,6 @@ import com.tersesystems.echopraxia.api.Level._
 import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import com.tersesystems.echopraxia.spi.FieldConstants
 
 /**
  * Default Logger methods with source code implicits.
