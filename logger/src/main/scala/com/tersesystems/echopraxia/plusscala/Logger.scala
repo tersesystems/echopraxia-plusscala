@@ -141,7 +141,7 @@ object Logger {
 
       override def core: CoreLogger = c
 
-      override def fieldBuilder: FB = fb
+      override val fieldBuilder: FB = fb
 
       override def withCondition(scalaCondition: Condition): Logger[FB] = this
 

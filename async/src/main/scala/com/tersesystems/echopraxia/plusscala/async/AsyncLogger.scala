@@ -147,7 +147,7 @@ object AsyncLogger {
 
       override def core: CoreLogger = c
 
-      override def fieldBuilder: FB = fb
+      override val fieldBuilder: FB = fb
 
       override def withCondition(scalaCondition: Condition): AsyncLogger[FB] = this
 

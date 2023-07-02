@@ -7,5 +7,5 @@ trait DefaultMethodsSupport[FB] {
 
   def core: CoreLogger
 
-  def fieldBuilder: FB
+  val fieldBuilder: FB
 }

@@ -81,7 +81,7 @@ object TraceLogger {
 
       override def core: CoreLogger = c
 
-      override def fieldBuilder: FB = fb
+      override val fieldBuilder: FB = fb
 
       override def withCondition(scalaCondition: Condition): TraceLogger[FB] = this
 
