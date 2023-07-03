@@ -42,7 +42,7 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 
 or for log4j2:
 
-```
+```scala
 libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "3.0.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.20.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json" % "2.20.0"
