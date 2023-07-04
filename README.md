@@ -35,7 +35,7 @@ libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "logger" % ech
 and one of the underlying core logger providers and frameworks, i.e. for `logstash-logback-encoder`:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "3.0.1" // provides core logger
+libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "3.0.2" // provides core logger
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8" // logback 1.2, 1.3, or 1.4 are supported
 libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
 ```
@@ -43,7 +43,7 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 or for log4j2:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "3.0.1"
+libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "3.0.2"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.20.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json" % "2.20.0"
 ```
