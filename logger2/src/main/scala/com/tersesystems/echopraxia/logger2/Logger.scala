@@ -2,12 +2,13 @@ package com.tersesystems.echopraxia.logger2
 
 import com.tersesystems.echopraxia.api.{FieldBuilderResult, Level}
 import com.tersesystems.echopraxia.api.Level._
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.{Condition, Implicits}
+import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport}
 import com.tersesystems.echopraxia.spi.{CoreLogger, Utilities}
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
-trait Logger[FB] {
+trait Logger[FB] extends LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB] {
 
   def trace: LoggerMethod[FB]
   def debug: LoggerMethod[FB]
@@ -24,6 +25,7 @@ object Logger {
    */
   class Impl[FB](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] {
     class DefaultLoggerMethod(level: Level) extends LoggerMethod[FB] {
+      import Implicits._
 
       override def enabled: Boolean = core.isEnabled(level)
 
@@ -31,11 +33,26 @@ object Logger {
 
       override def apply(message: String): Unit = core.log(level, message)
 
-      override def apply(message: String, f: FB => FieldBuilderResult): Unit = core.log(level, message, f.asJava, fieldBuilder)
+      override def apply(message: String, f1: FB => FieldBuilderResult): Unit = core.log(level, message, f1.asJava, fieldBuilder)
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult): Unit = {
+        val f: FB => FieldBuilderResult = fb => f1(fb) ++ f2(fb)
+        core.log(level, message, f.asJava, fieldBuilder)
+      }
+
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult, f3: FB => FieldBuilderResult): Unit = {
+        val f: FB => FieldBuilderResult = fb => f1(fb) ++ f2(fb) ++ f3(fb)
+        core.log(level, message, f.asJava, fieldBuilder)
+      }
+
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult, f3: FB => FieldBuilderResult, f4: FB => FieldBuilderResult): Unit = {
+        val f: FB => FieldBuilderResult = fb => f1(fb) ++ f2(fb) ++ f3(fb) ++ f4(fb)
+        core.log(level, message, f.asJava, fieldBuilder)
+      }
 
       override def apply(condition: Condition, message: String): Unit = core.log(level, condition.asJava, message)
 
-      override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit = core.log(level, condition.asJava, message, f.asJava, fieldBuilder)
+      override def apply(condition: Condition, message: String, f1: FB => FieldBuilderResult): Unit = core.log(level, condition.asJava, message, f1.asJava, fieldBuilder)
+
     }
 
     override val trace: DefaultLoggerMethod = new DefaultLoggerMethod(TRACE)
@@ -96,6 +113,12 @@ object Logger {
       override def apply(condition: Condition, message: String): Unit = ()
 
       override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult): Unit = ()
+
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult): Unit = ()
+
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult, f3: FB => FieldBuilderResult): Unit = ()
+
+      override def apply(message: String, f1: FB => FieldBuilderResult, f2: FB => FieldBuilderResult, f3: FB => FieldBuilderResult, f4: FB => FieldBuilderResult): Unit = ()
     }
   }
 

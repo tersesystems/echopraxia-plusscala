@@ -1,12 +1,13 @@
 package com.tersesystems.echopraxia.logger2
 
+import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
 
 /**
- * LoggerFactory for a logger with source code enabled.
+ * LoggerFactory for a logger.
  */
 object LoggerFactory {
-  val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
+  val FQCN: String = classOf[Logger[_]].getName
 
   val fieldBuilder: PresentationFieldBuilder = PresentationFieldBuilder
 

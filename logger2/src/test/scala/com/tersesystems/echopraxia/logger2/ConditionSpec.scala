@@ -12,7 +12,25 @@ import java.util
 
 class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
+  trait ConditionFieldBuilder extends FieldBuilder {
+    implicit val personToValue: ToObjectValue[Person] = { person: Person =>
+      ToObjectValue(
+        keyValue("name", ToValue(person.name)),
+        keyValue("age", ToValue(person.age))
+      )
+    }
+
+    implicit val govtToValue: ToObjectValue[Government] = { govt: Government =>
+      ToObjectValue(
+        keyValue("name", ToValue(govt.name)),
+        keyValue("debt", ToValue(govt.debt))
+      )
+    }
+  }
+
+  object ConditionFieldBuilder extends ConditionFieldBuilder
+
+  private val logger = LoggerFactory.getLogger(getClass, ConditionFieldBuilder)
 
   describe("findBoolean") {
 
@@ -220,7 +238,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("name") == "will"
     }
-    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+    logger.withFieldBuilder(ConditionFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
 
     matchThis("match list")
   }
@@ -259,7 +277,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     val usGovernment = Government("US", debt = BigDecimal("1100020323232341313413"))
-    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("government" -> usGovernment))
+    logger.withFieldBuilder(ConditionFieldBuilder).debug(isWill, "match list", _.obj("government" -> usGovernment))
 
     matchThis("match list")
   }
@@ -329,21 +347,3 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 case class Person(name: String, age: Int)
 
 case class Government(name: String, debt: BigDecimal)
-
-trait MyFieldBuilder extends FieldBuilder {
-  implicit val personToValue: ToObjectValue[Person] = { person: Person =>
-    ToObjectValue(
-      keyValue("name", ToValue(person.name)),
-      keyValue("age", ToValue(person.age))
-    )
-  }
-
-  implicit val govtToValue: ToObjectValue[Government] = { govt: Government =>
-    ToObjectValue(
-      keyValue("name", ToValue(govt.name)),
-      keyValue("debt", ToValue(govt.debt))
-    )
-  }
-}
-
-object MyFieldBuilder extends MyFieldBuilder
