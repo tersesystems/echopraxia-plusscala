@@ -85,6 +85,22 @@ lazy val logger = (project in file("logger"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
+
+lazy val logger2 = (project in file("logger2"))
+  .settings(
+    name := "logger2",
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
+    libraryDependencies += "eu.timepit"                 %% "refined"                  % "0.10.3"              % Test,
+    libraryDependencies += "eu.timepit"                 %% "singleton-ops"            % "0.5.2"               % Test,
+    libraryDependencies += "com.beachape"               %% "enumeratum"               % "1.7.2"               % Test,
+    libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
+    libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
+  )
+  .dependsOn(api % "compile->compile;test->compile")
+
+
 lazy val asyncLogger = (project in file("async"))
   .settings(
     name := "async-logger",
@@ -171,7 +187,7 @@ lazy val root = (project in file("."))
     publishArtifact                        := false,
     publish / skip                         := true
   )
-  .aggregate(api, generic, logger, asyncLogger, nameOfLogger, diff, flowLogger, traceLogger, benchmarks)
+  .aggregate(api, generic, logger, logger2, asyncLogger, nameOfLogger, diff, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
