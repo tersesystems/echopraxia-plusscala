@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logger2
+package com.tersesystems.echopraxia.plusscala.logger2
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -227,4 +227,8 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   object MyFieldBuilder extends MyFieldBuilder
+
+  case class Person(name: String, age: Int)
+
+  case class Government(name: String, debt: BigDecimal)
 }
