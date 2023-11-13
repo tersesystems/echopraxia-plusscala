@@ -10,10 +10,34 @@ import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
 trait Logger[FB] extends LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB] {
 
+  def isTraceEnabled: Boolean
+
+  def isTraceEnabled(condition: Condition): Boolean
+
   def trace: LoggerMethod[FB]
+
+  def isDebugEnabled: Boolean
+
+  def isDebugEnabled(condition: Condition): Boolean
+
   def debug: LoggerMethod[FB]
+
+  def isInfoEnabled: Boolean
+
+  def isInfoEnabled(condition: Condition): Boolean
+
   def info: LoggerMethod[FB]
+
+  def isWarnEnabled: Boolean
+
+  def isWarnEnabled(condition: Condition): Boolean
+
   def warn: LoggerMethod[FB]
+
+  def isErrorEnabled: Boolean
+
+  def isErrorEnabled(condition: Condition): Boolean
+
   def error: LoggerMethod[FB]
 }
 
@@ -169,6 +193,26 @@ object Logger {
       }
     }
 
+    override def isTraceEnabled: Boolean = core.isEnabled(Level.TRACE)
+
+    override def isTraceEnabled(condition: Condition): Boolean = core.isEnabled(Level.TRACE, condition.asJava)
+
+    override def isDebugEnabled: Boolean = core.isEnabled(Level.TRACE)
+
+    override def isDebugEnabled(condition: Condition): Boolean = core.isEnabled(Level.DEBUG, condition.asJava)
+
+    override def isInfoEnabled: Boolean = core.isEnabled(Level.INFO)
+
+    override def isInfoEnabled(condition: Condition): Boolean = core.isEnabled(Level.INFO, condition.asJava)
+
+    override def isWarnEnabled: Boolean = core.isEnabled(Level.WARN)
+
+    override def isWarnEnabled(condition: Condition): Boolean = core.isEnabled(Level.WARN, condition.asJava)
+
+    override def isErrorEnabled: Boolean = core.isEnabled(Level.ERROR)
+
+    override def isErrorEnabled(condition: Condition): Boolean = core.isEnabled(Level.ERROR, condition.asJava)
+
     override val trace: DefaultLoggerMethod = new DefaultLoggerMethod(TRACE)
 
     override val debug: DefaultLoggerMethod = new DefaultLoggerMethod(DEBUG)
@@ -211,6 +255,7 @@ object Logger {
         newCoreLogger: CoreLogger = core,
         newFieldBuilder: T = fieldBuilder
     ): Logger[T] = new Impl[T](newCoreLogger, newFieldBuilder)
+
   }
 
   trait NoOp[FB] extends Logger[FB] {
@@ -285,6 +330,26 @@ object Logger {
       override def warn: LoggerMethod[FB] = NoOpMethod
 
       override def error: LoggerMethod[FB] = NoOpMethod
+
+      override def isTraceEnabled: Boolean = false
+
+      override def isTraceEnabled(condition: Condition): Boolean = false
+
+      override def isDebugEnabled: Boolean = false
+
+      override def isDebugEnabled(condition: Condition): Boolean = false
+
+      override def isInfoEnabled: Boolean = false
+
+      override def isInfoEnabled(condition: Condition): Boolean = false
+
+      override def isWarnEnabled: Boolean = false
+
+      override def isWarnEnabled(condition: Condition): Boolean = false
+
+      override def isErrorEnabled: Boolean = false
+
+      override def isErrorEnabled(condition: Condition): Boolean = false
     }
   }
 }

@@ -47,8 +47,8 @@ trait BookFieldBuilder extends PresentationFieldBuilder {
     )
   }
 
-  def apply[V: ToValue](tuple: (String, V)) = keyValue(tuple)
-  def apply[V: ToValue](key: String, value: V) = keyValue(key, value)
+  def apply[V: ToValue](tuple: (Name, V)) = keyValue(tuple)
+  def apply[V: ToValue](key: Name, value: V) = keyValue(key, value)
   def apply(e: Throwable) = keyValue(FieldConstants.EXCEPTION, e)
 }
 
