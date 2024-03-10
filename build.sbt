@@ -200,7 +200,10 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Ywarn-dead-code",
         "-Yrangepos",
         "-release",
-        "8"
+        "8",
+        "-Vimplicits",
+        "-Vtype-diffs",
+        "P:splain:Vimplicits-diverging"
       )
     case Some((2, n)) if n == 12 =>
       Seq(
