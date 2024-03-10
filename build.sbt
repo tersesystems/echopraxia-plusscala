@@ -1,5 +1,6 @@
 import sbt.Keys._
 import commandmatrix._
+import commandmatrix.extra._
 
 val echopraxiaVersion            = "3.1.2"
 val scalatestVersion             = "3.2.18"
@@ -16,7 +17,12 @@ val scalaCollectionCompatVersion = "2.11.0"
 val scala213                     = "2.13.13"
 val scala212                     = "2.12.19"
 
-val scalaVersions = Seq(scala213, scala212)
+val scalaVersions = List(scala213, scala212)
+val ideScala = scala213
+
+val only1JvmScalaInIde = MatrixAction
+  .ForPlatforms(VirtualAxis.jvm)
+  .Configure(_.settings(ideSkipProject := (scalaVersion.value != ideScala)))
 
 initialize := {
   val _        = initialize.value // run the previous initialization
@@ -63,7 +69,8 @@ lazy val api = (projectMatrix in file("api"))
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
-  ).jvmPlatform(scalaVersions = scalaVersions)
+  )
+  .jvmPlatform(scalaVersions = scalaVersions)
 
 lazy val generic = (projectMatrix in file("generic"))
   .settings(
