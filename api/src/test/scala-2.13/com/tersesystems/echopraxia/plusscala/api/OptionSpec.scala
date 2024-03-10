@@ -41,11 +41,8 @@ class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
     }
 
     "work with None" in {
-      // None must take priority over ToArray
-      // this doesn't work
-      //val field: Field = "test" -> None
-      // This does work but is ugly
-      val field: Field = "test" -> ToValue(None)
+      // XXX works in 2.13, does not work in 2.12
+      val field: Field = "test" -> None
       field.toString must be("test=null")
     }
 
