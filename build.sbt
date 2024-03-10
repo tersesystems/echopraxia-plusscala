@@ -14,10 +14,12 @@ val zjsonPatchVersion            = "0.4.16"
 val magnoliaVersion              = "1.1.8"
 val sourceCodeVersion            = "0.3.1"
 val scalaCollectionCompatVersion = "2.11.0"
+
+val scala3                       = "3.3.3"
 val scala213                     = "2.13.13"
 val scala212                     = "2.12.19"
 
-val scalaVersions = List(scala213, scala212)
+val scalaVersions = List(scala3, scala213, scala212)
 val ideScala = scala213
 
 val only1JvmScalaInIde = MatrixAction
@@ -236,7 +238,9 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "8",
         "-Vimplicits",
         "-Vtype-diffs",
-        "P:splain:Vimplicits-diverging"
+        "P:splain:Vimplicits-diverging",
+        "-Xsource:3-cross",
+        "-quickfix:cat=scala3-migration"
       )
     case Some((2, n)) if n == 12 =>
       Seq(
