@@ -28,13 +28,13 @@ class EitherSpec extends AnyWordSpec with Matchers with LoggingBase {
 
     "work with Either" in {
       val either: Either[Int, String] = Right("right")
-      val field: Field = "test" -> either
+      val field: Field                = "test" -> either
       field.name must be("test")
       field.value must be(Value.string("right"))
     }
 
     "work with a custom attribute" in {
-      implicit val uuidToValue: ToValue[UUID] = uuid => ToValue(uuid.toString)
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString)
       implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
       // Show a human readable toString for instant
@@ -43,13 +43,13 @@ class EitherSpec extends AnyWordSpec with Matchers with LoggingBase {
       }
 
       implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
-        val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+        val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         ToValue(formatter.format(datetime))
       }
 
       val either: Either[UUID, Instant] = Right(Instant.ofEpochMilli(0))
-      val field: Field = "test" -> either
+      val field: Field                  = "test" -> either
       field.toString must be("test=1/1/70, 12:00 AM")
     }
   }
