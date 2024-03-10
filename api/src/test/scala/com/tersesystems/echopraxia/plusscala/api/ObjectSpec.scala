@@ -17,7 +17,7 @@ class ObjectSpec extends AnyFunSpec with Matchers with LoggingBase {
       val field: Field = "test" -> ("foo" -> "bar": Field)
       field.name must be("test")
       val objectValue: Value.ObjectValue = field.value().asObject()
-      val fields: Seq[Field] = objectValue.raw.asScala.toSeq
+      val fields: Seq[Field]             = objectValue.raw.asScala.toSeq
       fields.head.name must be("foo")
     }
 
@@ -25,7 +25,7 @@ class ObjectSpec extends AnyFunSpec with Matchers with LoggingBase {
       val field: Field = "test" -> ToObjectValue("foo" -> "bar", "baz" -> "quux")
       field.name must be("test")
       val objectValue: Value.ObjectValue = field.value().asObject()
-      val fields: Seq[Field] = objectValue.raw.asScala.toSeq
+      val fields: Seq[Field]             = objectValue.raw.asScala.toSeq
       fields(1).name must be("baz")
     }
 

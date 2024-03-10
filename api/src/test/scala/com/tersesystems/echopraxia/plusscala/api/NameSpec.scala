@@ -16,7 +16,7 @@ class NameSpec extends AnyWordSpec with Matchers with LoggingBase {
   "named fields" should {
 
     "work with ToName" in {
-      implicit val uuidToName: ToName[UUID] = ToName.create("uuid")
+      implicit val uuidToName: ToName[UUID]   = ToName.create("uuid")
       implicit val uuidToValue: ToValue[UUID] = uuid => ToValue(uuid.toString)
 
       val field: Field = UUID.randomUUID
