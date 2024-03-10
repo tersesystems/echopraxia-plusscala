@@ -1,12 +1,12 @@
 import sbt.Keys._
 
-val echopraxiaVersion     = "3.0.1"
+val echopraxiaVersion     = "3.1.2"
 val scalatestVersion      = "3.2.15"
-val logbackClassicVersion = "1.4.8"
+val logbackClassicVersion = "1.4.14"
 val logstashVersion       = "7.4"
 
-val scala213      = "2.13.11"
-val scala212      = "2.12.18"
+val scala213      = "2.13.13"
+val scala212      = "2.12.19"
 val scalaVersions = Seq(scala212, scala213)
 
 initialize := {
