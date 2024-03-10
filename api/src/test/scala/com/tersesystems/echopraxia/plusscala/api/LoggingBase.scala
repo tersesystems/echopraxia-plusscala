@@ -5,7 +5,6 @@ import com.tersesystems.echopraxia.spi.{EchopraxiaService, FieldConstants, Field
 
 import scala.collection.JavaConverters._
 
-import scala.language.implicitConversions
 import scala.reflect.{ClassTag, classTag}
 
 // This trait should be extended for domain model classes
