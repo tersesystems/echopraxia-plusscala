@@ -55,17 +55,17 @@ trait DefaultTraceLoggerMethods[FB <: TraceFieldBuilder] extends DefaultMethodsS
   }
 
   @inline
-  private def entering(sourceFields: SourceFields): Function[FB, FieldBuilderResult] = { fb: FB =>
+  private def entering(sourceFields: SourceFields): Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.entering(sourceFields)
   }.asJava
 
   @inline
-  private def exiting[B: ToValue](sourceFields: SourceFields, ret: B): Function[FB, FieldBuilderResult] = { fb: FB =>
+  private def exiting[B: ToValue](sourceFields: SourceFields, ret: B): Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.exiting(sourceFields, implicitly[ToValue[B]].toValue(ret))
   }.asJava
 
   @inline
-  private def throwing(sourceFields: SourceFields, ex: Throwable): Function[FB, FieldBuilderResult] = { fb: FB =>
+  private def throwing(sourceFields: SourceFields, ex: Throwable): Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.throwing(sourceFields, ex)
   }.asJava
 

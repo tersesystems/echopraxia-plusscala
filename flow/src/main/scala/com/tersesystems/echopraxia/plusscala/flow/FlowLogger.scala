@@ -60,7 +60,7 @@ object FlowLogger {
 
       override def core: CoreLogger = c
 
-      override def fieldBuilder: FB = fb
+      override def fieldBuilder: FB = this.fb
 
       override def withCondition(scalaCondition: Condition): FlowLogger[FB] = this
 

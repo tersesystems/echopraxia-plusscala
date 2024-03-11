@@ -14,6 +14,15 @@ class IterableSpec extends AnyWordSpec with Matchers with LoggingBase {
 
   implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
 
+  implicit def iterableValueFormat[TV: ToValueAttribute]: ToValueAttribute[Iterable[TV]] = new ToValueAttribute[Iterable[TV]]() {
+    override def toValue(seq: collection.Iterable[TV]): Value[_] = {
+      val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttribute[TV]].toValue(el)).toSeq
+      Value.array(list.asJava)
+    }
+
+    override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
+  }
+
   "iterable" should {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 

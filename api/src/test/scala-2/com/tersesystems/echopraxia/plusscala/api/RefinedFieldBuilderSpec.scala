@@ -8,6 +8,7 @@ import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.predicates.all.NonEmpty
 
+// refined doesn't exist in scala 3
 class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
 
   private val fb = RefinedFieldBuilder
