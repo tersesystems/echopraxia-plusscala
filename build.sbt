@@ -20,6 +20,7 @@ val scala212                     = "2.12.19"
 val scalaVersions = List(scala3, scala213, scala212)
 val ideScala = scala213
 
+// https://stackoverflow.com/questions/74340971/how-to-configure-intellij-to-manage-different-scala-versions
 val only1JvmScalaInIde = MatrixAction
   .ForPlatforms(VirtualAxis.jvm)
   .Configure(_.settings(ideSkipProject := (scalaVersion.value != ideScala)))
@@ -109,7 +110,7 @@ lazy val generic = (projectMatrix in file("generic"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api, logger % "test")
-  .jvmPlatform(scalaVersions = scalaVersions)
+  .jvmPlatform(scalaVersions = List(scala213, scala212)) // disable scala 3 for now
 
 lazy val logger = (projectMatrix in file("logger"))
   .settings(
@@ -161,7 +162,7 @@ lazy val nameOfLogger = (projectMatrix in file("nameof"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
+  .jvmPlatform(scalaVersions = List(scala213, scala212)) // disable scala 3 for now
 
 // don't include dump for now
 //lazy val dump = (project in file("dump"))

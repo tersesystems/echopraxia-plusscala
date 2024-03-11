@@ -47,60 +47,6 @@ trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValu
   }
 
   trait LowPriorityToValueAttributeImplicits {
-    implicit def optionValueFormat[TV: ToValueAttribute]: ToValueAttribute[Option[TV]] = new ToValueAttribute[Option[TV]] {
-      override def toValue(v: Option[TV]): Value[_] = v match {
-        case Some(tv) =>
-          val ev = implicitly[ToValueAttribute[TV]]
-          ev.toValue(tv)
-        case None => Value.nullValue()
-      }
-
-      override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
-    }
-
-    implicit def iterableValueFormat[TV: ToValueAttribute]: ToValueAttribute[Iterable[TV]] = new ToValueAttribute[Iterable[TV]]() {
-      override def toValue(seq: collection.Iterable[TV]): Value[_] = {
-        val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttribute[TV]].toValue(el)).toSeq
-        Value.array(list.asJava)
-      }
-
-      override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
-    }
-
-    implicit def eitherToValueAttribute[TVL: ToValueAttribute, TVR: ToValueAttribute]: ToValueAttribute[Either[TVL, TVR]] =
-      new ToValueAttribute[Either[TVL, TVR]] {
-        // This isn't great, but we need to know whether left or right was picked for the attributes
-        // and if we have a parameter (either: Either[]) in the method signature then it doesn't
-        // pick it up?
-        private var optEither: Option[Either[TVL, TVR]] = None
-
-        override def toValue(v: Either[TVL, TVR]): Value[_] = {
-          this.optEither = Some(v)
-          v match {
-            case Left(l)  => implicitly[ToValueAttribute[TVL]].toValue(l)
-            case Right(r) => implicitly[ToValueAttribute[TVR]].toValue(r)
-          }
-        }
-
-        override def toAttributes(value: Value[_]): Attributes = {
-          // hack hack hack hack
-          optEither match {
-            case Some(either) =>
-              either match {
-                case Left(_) =>
-                  val left = implicitly[ToValueAttribute[TVL]]
-                  left.toAttributes(value)
-                case Right(_) =>
-                  val right = implicitly[ToValueAttribute[TVR]]
-                  right.toAttributes(value)
-              }
-            case None =>
-              // should never get here
-              Attributes.empty()
-          }
-        }
-      }
-
     // default low priority implicit that gets applied if nothing is found
     implicit def empty[TV]: ToValueAttribute[TV] = new ToValueAttribute[TV] {
       override def toValue(v: TV): Value[_]                  = Value.nullValue()
