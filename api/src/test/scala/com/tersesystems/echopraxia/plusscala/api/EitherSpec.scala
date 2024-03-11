@@ -12,41 +12,40 @@ import LoggingBase._
 
 class EitherSpec extends AnyWordSpec with Matchers with LoggingBase {
 
-    // XXX Is there a way to make this work more easily?
-    implicit def eitherToValueAttribute[TVL: ToValueAttribute, TVR: ToValueAttribute]: ToValueAttribute[Either[TVL, TVR]] =
-      new ToValueAttribute[Either[TVL, TVR]] {
-        // This isn't great, but we need to know whether left or right was picked for the attributes
-        // and if we have a parameter (either: Either[]) in the method signature then it doesn't
-        // pick it up?
-        private var optEither: Option[Either[TVL, TVR]] = None
+  // XXX Is there a way to make this work more easily?
+  implicit def eitherToValueAttribute[TVL: ToValueAttribute, TVR: ToValueAttribute]: ToValueAttribute[Either[TVL, TVR]] =
+    new ToValueAttribute[Either[TVL, TVR]] {
+      // This isn't great, but we need to know whether left or right was picked for the attributes
+      // and if we have a parameter (either: Either[]) in the method signature then it doesn't
+      // pick it up?
+      private var optEither: Option[Either[TVL, TVR]] = None
 
-        override def toValue(v: Either[TVL, TVR]): Value[_] = {
-          this.optEither = Some(v)
-          v match {
-            case Left(l)  => implicitly[ToValueAttribute[TVL]].toValue(l)
-            case Right(r) => implicitly[ToValueAttribute[TVR]].toValue(r)
-          }
-        }
-
-        override def toAttributes(value: Value[_]): Attributes = {
-          // hack hack hack hack
-          optEither match {
-            case Some(either) =>
-              either match {
-                case Left(_) =>
-                  val left = implicitly[ToValueAttribute[TVL]]
-                  left.toAttributes(value)
-                case Right(_) =>
-                  val right = implicitly[ToValueAttribute[TVR]]
-                  right.toAttributes(value)
-              }
-            case None =>
-              // should never get here
-              Attributes.empty()
-          }
+      override def toValue(v: Either[TVL, TVR]): Value[_] = {
+        this.optEither = Some(v)
+        v match {
+          case Left(l)  => implicitly[ToValueAttribute[TVL]].toValue(l)
+          case Right(r) => implicitly[ToValueAttribute[TVR]].toValue(r)
         }
       }
 
+      override def toAttributes(value: Value[_]): Attributes = {
+        // hack hack hack hack
+        optEither match {
+          case Some(either) =>
+            either match {
+              case Left(_) =>
+                val left = implicitly[ToValueAttribute[TVL]]
+                left.toAttributes(value)
+              case Right(_) =>
+                val right = implicitly[ToValueAttribute[TVR]]
+                right.toAttributes(value)
+            }
+          case None =>
+            // should never get here
+            Attributes.empty()
+        }
+      }
+    }
 
   "either" should {
 

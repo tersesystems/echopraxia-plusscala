@@ -73,21 +73,20 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   }
 
   private def deepAsScalaMap(value: util.Map[String, _]): Map[String, Any] = {
-    val derp: Map[String, Any] = value.asScala.map {
+    value.asScala.map {
       case (k: String, v) =>
         val mappedV = v match {
           case utilList: util.List[_] =>
             deepAsScalaSeq(utilList)
           case (utilMap: util.Map[String, _]) =>
             deepAsScalaMap(utilMap)
-          case other  =>
+          case other =>
             deepAsScalaValue(other)
         }
         k -> mappedV
       case (k, v) =>
         throw new IllegalStateException("Map must use String as key!")
     }.toMap
-    derp
   }
 
   private def deepAsScalaValue(value: Any): Any = {

@@ -10,30 +10,6 @@ trait ValueTypeClasses {
   /**
    * The ToValue trait, used for turning scala things into Value.
    *
-   * Most of the time you will define this in your own field builder. For example to define `java.time.Instant` you could do this:
-   *
-   * {{{
-   * trait InstantFieldBuilder extends FieldBuilder {
-   *   implicit val instantToStringValue: ToValue[Instant] = (t: Instant) => ToValue(t.toString)
-   *   def instant(name: String, i: Instant): Field        = keyValue(name, ToValue(i))
-   * }
-   * }}}
-   *
-   * This allows you to define an instant field:
-   *
-   * {{{
-   * logger.info("{}", _.instant("instant", Instant.now()))
-   * }}}
-   *
-   * or if you have a heterogeneous array of values you can import the implicit:
-   *
-   * {{{
-   * logger.info("{}", fb => {
-   *   import fb._
-   *   fb.array("instants" -> Seq(ToValue(Instant.now()), ToValue("string"))
-   * })
-   * }}}
-   *
    * @tparam T
    *   the object type
    */
@@ -43,13 +19,54 @@ trait ValueTypeClasses {
     def toValue(t: T): Value[_]
   }
 
-  object ToValue {
+  object ToValue extends ToValueImplicits {
     def apply[T: ToValue](t: T): Value[_] = implicitly[ToValue[T]].toValue(t)
+  }
 
+  /**
+   * ToArrayValue is used when passing an ArrayValue to a field builder.
+   *
+   * @tparam T
+   *   the array type.
+   */
+  // noinspection ScalaUnusedSymbol
+  @implicitNotFound("Could not find an implicit ToArrayValue[${T}]")
+  trait ToArrayValue[-T] extends ToValue[T] {
+    def toValue(t: T): Value.ArrayValue
+  }
+
+  object ToArrayValue extends ToArrayValueImplicits {
+    def apply[T: ToArrayValue](array: T): Value.ArrayValue =
+      implicitly[ToArrayValue[T]].toValue(array)
+  }
+
+  /**
+   * ToObjectValue is used when providing an explicit `object` value to a field builder.
+   *
+   * Notable when you have a field or fields in a collection.
+   *
+   * @tparam T
+   *   the object type
+   */
+  // noinspection ScalaUnusedSymbol
+  @implicitNotFound("Could not find an implicit ToObjectValue[${T}]")
+  trait ToObjectValue[-T] extends ToValue[T] {
+    def toValue(t: T): Value.ObjectValue
+  }
+
+  object ToObjectValue extends ToObjectValueImplicits {
+
+    def apply[T: ToObjectValue](obj: T): Value.ObjectValue =
+      implicitly[ToObjectValue[T]].toValue(obj)
+
+    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
+  }
+
+  trait ToValueImplicits {
     implicit val valueToValue: ToValue[Value[_]] = identity(_)
 
-    implicit def objectValueToValue[T: ToObjectValue]: ToValue[T] = ToObjectValue[T](_)
-    implicit def arrayValueToValue[T: ToArrayValue]: ToValue[T]   = ToArrayValue[T](_)
+    implicit def objectValueToValue[T: ToObjectValue]: ToValue[T] = implicitly[ToObjectValue[T]].toValue(_)
+    implicit def arrayValueToValue[T: ToArrayValue]: ToValue[T]   = implicitly[ToArrayValue[T]].toValue(_)
 
     implicit val stringToStringValue: ToValue[String] = (s: String) => Value.string(s)
 
@@ -84,61 +101,22 @@ trait ValueTypeClasses {
     implicit val throwableToValue: ToValue[Throwable] = e => Value.exception(e)
   }
 
-  /**
-   * ToArrayValue is used when passing an ArrayValue to a field builder.
-   *
-   * {{{
-   * val array: Array[Int] = Array(1, 2, 3)
-   * logger.info("{}", fb => fb.array("array", array)
-   * }}}
-   *
-   * @tparam T
-   *   the array type.
-   */
-  // noinspection ScalaUnusedSymbol
-  @implicitNotFound("Could not find an implicit ToArrayValue[${T}]")
-  trait ToArrayValue[-T] extends ToValue[T] {
-    def toValue(t: T): Value.ArrayValue
-  }
-
-  object ToArrayValue {
-
-    def apply[T: ToArrayValue](array: T): Value.ArrayValue =
-      implicitly[ToArrayValue[T]].toValue(array)
-
+  trait ToArrayValueImplicits {
     implicit val identityArrayValue: ToArrayValue[Value.ArrayValue] = identity(_)
 
     implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[collection.Iterable[V]] =
-      iterable => Value.array(iterable.map(ToValue[V]).toArray: _*)
+      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray: _*)
 
     implicit def immutableIterableToArrayValue[V: ToValue]: ToArrayValue[collection.immutable.Iterable[V]] =
-      iterable => Value.array(iterable.map(ToValue[V]).toArray: _*)
+      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray: _*)
 
     implicit def arrayToArrayValue[V: ToValue]: ToArrayValue[Array[V]] = array => {
-      Value.array(array.map(ToValue[V]): _*)
+
+      Value.array(array.map(implicitly[ToValue[V]].toValue): _*)
     }
-
   }
 
-  /**
-   * ToObjectValue is used when providing an explicit `object` value to a field builder. Notable when you have a field or fields in a collection.
-   *
-   * @tparam T
-   *   the object type
-   */
-  // noinspection ScalaUnusedSymbol
-  @implicitNotFound("Could not find an implicit ToObjectValue[${T}]")
-  trait ToObjectValue[-T] extends ToValue[T] {
-    def toValue(t: T): Value.ObjectValue
-  }
-
-  object ToObjectValue {
-
-    def apply[T: ToObjectValue](obj: T): Value.ObjectValue =
-      implicitly[ToObjectValue[T]].toValue(obj)
-
-    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
-
+  trait ToObjectValueImplicits {
     implicit val identityObjectValue: ToObjectValue[Value.ObjectValue] = identity(_)
 
     implicit val fieldToObjectValue: ToObjectValue[Field] = f => Value.`object`(f)
