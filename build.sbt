@@ -14,10 +14,11 @@ val zjsonPatchVersion            = "0.4.16"
 val magnoliaVersion              = "1.1.8"
 val sourceCodeVersion            = "0.3.1"
 val scalaCollectionCompatVersion = "2.11.0"
+val scala3                       = "3.3.3"
 val scala213                     = "2.13.13"
 val scala212                     = "2.12.19"
 
-val scalaVersions = List(scala213, scala212)
+val scalaVersions = List(scala3, scala213, scala212)
 val ideScala = scala213
 
 val only1JvmScalaInIde = MatrixAction
@@ -44,6 +45,20 @@ ThisBuild / scmInfo := Some(
   )
 )
 
+inThisBuild(
+  Seq(
+    // sbt-commandmatrix
+    commands ++= CrossCommand.single(
+      "test",
+      matrices = Seq(root),
+      dimensions = Seq(
+        Dimension.scala("2.13", fullFor3 = true),
+        Dimension.platform()
+      )
+    )
+  )
+)
+
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / resolvers += Resolver.mavenLocal
 ThisBuild / Compile / scalacOptions ++= optimizeInline
@@ -58,7 +73,15 @@ lazy val api = (projectMatrix in file("api"))
     name := "api",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
-    libraryDependencies += "org.scala-lang"              % "scala-reflect"      % scalaVersion.value,
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq.empty
+        case other =>
+          Seq(
+            "org.scala-lang" % "scala-reflect" % scalaVersion.value
+          )
+      }
+    },
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % scalaJavaVersion,
     libraryDependencies ++= compatLibraries(scalaVersion.value),
@@ -77,7 +100,15 @@ lazy val generic = (projectMatrix in file("generic"))
     name := "generic",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
-    libraryDependencies += "com.softwaremill.magnolia1_2" %% "magnolia" % magnoliaVersion,
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq("com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.4")
+        case other =>
+          Seq(
+            "com.softwaremill.magnolia1_2" %% "magnolia" % magnoliaVersion
+          )
+      }
+    },
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
@@ -94,8 +125,15 @@ lazy val logger = (projectMatrix in file("logger"))
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies += "eu.timepit"                 %% "refined"                  % refinedVersion        % Test,
-    libraryDependencies += "eu.timepit"                 %% "singleton-ops"            % singletonOpsVersion   % Test,
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq.empty
+        case other =>
+          Seq(
+           "eu.timepit"                 %% "refined"                  % refinedVersion        % Test
+          )
+      }
+    },
     libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
@@ -218,6 +256,21 @@ def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
 
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {
+    case Some((3, _)) =>
+      Seq(
+        "-unchecked",
+        "-deprecation",
+        "-feature",
+        "-encoding",
+        "UTF-8",
+        "-language:implicitConversions",
+        "-language:higherKinds",
+        "-language:existentials",
+        "-language:postfixOps",
+        "-release",
+        "8",
+        "-explain"
+      )
     case Some((2, n)) if n >= 13 =>
       Seq(
         "-unchecked",

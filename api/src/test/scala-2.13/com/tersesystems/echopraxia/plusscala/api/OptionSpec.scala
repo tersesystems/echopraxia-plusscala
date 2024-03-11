@@ -12,6 +12,17 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
   implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
+  implicit def optionValueFormat[TV: ToValueAttribute]: ToValueAttribute[Option[TV]] = new ToValueAttribute[Option[TV]] {
+    override def toValue(v: Option[TV]): Value[_] = v match {
+      case Some(tv) =>
+        val ev = implicitly[ToValueAttribute[TV]]
+        ev.toValue(tv)
+      case None => Value.nullValue()
+    }
+
+    override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
+  }
+
   // Show a human readable toString
   trait ToStringFormat[T] extends ToValueAttribute[T] {
     override def toAttributes(value: Value[_]): Attributes = withAttributes(withStringFormat(value))
@@ -42,7 +53,7 @@ class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
 
     "work with custom attributes" in {
       implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
-        val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+        val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         ToValue(formatter.format(datetime))
       }

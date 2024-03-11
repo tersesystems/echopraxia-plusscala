@@ -53,21 +53,21 @@ trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSup
   }
 
   @inline
-  private def entering: Function[FB, FieldBuilderResult] = { fb: FB =>
+  private def entering: Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.entering
   }.asJava
 
   @inline
   private def exiting[B: ToValue](
       ret: B
-  ): Function[FB, FieldBuilderResult] = { fb: FB =>
+  ): Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.exiting(implicitly[ToValue[B]].toValue(ret))
   }.asJava
 
   @inline
   private def throwing(
       ex: Throwable
-  ): Function[FB, FieldBuilderResult] = { fb: FB =>
+  ): Function[FB, FieldBuilderResult] = { (fb: FB) =>
     fb.throwing(ex)
   }.asJava
 

@@ -54,36 +54,37 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   }
 
   override def findObject(jsonPath: String): Option[Map[String, Any]] = {
-    context.findObject(jsonPath).asScala.map(deepAsScala(_))
+    context.findObject(jsonPath).asScala.map(deepAsScalaMap(_))
   }
 
   override def findList(jsonPath: String): Seq[Any] = {
-    deepAsScala(context.findList(jsonPath))
+    deepAsScalaSeq(context.findList(jsonPath))
   }
 
-  private def deepAsScala(value: util.List[_]): Seq[Any] = {
+  private def deepAsScalaSeq(value: util.List[_]): Seq[Any] = {
     value.asScala.map {
-      case javaMap: util.Map[_, _] =>
-        deepAsScala(javaMap)
+      case javaMap: util.Map[String, _] =>
+        deepAsScalaMap(javaMap)
       case list: util.List[_] =>
-        deepAsScala(list)
+        deepAsScalaSeq(list)
       case other =>
         other
     }.toSeq
   }
 
-  private def deepAsScala(value: util.Map[_, _]): Map[String, Any] = {
-    value.asScala
-      .map {
-        case (k, v: util.List[_]) =>
-          k -> deepAsScala(v)
-        case (k, v: util.Map[_, _]) =>
-          k -> deepAsScala(v)
-        case (k, v) =>
-          k -> deepAsScalaValue(v)
+  private def deepAsScalaMap(value: util.Map[String, _]): Map[String, Any] = {
+    val derp: Map[String, Any] = value.asScala.map { case (k: String, v) =>
+      val mappedV = v match {
+        case utilList: util.List[_] =>
+          deepAsScalaSeq(utilList)
+        case (utilMap: util.Map[String, _]) =>
+          deepAsScalaMap(utilMap)
+        case other =>
+          deepAsScalaValue(other)
       }
-      .toMap
-      .asInstanceOf[Map[String, Any]]
+      k -> mappedV
+    }.toMap
+    derp
   }
 
   private def deepAsScalaValue(value: Any): Any = {
