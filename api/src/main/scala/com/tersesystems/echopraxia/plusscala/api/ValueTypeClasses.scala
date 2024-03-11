@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.api.Value.ObjectValue
 import scala.annotation.implicitNotFound
 
 trait ValueTypeClasses {
+
   /**
    * The ToValue trait, used for turning scala things into Value.
    *

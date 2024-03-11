@@ -53,7 +53,7 @@ class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
 
     "work with custom attributes" in {
       implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
-        val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+        val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         ToValue(formatter.format(datetime))
       }

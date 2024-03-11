@@ -59,6 +59,20 @@ ThisBuild / scmInfo := Some(
   )
 )
 
+inThisBuild(
+  Seq(
+    // sbt-commandmatrix
+    commands ++= CrossCommand.single(
+      "test",
+      matrices = Seq(root),
+      dimensions = Seq(
+        Dimension.scala("2.13", fullFor3 = true),
+        Dimension.platform()
+      )
+    )
+  )
+)
+
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / resolvers += Resolver.mavenLocal
 ThisBuild / Compile / scalacOptions ++= optimizeInline
@@ -119,7 +133,15 @@ lazy val logger = (projectMatrix in file("logger"))
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies += "eu.timepit"                 %% "refined"                  % refinedVersion        % Test,
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq.empty
+        case other =>
+          Seq(
+           "eu.timepit"                 %% "refined"                  % refinedVersion        % Test
+          )
+      }
+    },
     libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test

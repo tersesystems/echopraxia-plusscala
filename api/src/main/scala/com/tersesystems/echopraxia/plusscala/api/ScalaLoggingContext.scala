@@ -73,6 +73,7 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   }
 
   private def deepAsScalaMap(value: util.Map[String, _]): Map[String, Any] = {
+<<<<<<< HEAD
     val derp: Map[String, Any] = value.asScala.map {
       case (k: String, v) =>
         val mappedV = v match {
@@ -86,6 +87,18 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
         k -> mappedV
       case (k, v) =>
         throw new IllegalStateException("Map must use String as key!")
+=======
+    val derp: Map[String, Any] = value.asScala.map { case (k: String, v) =>
+      val mappedV = v match {
+        case utilList: util.List[_] =>
+          deepAsScalaSeq(utilList)
+        case (utilMap: util.Map[String, _]) =>
+          deepAsScalaMap(utilMap)
+        case other =>
+          deepAsScalaValue(other)
+      }
+      k -> mappedV
+>>>>>>> d51eb2f (Add metals, update for scala 3)
     }.toMap
     derp
   }
