@@ -84,6 +84,8 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
             deepAsScalaValue(other)
         }
         k -> mappedV
+      case (k, v) =>
+        throw new IllegalStateException("Map must use String as key!")
     }.toMap
     derp
   }
