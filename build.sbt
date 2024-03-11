@@ -59,20 +59,6 @@ ThisBuild / scmInfo := Some(
   )
 )
 
-inThisBuild(
-  Seq(
-    // sbt-commandmatrix
-    commands ++= CrossCommand.single(
-      "test",
-      matrices = Seq(root),
-      dimensions = Seq(
-        Dimension.scala("2.13", fullFor3 = true),
-        Dimension.platform()
-      )
-    )
-  )
-)
-
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / resolvers += Resolver.mavenLocal
 ThisBuild / Compile / scalacOptions ++= optimizeInline
