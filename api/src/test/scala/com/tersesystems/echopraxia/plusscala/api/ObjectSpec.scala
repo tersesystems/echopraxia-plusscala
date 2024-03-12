@@ -13,7 +13,6 @@ class ObjectSpec extends AnyFunSpec with Matchers with LoggingBase {
   describe("object") {
 
     it("work with a single field") {
-      import ToObjectValue._
       val field: Field = "test" -> ("foo" -> "bar": Field)
       field.name must be("test")
       val objectValue: Value.ObjectValue = field.value().asObject()
@@ -21,7 +20,7 @@ class ObjectSpec extends AnyFunSpec with Matchers with LoggingBase {
       fields.head.name must be("foo")
     }
 
-    it("work with multiple fields") {
+    it("work with multiple fields with ToObjectValue") {
       val field: Field = "test" -> ToObjectValue("foo" -> "bar", "baz" -> "quux")
       field.name must be("test")
       val objectValue: Value.ObjectValue = field.value().asObject()
