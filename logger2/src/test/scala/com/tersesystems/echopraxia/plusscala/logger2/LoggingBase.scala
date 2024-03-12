@@ -40,9 +40,17 @@ trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValu
   // Allows custom attributes on fields through implicits
   trait ToValueAttribute[-T] {
     def toValue(v: T): Value[_]
-
     def toAttributes(value: Value[_]): Attributes
   }
+
+  trait LowPriorityToValueAttributeImplicits {
+    // default low priority implicit that gets applied if nothing is found
+    implicit def empty[TV]: ToValueAttribute[TV] = new ToValueAttribute[TV] {
+      override def toValue(v: TV): Value[_] = Value.nullValue()
+      override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
+    }
+  }
+  object ToValueAttribute extends LowPriorityToValueAttributeImplicits
 
   // implicit conversion from a ToLog to a ToValue
   implicit def convertToLogToValue[TL: ToLog]: ToValue[TL] = implicitly[ToLog[TL]].toValue

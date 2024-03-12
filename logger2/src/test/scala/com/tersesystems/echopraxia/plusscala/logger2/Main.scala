@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.logger2
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
 
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
@@ -69,6 +69,8 @@ class Printer extends Logging {
     logger.info("object" -> ToObjectValue(book1, person1)) // object={book={}, person={}}
 
     // For heterogeneous fields you'll need to use `Seq[Field]` explicitly, or use info.v as seen below
+    // XXX This only works if arrayToValue has higher precedence than objectToValue
+    import ToArrayValue._
     logger.info("object" -> Seq[Field](book1, person1)) // object=[book={}, person={}]
 
     // For heterogeneous values you'll want to specify Seq[Value[_]] to give implicit conversion some clues
