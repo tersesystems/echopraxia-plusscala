@@ -30,7 +30,9 @@ class Printer extends Logging {
     // Options work out of the box
     val optPerson: Option[Person] = Option(person1)
     logger.info("optPerson" -> optPerson)
-    logger.info("optPerson" -> None)
+
+    // XXX this doesn't work in 2.12 but works in 2.13 and 3
+    //logger.info("optPerson" -> None)
 
     // As does either
     logger.info("eitherPerson" -> Left(person1))
@@ -46,7 +48,8 @@ class Printer extends Logging {
     implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit va: ToValueAttribute[Tuple2[TVK, TVV]]): ToValue[Tuple2[TVK, TVV]] = {
       case (k, v) => ToObjectValue("_1" -> k, "_2" -> v)
     }
-    logger.info("tuple" -> (1, person1))
+    // XXX This doesn't work in 2.12, works in 2.13 and 3
+    //logger.info("tuple" -> (1, person1))
 
     // support for exceptions
     logger.error(new IllegalStateException())
@@ -69,8 +72,6 @@ class Printer extends Logging {
     logger.info("object" -> ToObjectValue(book1, person1)) // object={book={}, person={}}
 
     // For heterogeneous fields you'll need to use `Seq[Field]` explicitly, or use info.v as seen below
-    // XXX This only works if arrayToValue has higher precedence than objectToValue
-    import ToArrayValue._
     logger.info("object" -> Seq[Field](book1, person1)) // object=[book={}, person={}]
 
     // For heterogeneous values you'll want to specify Seq[Value[_]] to give implicit conversion some clues

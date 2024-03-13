@@ -9,6 +9,9 @@ import scala.reflect.{ClassTag, classTag}
 // This trait should be extended for domain model classes
 trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValueTypes {
 
+  // XXX This should be something the framework does for us
+  implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
+
   // Provides a default name for a field if not provided
   trait ToName[-T] {
     def toName(t: T): String

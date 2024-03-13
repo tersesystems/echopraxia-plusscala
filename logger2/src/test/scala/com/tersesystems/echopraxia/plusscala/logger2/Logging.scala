@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.logger2
 
-import com.tersesystems.echopraxia.api.{Attributes, Field, Value}
+import com.tersesystems.echopraxia.api.Value
 
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
