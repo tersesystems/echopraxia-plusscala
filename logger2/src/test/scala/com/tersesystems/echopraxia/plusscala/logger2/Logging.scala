@@ -5,6 +5,7 @@ import com.tersesystems.echopraxia.api.Value
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
 import scala.reflect.{ClassTag, classTag}
+import com.tersesystems.echopraxia.plusscala.api.ToName
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {

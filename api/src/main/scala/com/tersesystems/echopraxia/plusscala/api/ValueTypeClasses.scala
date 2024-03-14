@@ -4,6 +4,9 @@ import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 
 import scala.annotation.implicitNotFound
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 trait ValueTypeClasses {
 
@@ -149,6 +152,22 @@ trait EitherValueTypes { self: ValueTypeClasses =>
   }
   implicit def leftToValue[L: ToValue, R]: ToValue[Left[L, R]]   = v => ToValue(v.left.get)
   implicit def rightToValue[L, R: ToValue]: ToValue[Right[L, R]] = v => ToValue(v.right.get)
+}
+
+trait FutureValueTypes { self: ValueTypeClasses =>
+  implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>
+    f.value match {
+      case Some(value) =>
+        value match {
+          case Failure(exception) => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("failure", ToValue(exception)))
+          case Success(value)     => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("success", ToValue(value)))
+        }
+      case None =>
+        Value.`object`(Field.keyValue("completed", ToValue(false)))
+    }
+  }
+
+  // Don't define name, as this can be very different depending on the field name requirements (Elasticsearch in particular)
 }
 
 trait FieldBuilderResultTypeClasses {

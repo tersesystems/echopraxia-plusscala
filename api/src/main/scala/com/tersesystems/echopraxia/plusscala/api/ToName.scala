@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.plusscala.logger2
+package com.tersesystems.echopraxia.plusscala.api
 
 // Provides a default name for a field if not provided
 trait ToName[-T] {
