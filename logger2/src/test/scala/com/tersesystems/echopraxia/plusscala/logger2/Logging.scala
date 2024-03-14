@@ -9,10 +9,12 @@ import scala.reflect.{ClassTag, classTag}
 // Each package can add its own mappings
 trait Logging extends LoggingBase {
 
-  implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
-
   // use the class name as the name here
+  // Elasticsearch doesn't like dots in field names so this doesn't go in the framework.
   implicit val uuidToLog: ToLog[UUID] = ToLog.create(classOf[UUID].getName, uuid => ToValue(uuid.toString))
+
+  // Use class naem for future
+  implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
 
   implicit val personToLog: ToLog[Person] = ToLog.create("person", p => ToObjectValue("firstName" -> p.firstName, "lastName" -> p.lastName))
 
