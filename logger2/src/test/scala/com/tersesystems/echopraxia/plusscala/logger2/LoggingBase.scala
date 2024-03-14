@@ -5,22 +5,27 @@ import com.tersesystems.echopraxia.plusscala.api.{EitherValueTypes, OptionValueT
 import com.tersesystems.echopraxia.spi.{EchopraxiaService, FieldConstants, FieldCreator}
 
 import scala.reflect.{ClassTag, classTag}
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
-// This trait should be extended for domain model classes
-trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValueTypes {
-
-  // XXX This should be something the framework does for us
-  implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
-
-  // Provides a default name for a field if not provided
-  trait ToName[-T] {
-    def toName(t: T): String
+trait FutureValueTypes { self: ValueTypeClasses =>
+  implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>
+    f.value match {
+      case Some(value) =>
+        value match {
+          case Failure(exception) => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("failure", ToValue(exception)))
+          case Success(value)     => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("success", ToValue(value)))
+        }
+      case None =>
+        Value.`object`(Field.keyValue("completed", ToValue(false)))
+    }
   }
 
-  object ToName {
-    def create[T](name: String): ToName[T] = _ => name
-  }
+  // Don't define name, as this can be very different depending on the field name requirements (Elasticsearch in particular)
+}
 
+trait ToLogTypes { self: ValueTypeClasses =>
   // Provides easier packaging for ToName and ToValue
   trait ToLog[-TF] {
     def toName: ToName[TF]
@@ -28,17 +33,20 @@ trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValu
   }
 
   object ToLog {
-
     def create[TF](name: String, valueFunction: TF => Value[_]): ToLog[TF] = new ToLog[TF] {
       override val toName: ToName[TF]   = ToName.create(name)
       override val toValue: ToValue[TF] = t => valueFunction(t)
     }
-
-    def createFromClass[TF: ClassTag](valueFunction: TF => Value[_]): ToLog[TF] = new ToLog[TF] {
-      override val toName: ToName[TF]   = ToName.create(classTag[TF].runtimeClass.getName)
-      override val toValue: ToValue[TF] = t => valueFunction(t)
-    }
   }
+
+  // implicit conversion from a ToLog to a ToValue
+  implicit def convertToLogToValue[TL: ToLog]: ToValue[TL] = implicitly[ToLog[TL]].toValue
+
+  // implicit conversion from a ToLog to a ToName
+  implicit def convertToLogToName[TL: ToLog]: ToName[TL] = implicitly[ToLog[TL]].toName
+}
+
+trait ToValueAttributeTypes {
 
   // Allows custom attributes on fields through implicits
   trait ToValueAttribute[-T] {
@@ -49,17 +57,24 @@ trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValu
   trait LowPriorityToValueAttributeImplicits {
     // default low priority implicit that gets applied if nothing is found
     implicit def empty[TV]: ToValueAttribute[TV] = new ToValueAttribute[TV] {
-      override def toValue(v: TV): Value[_] = Value.nullValue()
+      override def toValue(v: TV): Value[_]                  = Value.nullValue()
       override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
     }
   }
   object ToValueAttribute extends LowPriorityToValueAttributeImplicits
+}
 
-  // implicit conversion from a ToLog to a ToValue
-  implicit def convertToLogToValue[TL: ToLog]: ToValue[TL] = implicitly[ToLog[TL]].toValue
+// This trait should be extended for domain model classes
+trait LoggingBase
+    extends ValueTypeClasses
+    with OptionValueTypes
+    with EitherValueTypes
+    with FutureValueTypes
+    with ToLogTypes
+    with ToValueAttributeTypes {
 
-  // implicit conversion from a ToLog to a ToName
-  implicit def convertToLogToName[TL: ToLog]: ToName[TL] = implicitly[ToLog[TL]].toName
+  // XXX This should be something the framework does for us
+  implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
 
   // Convert a tuple into a field.  This does most of the heavy lifting.
   // i.e logger.info("foo" -> foo) becomes logger.info(Field.keyValue("foo", ToValue(foo)))

@@ -42,12 +42,12 @@ class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
 
     "work with None" in {
       // XXX works in 2.13, does not work in 2.12
-      //val option: Option[Nothing] = None   
-      //val option: None.type = None
+      // val option: Option[Nothing] = None
+      // val option: None.type = None
 
       // Using a straight Option[Int] with None works in 2.12
-      val option: Option[Int] = None   
-      val field: Field = ("test" -> option)
+      val option: Option[Int] = None
+      val field: Field        = ("test" -> option)
       field.toString must be("test=null")
     }
 

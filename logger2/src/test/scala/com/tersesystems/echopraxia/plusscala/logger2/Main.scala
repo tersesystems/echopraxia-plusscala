@@ -32,7 +32,7 @@ class Printer extends Logging {
     logger.info("optPerson" -> optPerson)
 
     // XXX this doesn't work in 2.12 but works in 2.13 and 3
-    //logger.info("optPerson" -> None)
+    // logger.info("optPerson" -> None)
 
     // As does either
     logger.info("eitherPerson" -> Left(person1))
@@ -40,16 +40,12 @@ class Printer extends Logging {
     // And so do lists
     logger.info("people" -> Seq(person1, person2))
 
-    // and maps
+    // and maps (defined in Logging.scala)
     logger.info("people" -> Map("person1" -> person1, "person2" -> person2))
 
-    // Echopraxia takes a bit more work the more heterogeneous the input gets.
-    // For example, to pass through random tuples, you need to map it to an object
-    implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit va: ToValueAttribute[Tuple2[TVK, TVV]]): ToValue[Tuple2[TVK, TVV]] = {
-      case (k, v) => ToObjectValue("_1" -> k, "_2" -> v)
-    }
+    // And even tuples  (defined in Logging.scala)
     // XXX This doesn't work in 2.12, works in 2.13 and 3
-    //logger.info("tuple" -> (1, person1))
+    logger.info("intToPersonMap" -> (1 -> person1))
 
     // support for exceptions
     logger.error(new IllegalStateException())
@@ -95,7 +91,7 @@ class Printer extends Logging {
     // Can also log using class name
     logger.info(UUID.randomUUID)
 
-    // Logging futures is also possible, and can include names
+    // Logging futures is also possible, and can include names (defined in Logging.scala)
     logger.info(Future.successful(true))
     logger.info(Future.successful("String"))
   }

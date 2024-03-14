@@ -141,6 +141,7 @@ lazy val logger2 = (projectMatrix in file("logger2"))
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
