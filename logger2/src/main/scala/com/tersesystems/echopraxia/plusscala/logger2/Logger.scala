@@ -38,7 +38,7 @@ class Logger(val core: CoreLogger) {
   abstract class LoggerMethod(level: Level) {
     def enabled: Boolean = core.isEnabled(level.asJava)
 
-    def apply(message: String)(implicit line: Line, file: File, enclosing: Enclosing): Unit               = core.log(level.asJava, message)
+    def apply(message: String)(implicit line: Line, file: File, enclosing: Enclosing): Unit               = handle(level, message)
     def apply(message: String, f1: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit = handle(level, message, f1)
     def apply(message: String, f1: => Field, f2: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
       handle(level, message, f1 ++ f2)
@@ -47,7 +47,7 @@ class Logger(val core: CoreLogger) {
     def apply(message: String, f1: => Field, f2: => Field, f3: => Field, f4: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
       handle(level, message, f1 ++ f2 ++ f3 ++ f4)
 
-    def apply()(implicit line: Line, file: File, enclosing: Enclosing): Unit                                         = core.log(level.asJava, "")
+    def apply()(implicit line: Line, file: File, enclosing: Enclosing): Unit                                         = apply("")
     def apply(f1: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit                             = apply("{}", f1)
     def apply(f1: => Field, f2: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit               = apply("{} {}", f1, f2)
     def apply(f1: => Field, f2: => Field, f3: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit = apply("{} {} {}", f1, f2, f3)
@@ -57,6 +57,10 @@ class Logger(val core: CoreLogger) {
     // variadic params don't take call by name  :-(
     def v(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
       handle(level, ("{} " * fields.size).trim, list(fields.toArray))
+
+    private def handle(level: Level, message: String)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
+      handle(level, message, FieldBuilderResult.empty())
+    }
 
     private def handle(level: Level, message: String, f: => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
       import scala.compat.java8.FunctionConverters._

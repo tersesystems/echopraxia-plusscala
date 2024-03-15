@@ -6,6 +6,7 @@ import java.util.{Currency, UUID}
 import scala.concurrent.Future
 import scala.reflect.{ClassTag, classTag}
 import com.tersesystems.echopraxia.plusscala.api.ToName
+import com.tersesystems.echopraxia.plusscala.api.ToValueAttribute
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {
@@ -14,7 +15,7 @@ trait Logging extends LoggingBase {
   // Elasticsearch doesn't like dots in field names so this doesn't go in the framework.
   implicit val uuidToLog: ToLog[UUID] = ToLog.create(classOf[UUID].getName, uuid => ToValue(uuid.toString))
 
-  // Use class naem for future
+  // Use class name for future
   implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
 
   implicit val personToLog: ToLog[Person] = ToLog.create("person", p => ToObjectValue("firstName" -> p.firstName, "lastName" -> p.lastName))
@@ -43,6 +44,6 @@ trait Logging extends LoggingBase {
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object
   implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit va: ToValueAttribute[Tuple2[TVK, TVV]]): ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
-    ToObjectValue("_1" -> k, "_2" -> v)
+    ToObjectValue("key" -> k, "value" -> v)
   }
 }

@@ -1,26 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.logger2
 
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.plusscala.api.{
-  EitherValueTypes,
-  OptionValueTypes,
-  ValueTypeClasses,
-  FutureValueTypes,
-  ToLogTypes,
-  ToValueAttributeTypes
-}
+import com.tersesystems.echopraxia.plusscala.api.{EitherValueTypes, OptionValueTypes, ValueTypeClasses, FutureValueTypes, ToLogTypes}
 import com.tersesystems.echopraxia.spi.{EchopraxiaService, FieldConstants, FieldCreator}
 
 import com.tersesystems.echopraxia.plusscala.api.ToName
+import com.tersesystems.echopraxia.plusscala.api.ToValueAttribute
 
 // This trait should be extended for domain model classes
-trait LoggingBase
-    extends ValueTypeClasses
-    with OptionValueTypes
-    with EitherValueTypes
-    with FutureValueTypes
-    with ToLogTypes
-    with ToValueAttributeTypes {
+trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValueTypes with FutureValueTypes with ToLogTypes {
 
   // XXX this is awkward
   // if foo and bar are two different types, we need an explicit ascription to Seq[Field]
