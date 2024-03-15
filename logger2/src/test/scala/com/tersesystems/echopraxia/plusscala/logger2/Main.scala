@@ -94,6 +94,9 @@ class Printer extends Logging {
     // Logging futures is also possible, and can include names (defined in Logging.scala)
     logger.info(Future.successful(true))
     logger.info(Future.successful("String"))
+
+    // XXX why doesn't this pick up value attributes for string?
+    logger.info("derp" -> (1 -> Price(amount = 8.95, currency = Currency.getInstance("USD"))))
   }
 }
 

@@ -7,6 +7,7 @@ import scala.concurrent.Future
 import scala.reflect.{ClassTag, classTag}
 import com.tersesystems.echopraxia.plusscala.api.ToName
 import com.tersesystems.echopraxia.plusscala.api.ToValueAttribute
+import com.tersesystems.echopraxia.plusscala.api.ToStringFormat
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {
@@ -31,6 +32,9 @@ trait Logging extends LoggingBase {
   implicit val priceToLog: ToLog[Price] = ToLog.create("price", price => ToObjectValue(price.currency, "amount" -> price.amount))
 
   implicit val bookToLog: ToLog[Book] = ToLog.create("book", book => ToObjectValue(book.title, book.category, book.author, book.price))
+
+  // Says we want a toString of $8.95 in a message template for a price
+  implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
 
   // everyone wants different things out of maps, so implementing that
   // is up to the individual application
