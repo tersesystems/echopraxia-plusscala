@@ -12,6 +12,21 @@ import com.tersesystems.echopraxia.plusscala.api.ToStringFormat
 // Each package can add its own mappings
 trait Logging extends LoggingBase {
 
+  // Echopraxia takes a bit more work the more heterogeneous the input gets.
+  // For example, to pass through random tuples, you need to map it to an object
+  implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit vak: ToValueAttribute[TVK], vav: ToValueAttribute[TVV]): ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+    ToObjectValue("key" -> k, "value" -> v)
+  }
+
+  // everyone wants different things out of maps, so implementing that
+  // is up to the individual application
+  implicit def mapToValue[TVK: ToValue, TVV: ToValue](implicit vak: ToValueAttribute[TVK], vav: ToValueAttribute[TVV]): ToValue[Map[TVK, TVV]] = { v =>
+    val value: Seq[Value.ObjectValue] = v.map { case (k, v) =>
+      ToObjectValue("key" -> k, "value" -> v)
+    }.toSeq
+    ToArrayValue(value)
+  }
+
   // use the class name as the name here
   // Elasticsearch doesn't like dots in field names so this doesn't go in the framework.
   implicit val uuidToLog: ToLog[UUID] = ToLog.create(classOf[UUID].getName, uuid => ToValue(uuid.toString))
@@ -35,19 +50,4 @@ trait Logging extends LoggingBase {
 
   // Says we want a toString of $8.95 in a message template for a price
   implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
-
-  // everyone wants different things out of maps, so implementing that
-  // is up to the individual application
-  implicit def mapToValue[TV: ToValue](implicit va: ToValueAttribute[TV]): ToValue[Map[String, TV]] = { v =>
-    val value: Seq[Value.ObjectValue] = v.map { case (k, v) =>
-      ToObjectValue("key" -> k, "value" -> v)
-    }.toSeq
-    ToArrayValue(value)
-  }
-
-  // Echopraxia takes a bit more work the more heterogeneous the input gets.
-  // For example, to pass through random tuples, you need to map it to an object
-  implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit va: ToValueAttribute[Tuple2[TVK, TVV]]): ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
-    ToObjectValue("key" -> k, "value" -> v)
-  }
 }

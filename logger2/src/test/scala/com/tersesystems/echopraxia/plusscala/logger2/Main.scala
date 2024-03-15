@@ -15,6 +15,8 @@ object Main {
 class Printer extends Logging {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
+  private val USD = Currency.getInstance("USD")
+
   def print(): Unit = {
     val person1 = Person("Person1", "Last Name")
     val person2 = Person("Person2", "Last Name")
@@ -64,6 +66,11 @@ class Printer extends Logging {
     )
     logger.info(book1)
 
+    // You can also render case classes using custom presentation while using
+    // structured JSON, i.e. this will render $8.95 in pattern layout
+    // while still rendering as a JSON object
+    logger.info(Price(8.95, USD))
+
     // If you want to render fields as an object, you can use ToObjectValue
     logger.info("object" -> ToObjectValue(book1, person1)) // object={book={}, person={}}
 
@@ -83,7 +90,7 @@ class Printer extends Logging {
         Category("reference"),
         Author("Nigel Rees"),
         Title("Sayings of the Century"),
-        Price(amount = 8.95, currency = Currency.getInstance("USD")),
+        Price(amount = 8.95, currency = USD),
         person1 // add more than 4
       )
     }
@@ -94,9 +101,6 @@ class Printer extends Logging {
     // Logging futures is also possible, and can include names (defined in Logging.scala)
     logger.info(Future.successful(true))
     logger.info(Future.successful("String"))
-
-    // XXX why doesn't this pick up value attributes for string?
-    logger.info("derp" -> (1 -> Price(amount = 8.95, currency = Currency.getInstance("USD"))))
   }
 }
 
