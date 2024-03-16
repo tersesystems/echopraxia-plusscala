@@ -226,7 +226,15 @@ lazy val benchmarks = (projectMatrix in file("benchmarks"))
   .dependsOn(api, logger, asyncLogger, flowLogger, traceLogger)
   .jvmPlatform(scalaVersions = scalaVersions)
 
-val refs = api.projectRefs ++ generic.projectRefs ++ logger.projectRefs ++ asyncLogger.projectRefs ++ nameOfLogger.projectRefs ++ diff.projectRefs ++ flowLogger.projectRefs ++ traceLogger.projectRefs ++ benchmarks.projectRefs
+val refs = api.projectRefs ++
+           generic.projectRefs ++
+           logger.projectRefs ++
+           asyncLogger.projectRefs ++
+           nameOfLogger.projectRefs ++
+           diff.projectRefs ++
+            flowLogger.projectRefs ++
+            traceLogger.projectRefs ++
+            benchmarks.projectRefs
 
 lazy val root = (projectMatrix in file("."))
   .settings(
