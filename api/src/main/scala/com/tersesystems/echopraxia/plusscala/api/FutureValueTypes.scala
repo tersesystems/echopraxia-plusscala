@@ -6,7 +6,6 @@ import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.Value
 import scala.concurrent.Future
 
-
 trait FutureValueTypes { self: ValueTypeClasses =>
   implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>
     f.value match {
@@ -22,4 +21,3 @@ trait FutureValueTypes { self: ValueTypeClasses =>
 
   // Don't define name, as this can be very different depending on the field name requirements (Elasticsearch in particular)
 }
-

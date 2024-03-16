@@ -17,7 +17,8 @@ object Utils {
 
   private def defaultFieldCreator: FieldCreator[PresentationField] = PresentationFieldCreator
 
-  def newField[TV](name: String, value: Value[_])(implicit ev: ToValueAttribute[TV]): PresentationField = defaultFieldCreator.create(name, value, ev.toAttributes(value))
+  def newField[TV](name: String, value: Value[_])(implicit ev: ToValueAttribute[TV]): PresentationField =
+    defaultFieldCreator.create(name, value, ev.toAttributes(value))
 
   def newField(name: String, value: Value[_], attributes: Attributes): PresentationField = defaultFieldCreator.create(name, value, attributes)
 

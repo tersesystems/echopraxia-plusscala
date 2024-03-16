@@ -20,4 +20,3 @@ trait LowPriorityToValueAttributeImplicits {
 object ToValueAttribute extends LowPriorityToValueAttributeImplicits {
   def attributes(value: Value[_], ev: ToValueAttribute[_]): Attributes = ev.toAttributes(value)
 }
-

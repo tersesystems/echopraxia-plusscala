@@ -31,7 +31,8 @@ import com.tersesystems.echopraxia.plusscala.api.{EitherValueTypes, OptionValueT
  * }
  * }}}
  */
-trait LoggingBase extends ValueTypeClasses
+trait LoggingBase
+    extends ValueTypeClasses
     with FieldConversionImplicits
     with OptionValueTypes
     with EitherValueTypes

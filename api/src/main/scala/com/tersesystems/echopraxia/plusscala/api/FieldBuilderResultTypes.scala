@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.plusscala.api
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Field
 
-
 trait FieldBuilderResultTypeClasses {
 
   // if using -T here then all the subtypes of iterable also apply
@@ -27,9 +26,7 @@ trait FieldBuilderResultTypeClasses {
     implicit val arrayToFieldBuilderResult: ToFieldBuilderResult[Array[Field]] = FieldBuilderResult.list(_)
   }
 
-  object LowPriorityToFieldBuilderResult {
-
-  }
+  object LowPriorityToFieldBuilderResult {}
 
   object ToFieldBuilderResult extends LowPriorityToFieldBuilderResult {
     def apply[T: ToFieldBuilderResult](input: T): FieldBuilderResult =
@@ -37,7 +34,6 @@ trait FieldBuilderResultTypeClasses {
   }
 
 }
-
 
 trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
 
