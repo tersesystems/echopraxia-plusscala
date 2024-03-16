@@ -135,30 +135,6 @@ lazy val logger = (projectMatrix in file("logger"))
   .dependsOn(api % "compile->compile;test->compile")
   .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val logger2 = (projectMatrix in file("logger2"))
-  .settings(
-    name := "logger2",
-    scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
-    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _)) => Seq.empty
-        case other =>
-          Seq(
-           "eu.timepit"                 %% "refined"                  % refinedVersion        % Test
-          )
-      }
-    },
-    libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
-    libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
-    libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
-  )
-  .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
-
 lazy val asyncLogger = (projectMatrix in file("async"))
   .settings(
     name := "async-logger",
@@ -251,15 +227,14 @@ lazy val benchmarks = (projectMatrix in file("benchmarks"))
   .jvmPlatform(scalaVersions = scalaVersions)
 
 val refs = api.projectRefs ++
-           generic.projectRefs ++ 
-           logger.projectRefs ++ 
-           logger2.projectRefs ++
-           asyncLogger.projectRefs ++ 
-           nameOfLogger.projectRefs ++ 
-           diff.projectRefs ++ 
-            flowLogger.projectRefs ++ 
+           generic.projectRefs ++
+           logger.projectRefs ++
+           asyncLogger.projectRefs ++
+           nameOfLogger.projectRefs ++
+           diff.projectRefs ++
+            flowLogger.projectRefs ++
             traceLogger.projectRefs ++
-              benchmarks.projectRefs
+            benchmarks.projectRefs
 
 lazy val root = (projectMatrix in file("."))
   .settings(
