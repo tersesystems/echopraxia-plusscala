@@ -5,26 +5,24 @@ import com.tersesystems.echopraxia.api.Value
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
 import scala.reflect.{ClassTag, classTag}
-import com.tersesystems.echopraxia.plusscala.api.ToName
-import com.tersesystems.echopraxia.plusscala.api.ToValueAttribute
-import com.tersesystems.echopraxia.plusscala.api.ToStringFormat
+import com.tersesystems.echopraxia.plusscala.api._
 
 // Each package can add its own mappings
-trait Logging extends LoggingBase {
-
-  // Echopraxia takes a bit more work the more heterogeneous the input gets.
-  // For example, to pass through random tuples, you need to map it to an object
-  implicit def tupleToValue[TVK: ToValue, TVV: ToValue](implicit vak: ToValueAttribute[TVK], vav: ToValueAttribute[TVV]): ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
-    ToObjectValue("key" -> k, "value" -> v)
-  }
+trait Logging extends LoggingBase with IterableToArrayValueImplicit {
 
   // everyone wants different things out of maps, so implementing that
   // is up to the individual application
-  implicit def mapToValue[TVK: ToValue, TVV: ToValue](implicit vak: ToValueAttribute[TVK], vav: ToValueAttribute[TVV]): ToValue[Map[TVK, TVV]] = { v =>
+  implicit def mapToValue[TVK: ToValue: ToValueAttribute, TVV: ToValue: ToValueAttribute]: ToValue[Map[TVK, TVV]] = { v =>
     val value: Seq[Value.ObjectValue] = v.map { case (k, v) =>
       ToObjectValue("key" -> k, "value" -> v)
     }.toSeq
     ToArrayValue(value)
+  }
+
+  // Echopraxia takes a bit more work the more heterogeneous the input gets.
+  // For example, to pass through random tuples, you need to map it to an object
+  implicit def tupleToValue[TVK: ToValue: ToValueAttribute, TVV: ToValue: ToValueAttribute]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+    ToObjectValue("key" -> k, "value" -> v)
   }
 
   // use the class name as the name here

@@ -7,22 +7,6 @@ import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.SimpleFieldVisitor
 
-// Allows custom attributes on fields through implicits
-trait ToValueAttribute[-T] {
-  def toValue(v: T): Value[_]
-  def toAttributes(value: Value[_]): Attributes
-}
-
-trait LowPriorityToValueAttributeImplicits {
-  // default low priority implicit that gets applied if nothing is found
-  implicit def empty[TV]: ToValueAttribute[TV] = new ToValueAttribute[TV] {
-    override def toValue(v: TV): Value[_]                  = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
-  }
-}
-
-object ToValueAttribute extends LowPriorityToValueAttributeImplicits
-
 trait ToStringFormat[-T] extends ToValueAttribute[T] {
   override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
 }

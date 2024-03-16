@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
+import com.tersesystems.echopraxia.api.{Field, Value}
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 
 import scala.annotation.implicitNotFound
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
+import com.tersesystems.echopraxia.spi.EchopraxiaService
+import com.tersesystems.echopraxia.spi.FieldCreator
 
 trait ValueTypeClasses {
 
@@ -128,82 +127,4 @@ trait ValueTypeClasses {
 
     def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
   }
-}
-
-/**
- * This trait resolves options to either the value, or nullValue if `None`.
- */
-trait OptionValueTypes { self: ValueTypeClasses =>
-  implicit def optionToValue[V: ToValue]: ToValue[Option[V]] = {
-    case Some(v) => ToValue(v)
-    case None    => Value.nullValue()
-  }
-  implicit def someToValue[V: ToValue]: ToValue[Some[V]] = v => ToValue(v)
-  implicit val noneToValue: ToValue[None.type]           = _ => Value.nullValue()
-}
-
-/**
- * This trait resolves `Either` directly to the relevant value.
- */
-trait EitherValueTypes { self: ValueTypeClasses =>
-  implicit def eitherToValue[L: ToValue, R: ToValue]: ToValue[Either[L, R]] = {
-    case Left(left)   => ToValue(left)
-    case Right(right) => ToValue(right)
-  }
-  implicit def leftToValue[L: ToValue, R]: ToValue[Left[L, R]]   = v => ToValue(v.left.get)
-  implicit def rightToValue[L, R: ToValue]: ToValue[Right[L, R]] = v => ToValue(v.right.get)
-}
-
-trait FutureValueTypes { self: ValueTypeClasses =>
-  implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>
-    f.value match {
-      case Some(value) =>
-        value match {
-          case Failure(exception) => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("failure", ToValue(exception)))
-          case Success(value)     => ToObjectValue(Field.keyValue("completed", ToValue(true)), Field.keyValue("success", ToValue(value)))
-        }
-      case None =>
-        Value.`object`(Field.keyValue("completed", ToValue(false)))
-    }
-  }
-
-  // Don't define name, as this can be very different depending on the field name requirements (Elasticsearch in particular)
-}
-
-trait FieldBuilderResultTypeClasses {
-
-  // if using -T here then all the subtypes of iterable also apply
-  trait ToFieldBuilderResult[-T] {
-    def toResult(input: T): FieldBuilderResult
-  }
-
-  trait LowPriorityToFieldBuilderResult {
-    implicit def typeClassConversion[T: ToFieldBuilderResult](input: T): FieldBuilderResult =
-      ToFieldBuilderResult[T](input)
-
-    implicit val iterableToFieldBuilderResult: ToFieldBuilderResult[Iterable[Field]] =
-      iterable => FieldBuilderResult.list(iterable.toArray)
-
-    implicit val iteratorToFieldBuilderResult: ToFieldBuilderResult[Iterator[Field]] = iterator => {
-      import scala.jdk.CollectionConverters._
-      FieldBuilderResult.list(iterator.asJava)
-    }
-
-    // array doesn't seem to be covered by Iterable
-    implicit val arrayToFieldBuilderResult: ToFieldBuilderResult[Array[Field]] = FieldBuilderResult.list(_)
-  }
-
-  object ToFieldBuilderResult extends LowPriorityToFieldBuilderResult {
-    def apply[T: ToFieldBuilderResult](input: T): FieldBuilderResult =
-      implicitly[ToFieldBuilderResult[T]].toResult(input)
-  }
-
-}
-
-trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
-
-  def list(fields: Field*): FieldBuilderResult = list(fields)
-
-  def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
-
 }

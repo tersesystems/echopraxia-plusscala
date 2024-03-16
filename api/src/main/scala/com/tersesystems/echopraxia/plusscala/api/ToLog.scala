@@ -11,7 +11,7 @@ trait ToLogTypes { self: ValueTypeClasses =>
 
   object ToLog {
     def create[TF](name: String, valueFunction: TF => Value[_]): ToLog[TF] = new ToLog[TF] {
-      override val toName: ToName[TF]   = com.tersesystems.echopraxia.plusscala.api.ToName.create(name)
+      override val toName: ToName[TF]   = ToName.create(name)
       override val toValue: ToValue[TF] = t => valueFunction(t)
     }
   }
