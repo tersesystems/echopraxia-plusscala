@@ -7,7 +7,7 @@ import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.SimpleFieldVisitor
 
-trait ToStringFormat[-T] extends ToValueAttribute[T] {
+trait ToStringFormat[-T] extends ToValueAttributes[T] {
   override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
 }
 
@@ -20,7 +20,7 @@ object ToStringFormat {
   }
 }
 
-trait WithDisplayName[-T] extends ToValueAttribute[T] {
+trait WithDisplayName[-T] extends ToValueAttributes[T] {
   def displayName: String
   override def toAttributes(value: Value[_]): Attributes = Attributes.create(WithDisplayName(displayName))
 }
@@ -29,7 +29,7 @@ object WithDisplayName {
   def apply(name: String): Attribute[_] = PresentationHintAttributes.withDisplayName(name)
 }
 
-trait AbbreviateAfter[-T] extends ToValueAttribute[T] {
+trait AbbreviateAfter[-T] extends ToValueAttributes[T] {
   def after: Int
   override def toAttributes(value: Value[_]): Attributes = Attributes.create(AbbreviateAfter(after))
 }
@@ -38,7 +38,7 @@ object AbbreviateAfter {
   def apply(after: Int): Attribute[_] = PresentationHintAttributes.abbreviateAfter(after)
 }
 
-trait Elided[-T] extends ToValueAttribute[T] {
+trait Elided[-T] extends ToValueAttributes[T] {
   override def toAttributes(value: Value[_]): Attributes = Elided.attributes
 }
 
@@ -48,7 +48,7 @@ object Elided {
   def apply() = PresentationHintAttributes.asElided()
 }
 
-trait AsValueOnly[-T] extends ToValueAttribute[T] {
+trait AsValueOnly[-T] extends ToValueAttributes[T] {
   override def toAttributes(value: Value[_]): Attributes = AsValueOnly.attributes
 }
 
@@ -58,7 +58,7 @@ object AsValueOnly {
   def apply() = PresentationHintAttributes.asElided()
 }
 
-trait AsCardinal[-T] extends ToValueAttribute[T] {
+trait AsCardinal[-T] extends ToValueAttributes[T] {
   override def toAttributes(value: Value[_]): Attributes = AsCardinal.attributes
 }
 

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.spi
 
-import com.tersesystems.echopraxia.plusscala.api.ToValueAttribute
+import com.tersesystems.echopraxia.plusscala.api.ToValueAttributes
 
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.spi.FieldCreator
@@ -17,7 +17,7 @@ object Utils {
 
   private def defaultFieldCreator: FieldCreator[PresentationField] = PresentationFieldCreator
 
-  def newField[TV](name: String, value: Value[_])(implicit ev: ToValueAttribute[TV]): PresentationField =
+  def newField[TV](name: String, value: Value[_])(implicit ev: ToValueAttributes[TV]): PresentationField =
     defaultFieldCreator.create(name, value, ev.toAttributes(value))
 
   def newField(name: String, value: Value[_], attributes: Attributes): PresentationField = defaultFieldCreator.create(name, value, attributes)

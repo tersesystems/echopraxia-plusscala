@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.plusscala.api.{EitherValueTypes, OptionValueTypes, ValueTypeClasses, FutureValueTypes, ToLogTypes}
-
 /**
  * This is a trait that should be extended by domain logging traits.
  *
