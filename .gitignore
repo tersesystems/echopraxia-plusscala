@@ -17,3 +17,5 @@ target/
 *.log
 
 .uuid
+
+.scala-build/
