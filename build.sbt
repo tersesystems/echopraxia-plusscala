@@ -110,7 +110,7 @@ lazy val generic = (projectMatrix in file("generic"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api, logger % "test")
-  .jvmPlatform(scalaVersions = List(scala213, scala212)) // disable scala 3 for now
+  .jvmPlatform(scalaVersions = scalaVersions)
 
 lazy val logger = (projectMatrix in file("logger"))
   .settings(
