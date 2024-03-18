@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.spi
 
-import com.tersesystems.echopraxia.plusscala.api.ToValueAttributes
-
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.spi.FieldCreator
 import com.tersesystems.echopraxia.spi.EchopraxiaService
@@ -9,7 +7,14 @@ import com.tersesystems.echopraxia.api.PresentationField
 import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Attributes
 
+import com.tersesystems.echopraxia.api.AttributeKey
+
+import scala.reflect.runtime.{universe => ru}
+
 object Utils {
+
+  val TypeTagAttributeKey: AttributeKey[ru.TypeTag[_]] = AttributeKey.create[ru.TypeTag[_]]("TypeTagAttribute")
+
   @inline
   private def fieldCreator[F <: Field](clazz: Class[F]): FieldCreator[F] = EchopraxiaService.getInstance.getFieldCreator(clazz)
 
@@ -17,9 +22,12 @@ object Utils {
 
   private def defaultFieldCreator: FieldCreator[PresentationField] = PresentationFieldCreator
 
-  def newField[TV](name: String, value: Value[_])(implicit ev: ToValueAttributes[TV]): PresentationField =
-    defaultFieldCreator.create(name, value, ev.toAttributes(value))
+  def newField(name: String, value: Value[_], typeTag: ru.TypeTag[_]): PresentationField = {
+    newField(name, value, Attributes.create(TypeTagAttributeKey.bindValue(typeTag)))
+  }
 
-  def newField(name: String, value: Value[_], attributes: Attributes): PresentationField = defaultFieldCreator.create(name, value, attributes)
+  private def newField(name: String, value: Value[_], attributes: Attributes): PresentationField = {
+    defaultFieldCreator.create(name, value, attributes)
+  }
 
 }

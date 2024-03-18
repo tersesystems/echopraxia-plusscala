@@ -1,11 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.spi.{EchopraxiaService, FieldConstants, FieldCreator, PresentationHintAttributes}
+import com.tersesystems.echopraxia.spi.{EchopraxiaService, FieldConstants, PresentationHintAttributes}
+
+import scala.reflect.runtime.{universe => ru}
 
 import scala.collection.JavaConverters._
 
 import scala.reflect.{ClassTag, classTag}
+import com.tersesystems.echopraxia.plusscala.spi.Utils
 
 // This trait should be extended for domain model classes
 trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValueTypes {
@@ -63,24 +66,23 @@ trait LoggingBase extends ValueTypeClasses with OptionValueTypes with EitherValu
 
   // Convert a tuple into a field.  This does most of the heavy lifting.
   // i.e logger.info("foo" -> foo) becomes logger.info(Field.keyValue("foo", ToValue(foo)))
-  implicit def tupleToField[TV: ToValue](tuple: (String, TV))(implicit va: ToValueAttribute[TV]): Field = keyValue(tuple._1, tuple._2)
+  implicit def tupleToField[TV: ToValue: ru.TypeTag](tuple: (String, TV)): Field = keyValue(tuple._1, tuple._2)
 
   // Convert an object with implicit ToValue and ToName to a field.
   // i.e. logger.info(foo) becomes logger.info(Field.keyValue(ToName[Foo].toName, ToValue(foo)))
-  implicit def nameAndValueToField[TV: ToValue: ToName](value: TV)(implicit va: ToValueAttribute[TV]): Field =
+  implicit def nameAndValueToField[TV: ToValue: ToName: ru.TypeTag](value: TV): Field =
     keyValue(implicitly[ToName[TV]].toName(value), value)
 
   // All exceptions should use "exception" field constant by default
   implicit def throwableToName[T <: Throwable]: ToName[T] = ToName.create(FieldConstants.EXCEPTION)
 
   // Creates a field, this is private so it's not exposed to traits that extend this
-  private def keyValue[TV: ToValue](name: String, tv: TV)(implicit va: ToValueAttribute[TV]): Field = {
-    LoggingBase.fieldCreator.create(name, ToValue(tv), va.toAttributes(va.toValue(tv)))
+  private def keyValue[TV: ToValue: ru.TypeTag](name: String, tv: TV): Field = {
+    Utils.newField(name, ToValue(tv), ru.typeTag[TV])
   }
 }
 
 object LoggingBase {
-  val fieldCreator: FieldCreator[PresentationField] = EchopraxiaService.getInstance.getFieldCreator(classOf[PresentationField])
 
   def withAttributes(seq: Attribute[_]*): Attributes = {
     Attributes.create(seq.asJava)
