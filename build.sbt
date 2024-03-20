@@ -306,7 +306,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "8",
         "-Vimplicits",
         "-Vtype-diffs",
-        "P:splain:Vimplicits-diverging",
         "-Xsource:3-cross"
       )
     case Some((2, n)) if n == 12 =>
