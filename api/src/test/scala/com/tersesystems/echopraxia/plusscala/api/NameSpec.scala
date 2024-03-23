@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Attributes, Field, Value}
-import com.tersesystems.echopraxia.plusscala.api.Logging._
+import com.tersesystems.echopraxia.api.Field
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,8 +8,8 @@ import java.util.UUID
 
 class NameSpec extends AnyWordSpec with Matchers with Logging {
 
-  trait ToDerp[T] extends ToValueAttribute[T] {
-    override def toAttributes(value: Value[_]): Attributes = withAttributes(withDisplayName("derp"))
+  trait ToDerp[T] extends WithDisplayName[T] {
+    override val displayName = "derp"
   }
 
   "named fields" should {

@@ -1,35 +1,22 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Attributes, Field, Value}
-import com.tersesystems.echopraxia.plusscala.api.Logging._
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import scala.collection.JavaConverters._
 
 // The tests here compile in 2.13 but do not compile in 2.12
 class IterableSpec extends AnyWordSpec with Matchers with Logging {
 
-  implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
-
-  implicit def iterableValueFormat[TV: ToValueAttribute]: ToValueAttribute[Iterable[TV]] = new ToValueAttribute[Iterable[TV]]() {
-    override def toValue(seq: collection.Iterable[TV]): Value[_] = {
-      val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttribute[TV]].toValue(el)).toSeq
-      Value.array(list.asJava)
-    }
-
-    override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
-  }
-
   "iterable" should {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-
-    // Show a human readable toString
-    trait ToStringFormat[T] extends ToValueAttribute[T] {
-      override def toAttributes(value: Value[_]): Attributes = withAttributes(withStringFormat(value))
-    }
 
     // XXX check array depends on implicit
     // XXX check immutable iterable depends on implicit
