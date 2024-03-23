@@ -8,8 +8,6 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.UUID
 
-import Logging._
-
 class EitherSpec extends AnyWordSpec with Matchers with Logging {
 
   "either" should {
@@ -36,11 +34,6 @@ class EitherSpec extends AnyWordSpec with Matchers with Logging {
     "work with a custom attribute" in {
       implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString)
       implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-
-      // Show a human readable toString for instant
-      trait ToStringFormat[T] extends ToValueAttributes[T] {
-        override def toAttributes(value: Value[_]): Attributes = withAttributes(withStringFormat(value))
-      }
 
       implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
         val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
