@@ -8,9 +8,9 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.UUID
 
-import LoggingBase._
+import Logging._
 
-class EitherSpec extends AnyWordSpec with Matchers with LoggingBase {
+class EitherSpec extends AnyWordSpec with Matchers with Logging {
 
   // XXX Is there a way to make this work more easily?
   implicit def eitherToValueAttribute[TVL: ToValueAttribute, TVR: ToValueAttribute]: ToValueAttribute[Either[TVL, TVR]] =

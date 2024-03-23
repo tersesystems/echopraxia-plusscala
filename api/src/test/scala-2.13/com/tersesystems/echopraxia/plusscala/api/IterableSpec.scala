@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.{Attributes, Field, Value}
-import com.tersesystems.echopraxia.plusscala.api.LoggingBase._
+import com.tersesystems.echopraxia.plusscala.api.Logging._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -10,7 +10,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.collection.JavaConverters._
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class IterableSpec extends AnyWordSpec with Matchers with LoggingBase {
+class IterableSpec extends AnyWordSpec with Matchers with Logging {
 
   implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
 

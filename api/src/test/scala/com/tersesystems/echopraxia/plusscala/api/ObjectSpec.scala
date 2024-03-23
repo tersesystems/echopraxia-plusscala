@@ -8,7 +8,7 @@ import com.tersesystems.echopraxia.api.Value
 
 import scala.collection.JavaConverters._
 
-class ObjectSpec extends AnyFunSpec with Matchers with LoggingBase {
+class ObjectSpec extends AnyFunSpec with Matchers with Logging {
 
   describe("object") {
 
