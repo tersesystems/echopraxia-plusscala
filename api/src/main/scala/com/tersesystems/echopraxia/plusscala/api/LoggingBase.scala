@@ -38,3 +38,4 @@ trait LoggingBase
     with FutureValueTypes
     with ToLogTypes
     with ThrowableToName
+    with IterableToArrayValueImplicit

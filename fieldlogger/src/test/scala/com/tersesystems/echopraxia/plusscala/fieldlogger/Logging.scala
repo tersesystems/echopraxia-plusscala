@@ -8,16 +8,7 @@ import scala.reflect.{ClassTag, classTag}
 import com.tersesystems.echopraxia.plusscala.api._
 
 // Each package can add its own mappings
-trait Logging extends LoggingBase with IterableToArrayValueImplicit {
-
-  // everyone wants different things out of maps, so implementing that
-  // is up to the individual application
-  implicit def mapToValue[TVK: ToValue: ToValueAttributes, TVV: ToValue: ToValueAttributes]: ToValue[Map[TVK, TVV]] = { v =>
-    val value: Seq[Value.ObjectValue] = v.map { case (k, v) =>
-      ToObjectValue("key" -> k, "value" -> v)
-    }.toSeq
-    ToArrayValue(value)
-  }
+trait Logging extends LoggingBase {
 
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object
