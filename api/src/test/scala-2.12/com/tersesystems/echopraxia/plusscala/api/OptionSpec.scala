@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.{Attributes, Field, Value}
-import com.tersesystems.echopraxia.plusscala.api.LoggingBase._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,24 +8,8 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
+class OptionSpec extends AnyWordSpec with Matchers with Logging {
   implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-
-  implicit def optionValueFormat[TV: ToValueAttribute]: ToValueAttribute[Option[TV]] = new ToValueAttribute[Option[TV]] {
-    override def toValue(v: Option[TV]): Value[_] = v match {
-      case Some(tv) =>
-        val ev = implicitly[ToValueAttribute[TV]]
-        ev.toValue(tv)
-      case None => Value.nullValue()
-    }
-
-    override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttribute[TV]].toAttributes(value)
-  }
-
-  // Show a human readable toString
-  trait ToStringFormat[T] extends ToValueAttribute[T] {
-    override def toAttributes(value: Value[_]): Attributes = withAttributes(withStringFormat(value))
-  }
 
   "option" should {
 

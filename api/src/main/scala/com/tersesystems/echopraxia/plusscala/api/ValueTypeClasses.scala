@@ -4,8 +4,6 @@ import com.tersesystems.echopraxia.api.{Field, Value}
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 
 import scala.annotation.implicitNotFound
-import com.tersesystems.echopraxia.spi.EchopraxiaService
-import com.tersesystems.echopraxia.spi.FieldCreator
 
 trait ValueTypeClasses {
 
