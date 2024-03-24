@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.api.Attributes
 
 /**
  * This trait resolves options to either the value, or nullValue if `None`.

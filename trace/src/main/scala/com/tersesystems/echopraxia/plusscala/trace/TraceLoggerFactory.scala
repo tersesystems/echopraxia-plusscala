@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
+import com.tersesystems.echopraxia.spi.Caller
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory
 
 object TraceLoggerFactory {
   val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName

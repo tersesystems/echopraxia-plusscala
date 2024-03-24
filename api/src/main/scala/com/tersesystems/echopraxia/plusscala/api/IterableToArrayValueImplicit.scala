@@ -10,7 +10,6 @@ package com.tersesystems.echopraxia.plusscala.api
  * {{{
  * logger.info("foo" -> Seq[Field](foo, bar)) // "foo": [foo, bar]
  * }}}
- *
  */
 trait IterableToArrayValueImplicit { self: ValueTypeClasses =>
   // Render iterables as arrays (user may want to render as object, so this is broken out)

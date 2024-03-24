@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.spi
 
+import com.tersesystems.echopraxia.api.Attributes
 import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.spi.FieldCreator
-import com.tersesystems.echopraxia.spi.EchopraxiaService
 import com.tersesystems.echopraxia.api.PresentationField
 import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.api.Attributes
+import com.tersesystems.echopraxia.spi.EchopraxiaService
+import com.tersesystems.echopraxia.spi.FieldCreator
 
 object Utils {
   @inline

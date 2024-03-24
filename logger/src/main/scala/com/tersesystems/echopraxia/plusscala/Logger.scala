@@ -1,9 +1,11 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.spi.{CoreLogger, Utilities}
 import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport}
+import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
+import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
+import com.tersesystems.echopraxia.spi.CoreLogger
+import com.tersesystems.echopraxia.spi.Utilities
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 

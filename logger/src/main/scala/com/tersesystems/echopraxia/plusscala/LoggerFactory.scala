@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
 import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
+import com.tersesystems.echopraxia.spi.Caller
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory
 
 /**
  * LoggerFactory for a logger with source code enabled.

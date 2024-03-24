@@ -1,16 +1,16 @@
 package com.tersesystems.echopraxia.plusscala.fieldlogger
 
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.FieldBuilderResult.list
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult}
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.Level._
 import com.tersesystems.echopraxia.plusscala.api._
 import com.tersesystems.echopraxia.spi.CoreLogger
-
-import scala.collection.JavaConverters.seqAsJavaListConverter
-
 import sourcecode._
-import com.tersesystems.echopraxia.api.Value
+
 import java.util.Collections
+import scala.collection.JavaConverters.seqAsJavaListConverter
 
 /**
  * This logger does not expose a field builder and instead relies on a complimentary trait to implicitly convert arguments into Fields.

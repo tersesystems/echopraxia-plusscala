@@ -1,14 +1,16 @@
 package com.tersesystems.echopraxia.plusscala.nameof
 
 import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.spi.{CoreLogger, Utilities}
-import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
+import com.tersesystems.echopraxia.spi.CoreLogger
+import com.tersesystems.echopraxia.spi.Utilities
 
 import scala.annotation.tailrec
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
-import scala.reflect.macros.blackbox
 import scala.language.experimental.macros
+import scala.reflect.macros.blackbox
 
 /**
  * This class dumps a variable or field that has a `fieldBuilder.ToValue[A]` type class with it, using the name of the field.
@@ -81,35 +83,35 @@ object NameOfLogger {
       q"(): Unit"
     }
 
-    def error[A: c.WeakTypeTag](expr: c.Tree) = {
+    def error[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.ERROR"
 
       handle(tpeA, level, expr)
     }
 
-    def warn[A: c.WeakTypeTag](expr: c.Tree) = {
+    def warn[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.WARN"
 
       handle(tpeA, level, expr)
     }
 
-    def info[A: c.WeakTypeTag](expr: c.Tree) = {
+    def info[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.INFO"
 
       handle(tpeA, level, expr)
     }
 
-    def debug[A: c.WeakTypeTag](expr: c.Tree) = {
+    def debug[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.DEBUG"
 
       handle(tpeA, level, expr)
     }
 
-    def trace[A: c.WeakTypeTag](expr: c.Tree) = {
+    def trace[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
       val level: Select = q"com.tersesystems.echopraxia.api.Level.TRACE"
 

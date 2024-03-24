@@ -73,7 +73,7 @@ class TraceLoggerBenchmarks {
 object TraceLoggerBenchmarks {
   private val logger = TraceLoggerFactory.getLogger
 
-  private val condition: Condition = (_, ctx) => false
+  private val condition: Condition = (_, _) => false
 
   private val fieldsCondition: Condition = (_, ctx) => ctx.findString("$.sourcecode.file").exists(s => s.endsWith("TraceLoggerBenchmarks.scala"))
 

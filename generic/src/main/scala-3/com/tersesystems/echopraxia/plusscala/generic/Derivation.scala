@@ -1,13 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.generic
 
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.plusscala.api.*
 import magnolia1.*
 import magnolia1.CaseClass.Param
 
 import scala.deriving.Mirror
-
-import com.tersesystems.echopraxia.plusscala.api._
-import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.api.Field
 
 /**
  * This trait uses Magnolia to provide generic type class derivation for case classes and sealed traits. Note that you need to include the
@@ -46,10 +45,10 @@ trait AutoDerivation { self: ValueTypeClasses =>
       new ToValue[T] {
         def toValue(value: T): Value[_] = {
           def parameterStrategy(parameter: Param[ToValue, T]) = {
-              // What if there's a ToName defined on this guy?
-              // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
-              // How does play-json manage its configuration with snake_case vs camel case?
-              Field.keyValue(parameter.label, parameter.typeclass.toValue(parameter.deref(value)))
+            // What if there's a ToName defined on this guy?
+            // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
+            // How does play-json manage its configuration with snake_case vs camel case?
+            Field.keyValue(parameter.label, parameter.typeclass.toValue(parameter.deref(value)))
           }
           val serializedParams = caseClass.parameters.map(parameterStrategy)
           ToObjectValue(serializedParams.toSeq)
@@ -60,7 +59,7 @@ trait AutoDerivation { self: ValueTypeClasses =>
     override def split[T](sealedTrait: SealedTrait[ToValue, T]): ToValue[T] =
       new ToValue[T] {
         def toValue(value: T): Value[_] =
-          sealedTrait.choose(value){ subtype =>
+          sealedTrait.choose(value) { subtype =>
             subtype.typeclass.toValue(subtype.cast(value))
           }
       }
@@ -68,7 +67,6 @@ trait AutoDerivation { self: ValueTypeClasses =>
 
   inline given gen[A](using Mirror.Of[A]): ToValue[A] = ToValueAutoDerivation.autoDerived
 }
-
 
 /**
  * Semi automatic derivation.
@@ -81,10 +79,10 @@ trait SemiAutoDerivation { self: ValueTypeClasses =>
       new ToValue[T] {
         def toValue(value: T): Value[_] = {
           def parameterStrategy(parameter: Param[ToValue, T]) = {
-              // What if there's a ToName defined on this guy?
-              // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
-              // How does play-json manage its configuration with snake_case vs camel case?
-              Field.keyValue(parameter.label, parameter.typeclass.toValue(parameter.deref(value)))
+            // What if there's a ToName defined on this guy?
+            // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
+            // How does play-json manage its configuration with snake_case vs camel case?
+            Field.keyValue(parameter.label, parameter.typeclass.toValue(parameter.deref(value)))
           }
           val serializedParams = caseClass.parameters.map(parameterStrategy)
           ToObjectValue(serializedParams.toSeq)
@@ -95,7 +93,7 @@ trait SemiAutoDerivation { self: ValueTypeClasses =>
     override def split[T](sealedTrait: SealedTrait[ToValue, T]): ToValue[T] =
       new ToValue[T] {
         def toValue(value: T): Value[_] =
-          sealedTrait.choose(value){ subtype =>
+          sealedTrait.choose(value) { subtype =>
             subtype.typeclass.toValue(subtype.cast(value))
           }
       }

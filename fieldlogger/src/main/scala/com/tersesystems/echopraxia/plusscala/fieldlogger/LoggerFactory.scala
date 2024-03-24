@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.fieldlogger
 
-import com.tersesystems.echopraxia.spi.{CoreLogger, CoreLoggerFactory}
+import com.tersesystems.echopraxia.spi.CoreLogger
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory
 
 object LoggerFactory {
   private val FQCN = classOf[Logger].getName

@@ -1,8 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.api.Attributes
-
 /**
  * This trait resolves `Either` directly to the relevant value.
  */
