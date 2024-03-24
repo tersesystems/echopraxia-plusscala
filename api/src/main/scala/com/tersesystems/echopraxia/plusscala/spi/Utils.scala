@@ -17,4 +17,8 @@ object Utils {
 
   def newField(name: String, value: Value[_], attributes: Attributes): PresentationField = defaultFieldCreator.create(name, value, attributes)
 
+  def newField[F <: Field](name: String, value: Value[_], attributes: Attributes, fieldClass: Class[_ <: F]): F = {
+    fieldCreator(fieldClass).create(name, value, attributes)
+  }
+
 }
