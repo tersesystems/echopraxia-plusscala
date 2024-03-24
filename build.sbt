@@ -13,7 +13,7 @@ val zjsonPatchVersion            = "0.4.16"
 val sourceCodeVersion            = "0.3.1"
 val scalaCollectionCompatVersion = "2.11.0"
 
-val scala3                       = "3.3.3"
+val scala3                       = "3.4.0"
 val scala213                     = "2.13.13"
 val scala212                     = "2.12.19"
 
@@ -42,7 +42,9 @@ inThisBuild(
         Dimension.scala("2.13", fullFor3 = true),
         Dimension.platform()
       )
-    )
+    ),
+    semanticdbEnabled := true, // enable SemanticDB
+    semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
 )
 
@@ -79,6 +81,9 @@ lazy val api = (projectMatrix in file("api"))
         case other => Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value)
       }
     },
+    //
+    semanticdbEnabled := true, // enable SemanticDB
+    //
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % scalaJavaVersion,
     libraryDependencies ++= compatLibraries(scalaVersion.value),
@@ -284,6 +289,7 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-language:higherKinds",
         "-language:existentials",
         "-language:postfixOps",
+        "-Wunused:all",
         "-release",
         "8",
         "-explain"
@@ -302,6 +308,7 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Xlint",
         "-Ywarn-dead-code",
         "-Yrangepos",
+        "-Wunused",
         "-release",
         "8",
         "-Vimplicits",
@@ -323,8 +330,9 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Ywarn-dead-code",
         "-Yrangepos",
         "-Yno-adapted-args",
+        "-Ywarn-unused-import", // Scala 2.x only, required by `RemoveUnused`
         "-release",
-        "8"
+        "8",
       )
   }
 }

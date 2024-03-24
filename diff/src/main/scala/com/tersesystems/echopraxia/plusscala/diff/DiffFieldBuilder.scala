@@ -1,8 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.diff
 
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.flipkart.zjsonpatch.JsonDiff
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 
 /**

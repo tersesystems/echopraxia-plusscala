@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Condition => JCondition, Level => JLevel}
+import com.tersesystems.echopraxia.api.{Condition => JCondition}
+import com.tersesystems.echopraxia.api.{Level => JLevel}
 import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
 
 trait Condition {
@@ -78,11 +79,11 @@ object Condition {
     override def asJava: JCondition = JCondition.never()
   }
 
-  val diagnostic: Condition = (level: Level, context: LoggingContext) => level.isLessOrEqual(Level.DEBUG)
+  val diagnostic: Condition = (level: Level, _: LoggingContext) => level.isLessOrEqual(Level.DEBUG)
 
-  val operational: Condition = (level: Level, context: LoggingContext) => level.isGreaterOrEqual(Level.INFO)
+  val operational: Condition = (level: Level, _: LoggingContext) => level.isGreaterOrEqual(Level.INFO)
 
-  def exactly(exactLevel: Level): Condition = (level: Level, context: LoggingContext) => level.isEqual(exactLevel)
+  def exactly(exactLevel: Level): Condition = (level: Level, _: LoggingContext) => level.isEqual(exactLevel)
 
   def apply(f: (Level, LoggingContext) => Boolean): Condition = new Condition {
     override def test(level: Level, context: LoggingContext): Boolean = f(level, context)

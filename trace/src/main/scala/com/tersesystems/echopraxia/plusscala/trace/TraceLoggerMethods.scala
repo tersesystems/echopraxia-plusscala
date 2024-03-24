@@ -2,7 +2,10 @@ package com.tersesystems.echopraxia.plusscala.trace
 
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import sourcecode.{Args, Enclosing, File, Line}
+import sourcecode.Args
+import sourcecode.Enclosing
+import sourcecode.File
+import sourcecode.Line
 
 trait TraceLoggerMethods[FB <: TraceFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 

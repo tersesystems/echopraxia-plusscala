@@ -1,8 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Value}
-import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, ListToFieldBuilderResultMethods, ValueTypeClasses}
-import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.{TraceArgumentValues, TraceSignature, string}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.FieldBuilderResult
+import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.ListToFieldBuilderResultMethods
+import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
+import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
+import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceSignature
+import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.string
 import sourcecode._
 
 trait TraceFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
@@ -67,7 +73,7 @@ trait SourceFields {
 }
 
 class DefaultSourceFields(line: Line, file: File, enc: Enclosing, args: Args) extends SourceFields {
-  def signature = s"${enc.value}(${args.value.map(argumentTypes).mkString(",")})"
+  def signature: String = s"${enc.value}(${args.value.map(argumentTypes).mkString(",")})"
 
   def entryArguments(list: Seq[Text[_]]): String = {
     list.map(_.value).mkString(",")

@@ -1,10 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import scala.util.Failure
-import scala.util.Success
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.Value
+
 import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 trait FutureValueTypes { self: ValueTypeClasses =>
   implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>

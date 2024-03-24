@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 
 import scala.annotation.implicitNotFound

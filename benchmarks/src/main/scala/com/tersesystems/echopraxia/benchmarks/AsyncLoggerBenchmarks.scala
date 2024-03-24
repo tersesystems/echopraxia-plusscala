@@ -4,7 +4,8 @@ import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
 import org.openjdk.jmh.annotations._
 
-import java.util.concurrent.{Executor, TimeUnit}
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

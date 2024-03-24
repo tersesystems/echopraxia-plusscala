@@ -1,11 +1,13 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Attributes
-import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Attribute
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+import com.tersesystems.echopraxia.api.Attributes
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.SimpleFieldVisitor
+import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+
+import java.lang
 
 trait ToStringFormat[-T] extends ToValueAttributes[T] {
   override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
@@ -43,9 +45,9 @@ trait Elided[-T] extends ToValueAttributes[T] {
 }
 
 object Elided {
-  val attributes = Attributes.create(apply())
+  val attributes: Attributes = Attributes.create(apply())
 
-  def apply() = PresentationHintAttributes.asElided()
+  def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
 }
 
 trait AsValueOnly[-T] extends ToValueAttributes[T] {
@@ -53,9 +55,9 @@ trait AsValueOnly[-T] extends ToValueAttributes[T] {
 }
 
 object AsValueOnly {
-  val attributes = Attributes.create(apply())
+  val attributes: Attributes = Attributes.create(apply())
 
-  def apply() = PresentationHintAttributes.asElided()
+  def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
 }
 
 trait AsCardinal[-T] extends ToValueAttributes[T] {
@@ -63,7 +65,7 @@ trait AsCardinal[-T] extends ToValueAttributes[T] {
 }
 
 object AsCardinal {
-  val attributes = Attributes.create(apply())
+  val attributes: Attributes = Attributes.create(apply())
 
-  def apply() = PresentationHintAttributes.asCardinal()
+  def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asCardinal()
 }

@@ -43,13 +43,13 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     implicit lazy val orderToValue: ToValue[Order]               = gen[Order]
 
     implicit lazy val someObjectToValue: ToValue[SomeObject.type] = gen[SomeObject.type]
-    //implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
+    // implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
   }
   object SemiAutoFieldBuilder extends SemiAutoFieldBuilder
 
-  //trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
+  // trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
 
-  //trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
+  // trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
 
   trait ShortEither extends FieldBuilder with AutoDerivation with EitherValueTypes
 

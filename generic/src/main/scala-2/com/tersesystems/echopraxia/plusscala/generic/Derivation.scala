@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.generic
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import magnolia1._
 

@@ -1,12 +1,16 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.{FieldBuilderResult, LoggerHandle, Level => JLevel}
+import com.tersesystems.echopraxia.api.FieldBuilderResult
+import com.tersesystems.echopraxia.api.LoggerHandle
+import com.tersesystems.echopraxia.api.{Level => JLevel}
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
 
 import java.util.function.Function
 import scala.compat.java8.FunctionConverters._
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 trait DefaultFlowLoggerMethods[FB <: FlowFieldBuilder] extends DefaultMethodsSupport[FB] with FlowLoggerMethods[FB] {
 
