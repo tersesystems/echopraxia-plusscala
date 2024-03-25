@@ -1,9 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.api
 
+import com.tersesystems.echopraxia.api.Value
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.math.BigInteger
+import java.time.format.{DateTimeFormatter, FormatStyle}
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
@@ -110,7 +113,23 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       val bool = java.lang.Boolean.TRUE
       fb.keyValue("bool", bool)
     }
+    
+    it("should work with a value attribute") {
+      val fb = FieldBuilder
+      val epoch = Instant.EPOCH
+
+      fb.keyValue("instant", epoch) must be("derp=foo")
+    }
 
   }
 
+  trait MyFieldBuilder extends FieldBuilder {
+    implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
+    implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+      val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+      val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+      Value.string(formatter.format(datetime))
+    }
+  }
+  object MyFieldBuilder extends MyFieldBuilder
 }
