@@ -115,10 +115,10 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     }
     
     it("should work with a value attribute") {
-      val fb = FieldBuilder
+      val fb = MyFieldBuilder
       val epoch = Instant.EPOCH
 
-      fb.keyValue("instant", epoch) must be("derp=foo")
+      fb.keyValue("instant", epoch).toString must be("instant=1970-01-01T00:00:00Z")
     }
 
   }
