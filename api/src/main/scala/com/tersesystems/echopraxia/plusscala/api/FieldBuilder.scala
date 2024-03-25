@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.spi.FieldConstants
+import com.tersesystems.echopraxia.spi.{FieldConstants, PresentationHintAttributes}
+import com.tersesystems.echopraxia.plusscala.spi.Utils
 
 trait HasName {
   type Name
@@ -14,15 +15,15 @@ trait HasFieldClass {
 }
 
 trait TupleFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods with HasName with HasFieldClass {
-  def keyValue[V: ToValue](tuple: (Name, V)): FieldType
+  def keyValue[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType
 
-  def value[V: ToValue](tuple: (Name, V)): FieldType
+  def value[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType
 
   def exception(tuple: (Name, Throwable)): FieldType = keyValue(tuple)
 
-  def array[AV: ToArrayValue](tuple: (Name, AV)): FieldType = keyValue(tuple)
+  def array[AV: ToArrayValue: ToValueAttributes](tuple: (Name, AV)): FieldType = keyValue(tuple)
 
-  def obj[OV: ToObjectValue](tuple: (Name, OV)): FieldType = keyValue(tuple)
+  def obj[OV: ToObjectValue: ToValueAttributes](tuple: (Name, OV)): FieldType = keyValue(tuple)
 }
 
 trait PrimitiveTupleFieldBuilder extends TupleFieldBuilder {
@@ -41,12 +42,12 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // keyValue
 
-  def keyValue[V: ToValue](key: Name, value: V): FieldType
+  def keyValue[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType
 
   // ------------------------------------------------------------------
   // value
 
-  def value[V: ToValue](key: Name, value: V): FieldType
+  def value[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType
 
   // ------------------------------------------------------------------
   // null
@@ -63,13 +64,13 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // array
 
-  def array[AV: ToArrayValue](name: Name, value: AV): FieldType =
+  def array[AV: ToArrayValue: ToValueAttributes](name: Name, value: AV): FieldType =
     keyValue(name, ToArrayValue[AV](value))
 
   // ------------------------------------------------------------------
   // object
 
-  def obj[OV: ToObjectValue](name: Name, value: OV): FieldType =
+  def obj[OV: ToObjectValue: ToValueAttributes](name: Name, value: OV): FieldType =
     keyValue(name, ToObjectValue[OV](value))
 
 }
@@ -95,17 +96,33 @@ trait PrimitiveArgsFieldBuilder extends ArgsFieldBuilder {
 trait StringNameArgsFieldBuilder extends ArgsFieldBuilder with HasName {
   override type Name = String
 
-  override def keyValue[V: ToValue](key: Name, value: V): FieldType = Field.keyValue(key, ToValue(value), fieldClass)
+  override def keyValue[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType = {
+    val ev = implicitly[ToValueAttributes[V]]
+    val attributes = ev.toAttributes(ev.toValue(value))
+    Utils.newField(key, ToValue(value), attributes, fieldClass)
+  }
 
-  override def value[V: ToValue](key: Name, value: V): FieldType = Field.value(key, ToValue(value), fieldClass)
+  override def value[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType =  {
+    val ev = implicitly[ToValueAttributes[V]]
+    val attributes = ev.toAttributes(ev.toValue(value)).plus(PresentationHintAttributes.asValueOnly())
+    Utils.newField(key, ToValue(value), attributes, fieldClass)
+  }
 }
 
 trait StringNameTupleFieldBuilder extends TupleFieldBuilder {
   override type Name = String
 
-  override def keyValue[V: ToValue](tuple: (Name, V)): FieldType = Field.keyValue(tuple._1, ToValue(tuple._2), fieldClass)
+  override def keyValue[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType = {
+    val ev = implicitly[ToValueAttributes[V]]
+    val attributes = ev.toAttributes(ev.toValue(tuple._2))
+    Utils.newField(tuple._1, ToValue(tuple._2), attributes, fieldClass)
+  }
 
-  override def value[V: ToValue](tuple: (Name, V)): FieldType = Field.value(tuple._1, ToValue(tuple._2), fieldClass)
+  override def value[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType = {
+    val ev = implicitly[ToValueAttributes[V]]
+    val attributes = ev.toAttributes(ev.toValue(tuple._2)).plus(PresentationHintAttributes.asValueOnly())
+    Utils.newField(tuple._1, ToValue(tuple._2), attributes, fieldClass)
+  }
 
 }
 

@@ -1,8 +1,9 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.{Field, Level}
-import com.tersesystems.echopraxia.spi.{CoreLoggerFactory, DefaultField}
+import com.tersesystems.echopraxia.spi.{CoreLoggerFactory, DefaultField, PresentationHintAttributes}
 import com.tersesystems.echopraxia.plusscala.api._
+import com.tersesystems.echopraxia.plusscala.spi.Utils
 import enumeratum.EnumEntry._
 import enumeratum._
 
@@ -47,12 +48,20 @@ object Main {
     type Id[A] = A
     implicit def narrow[T <: Singleton](t: T): Id[T] = t
 
-    def keyValue[V: ToValue](key: Name, value: V): DefaultField = Field.keyValue(key.entryName, ToValue(value), fieldClass)
+    override def keyValue[V: ToValue: ToValueAttributes](key: Name, value: V) = {
+      val ev = implicitly[ToValueAttributes[V]]
+      val attributes = ev.toAttributes(ev.toValue(value))
+      Utils.newField(key.entryName, ToValue(value), attributes, fieldClass)
+    }
 
     // ------------------------------------------------------------------
     // value
 
-    def value[V: ToValue](key: Name, value: V): DefaultField = Field.value(key.entryName, ToValue(value), fieldClass)
+    override def value[V: ToValue: ToValueAttributes](key: Name, value: V) = {
+      val ev = implicitly[ToValueAttributes[V]]
+      val attributes = ev.toAttributes(ev.toValue(value)).plus(PresentationHintAttributes.asValueOnly())
+      Utils.newField(key.entryName, ToValue(value), attributes, fieldClass)
+    }
 
     implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {
       ToObjectValue(
