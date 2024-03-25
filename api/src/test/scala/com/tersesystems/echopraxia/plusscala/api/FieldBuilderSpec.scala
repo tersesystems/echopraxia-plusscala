@@ -113,17 +113,28 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       val bool = java.lang.Boolean.TRUE
       fb.keyValue("bool", bool)
     }
-    
+
     it("should work with a value attribute") {
       val fb = MyFieldBuilder
       val epoch = Instant.EPOCH
 
-      fb.keyValue("instant", epoch).toString must be("instant=1970-01-01T00:00:00Z")
+      import fb.readableInstant // if it's not a dependent trait, you have to import it specifically :-/
+
+      fb.keyValue("instant", epoch).toString must be("instant=1/1/70, 12:00 AM")
+    }
+
+    it("should work with array of value attribute") {
+      val fb = MyFieldBuilder
+      val epoch = Instant.EPOCH
+
+      import fb.readableInstant // if it's not a dependent trait, you have to import it specifically :-/
+
+      fb.array("instants", Seq(epoch)).toString must be("[instants=1/1/70, 12:00 AM]")
     }
 
   }
 
-  trait MyFieldBuilder extends FieldBuilder {
+  trait MyFieldBuilder extends PresentationFieldBuilder {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
     implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
       val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
