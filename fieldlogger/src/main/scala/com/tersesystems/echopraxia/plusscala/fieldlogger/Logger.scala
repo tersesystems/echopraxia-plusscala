@@ -4,7 +4,7 @@ import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.FieldBuilderResult.list
 import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.plusscala.api.Level._
+import com.tersesystems.echopraxia.api.Level
 import com.tersesystems.echopraxia.plusscala.api._
 import com.tersesystems.echopraxia.spi.CoreLogger
 import sourcecode._
@@ -26,6 +26,11 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
  * @param core
  */
 class Logger(val core: CoreLogger) {
+  private val traceMethod = new LoggerMethodWithLevel(Level.TRACE, core)
+  private val debugMethod = new LoggerMethodWithLevel(Level.DEBUG, core)
+  private val infoMethod = new LoggerMethodWithLevel(Level.INFO, core)
+  private val warnMethod = new LoggerMethodWithLevel(Level.WARN, core)
+  private val errorMethod = new LoggerMethodWithLevel(Level.ERROR, core)
 
   def name: String = core.getName()
 
@@ -35,60 +40,65 @@ class Logger(val core: CoreLogger) {
 
   def withCondition(condition: Condition): Logger = new Logger(core.withCondition(condition.asJava))
 
-  abstract class LoggerMethod(level: Level) {
-    def enabled: Boolean = core.isEnabled(level.asJava)
+  def isTraceEnabled = core.isEnabled(Level.TRACE)
+  def trace: LoggerMethod = if (core.isEnabled(Level.TRACE)) traceMethod else LoggerMethod.NoOp
 
-    def apply(message: String)(implicit line: Line, file: File, enclosing: Enclosing): Unit               = handle(level, message)
-    def apply(message: String, f1: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit = handle(level, message, f1)
-    def apply(message: String, f1: => Field, f2: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-      handle(level, message, f1 ++ f2)
-    def apply(message: String, f1: => Field, f2: => Field, f3: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-      handle(level, message, f1 ++ f2 ++ f3)
-    def apply(message: String, f1: => Field, f2: => Field, f3: => Field, f4: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-      handle(level, message, f1 ++ f2 ++ f3 ++ f4)
+  def isDebugEnabled = core.isEnabled(Level.DEBUG)
+  def debug: LoggerMethod = if (core.isEnabled(Level.DEBUG)) debugMethod else LoggerMethod.NoOp
 
-    def apply()(implicit line: Line, file: File, enclosing: Enclosing): Unit                                         = apply("")
-    def apply(f1: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit                             = apply("{}", f1)
-    def apply(f1: => Field, f2: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit               = apply("{} {}", f1, f2)
-    def apply(f1: => Field, f2: => Field, f3: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit = apply("{} {} {}", f1, f2, f3)
-    def apply(f1: => Field, f2: => Field, f3: => Field, f4: => Field)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-      apply("{} {} {} {}", f1, f2, f3, f4)
+  def isInfoEnabled = core.isEnabled(Level.INFO)
+  def info: LoggerMethod = if (core.isEnabled(Level.INFO)) infoMethod else LoggerMethod.NoOp
 
-    // variadic params don't take call by name  :-(
-    def v(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-      handle(level, ("{} " * fields.size).trim, list(fields.toArray))
+  def isWarnEnabled = core.isEnabled(Level.WARN)
+  def warn: LoggerMethod = if (core.isEnabled(Level.WARN)) warnMethod else LoggerMethod.NoOp
 
-    private def handle(level: Level, message: String)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-      handle(level, message, FieldBuilderResult.empty())
-    }
+  def isErrorEnabled = core.isEnabled(Level.ERROR)
+  def error: LoggerMethod = if (core.isEnabled(Level.ERROR)) errorMethod else LoggerMethod.NoOp
+}
 
-    private def handle(level: Level, message: String, f: => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-      import scala.compat.java8.FunctionConverters._
+trait LoggerMethod {
+  // Don't use call by name here, as we've already determined we are logging if it makes it past
+  // the log level check to access the method.  This also means we don't have to deal with type erasure if
+  // we want to do anything fancy.
+  //
+  // There is also no point in having special (field1, field2) methods here as we would have to create
+  // extra objects to concatenate them in any case.
 
-      val f1: PresentationFieldBuilder => FieldBuilderResult = _ => f
-      core.log(level.asJava, () => Collections.singletonList(sourceCodeField), message, f1.asJava, PresentationFieldBuilder)
-    }
+  def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
-    private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): Field = {
-      Field
-        .keyValue(
-          "sourcecode",
-          Value.`object`(
-            Field.keyValue("file", Value.string(file.value)),
-            Field.keyValue("line", Value.number(line.value: java.lang.Integer)),
-            Field.keyValue("enclosing", Value.string(enc.value))
-          )
-        )
-    }
+  def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
+}
+
+object LoggerMethod {
+  val NoOp = new LoggerMethod {
+    override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
+    override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
+  }
+}
+
+class LoggerMethodWithLevel(level: Level, core: CoreLogger) extends LoggerMethod {
+  override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
+    apply(("{} " * fields.size).trim, fields: _*)
+
+  override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
+    handle(level, message, list(fields.toArray))
+
+  private def handle(level: Level, message: String, f: => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
+    import scala.compat.java8.FunctionConverters._
+
+    val f1: PresentationFieldBuilder => FieldBuilderResult = _ => f
+    core.log(level, () => Collections.singletonList(sourceCodeField), message, f1.asJava, PresentationFieldBuilder)
   }
 
-  object info extends LoggerMethod(INFO)
-
-  object debug extends LoggerMethod(DEBUG)
-
-  object trace extends LoggerMethod(TRACE)
-
-  object warn extends LoggerMethod(WARN)
-
-  object error extends LoggerMethod(ERROR)
+  private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): Field = {
+    Field
+      .keyValue(
+        "sourcecode",
+        Value.`object`(
+          Field.keyValue("file", Value.string(file.value)),
+          Field.keyValue("line", Value.number(line.value: java.lang.Integer)),
+          Field.keyValue("enclosing", Value.string(enc.value))
+        )
+      )
+  }
 }

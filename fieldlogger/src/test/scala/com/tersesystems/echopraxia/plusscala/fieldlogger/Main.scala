@@ -51,10 +51,10 @@ class Printer extends Logging {
 
     // support for exceptions
     logger.error(new IllegalStateException())
-    if (logger.info.enabled) {
-      // this will take any number of fields but is less efficient
-      // as it is not call-by-name
-      logger.info.v("p1" -> person1, "p2" -> person2, "p3" -> person1)
+
+    // Log with conditional logging
+    if (logger.isInfoEnabled) {
+      logger.info("p1" -> person1, "p2" -> person2, "p3" -> person1)
     }
 
     // Complex objects are no problem
@@ -82,18 +82,6 @@ class Printer extends Logging {
 
     // You can also use "withFields" to render JSON on every message (this will not show in line format)
     logger.withFields(Seq(book1, person1)).info("testing")
-
-    // You can also use variadic method but best to wrap it in conditional
-    if (logger.info.enabled) {
-      // not call by name so it gets evaluated eagerly :-(
-      logger.info.v(
-        Category("reference"),
-        Author("Nigel Rees"),
-        Title("Sayings of the Century"),
-        Price(amount = 8.95, currency = USD),
-        person1 // add more than 4
-      )
-    }
 
     // Can also log using class name
     logger.info(UUID.randomUUID)
