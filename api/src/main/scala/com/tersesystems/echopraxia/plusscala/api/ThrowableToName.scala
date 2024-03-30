@@ -7,3 +7,5 @@ trait ThrowableToName {
   // All exceptions should use "exception" field constant by default
   implicit def throwableToName[T <: Throwable]: ToName[T] = ToName.create(FieldConstants.EXCEPTION)
 }
+
+object ThrowableToName extends ThrowableToName

@@ -2,10 +2,9 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.FieldBuilderResult.list
 import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Level, Value}
-import com.tersesystems.echopraxia.api.Level._
-import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
+import com.tersesystems.echopraxia.api.Level.{TRACE, DEBUG, INFO, WARN, ERROR}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, PresentationFieldBuilder, SourceCode}
+import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport, Utils}
 import com.tersesystems.echopraxia.spi.{CoreLogger, FieldConstants, Utilities}
 import sourcecode.{Enclosing, File, Line}
 
@@ -237,20 +236,14 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
   // Internal methods
 
   private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): Field = {
-    Field
-      .keyValue(
-        "sourcecode",
-        Value.`object`(
-          Field.keyValue("file", Value.string(file.value)),
-          Field.keyValue("line", Value.number(line.value: java.lang.Integer)),
-          Field.keyValue("enclosing", Value.string(enc.value))
-        )
-      )
+    val sc = SourceCode(line, file, enc)
+    val fb = PresentationFieldBuilder
+    fb.sourceCode(sc)
   }
 
   @inline
   protected def onlyException(e: Throwable): FieldBuilderResult = {
-    Field.keyValue(FieldConstants.EXCEPTION, Value.exception(e))
+    val fb = PresentationFieldBuilder
+    fb.exception(e)
   }
-
 }

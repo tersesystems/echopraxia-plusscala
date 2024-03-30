@@ -123,7 +123,10 @@ trait StringNameTupleFieldBuilder extends TupleFieldBuilder {
     val attributes = ev.toAttributes(ev.toValue(tuple._2)).plus(PresentationHintAttributes.asValueOnly())
     Utils.newField(tuple._1, ToValue(tuple._2), attributes, fieldClass)
   }
+}
 
+trait SourceCodeFieldBuilder extends ValueTypeClasses with SourceCodeImplicits with HasFieldClass {
+  def sourceCode(sourceCode: SourceCode): FieldType
 }
 
 /**
@@ -137,6 +140,7 @@ trait FieldBuilderBase
     with StringNameTupleFieldBuilder
     with PrimitiveTupleFieldBuilder
     with PrimitiveArgsFieldBuilder
+    with SourceCodeFieldBuilder
 
 /**
  * A field builder that uses PresentationField.
@@ -144,6 +148,8 @@ trait FieldBuilderBase
 trait PresentationFieldBuilder extends FieldBuilderBase {
   override type FieldType = PresentationField
   override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
+
+  override def sourceCode(sourceCode: SourceCode): PresentationField = keyValue(ToName(sourceCode), ToValue(sourceCode))
 }
 
 /**
@@ -154,6 +160,8 @@ object PresentationFieldBuilder extends PresentationFieldBuilder
 trait FieldBuilder extends FieldBuilderBase {
   override type FieldType = Field
   override protected def fieldClass: Class[Field] = classOf[Field]
+
+  override def sourceCode(sourceCode: SourceCode): Field = keyValue(ToName(sourceCode), ToValue(sourceCode))
 }
 
 /**

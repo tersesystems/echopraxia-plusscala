@@ -87,6 +87,7 @@ lazy val api = (projectMatrix in file("api"))
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % scalaJavaVersion,
     libraryDependencies ++= compatLibraries(scalaVersion.value),
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     // tests
     libraryDependencies += "eu.timepit"    %% "refined"   % refinedVersion   % Test,
     libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % Test,
@@ -121,7 +122,6 @@ lazy val logger = (projectMatrix in file("logger"))
   .settings(
     name := "logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
@@ -208,8 +208,6 @@ lazy val traceLogger = (projectMatrix in file("trace"))
   .settings(
     name := "trace-logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
