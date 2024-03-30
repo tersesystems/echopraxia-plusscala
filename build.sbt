@@ -121,6 +121,7 @@ lazy val logger = (projectMatrix in file("logger"))
   .settings(
     name := "logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,

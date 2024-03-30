@@ -8,7 +8,7 @@ import com.tersesystems.echopraxia.spi.CoreLoggerFactory
  * LoggerFactory for a logger with source code enabled.
  */
 object LoggerFactory {
-  val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
+  val FQCN: String = classOf[Logger[_]].getName
 
   val fieldBuilder: PresentationFieldBuilder = PresentationFieldBuilder
 
