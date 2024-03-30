@@ -141,20 +141,6 @@ lazy val logger = (projectMatrix in file("logger"))
   .dependsOn(api % "compile->compile;test->compile")
   .jvmPlatform(scalaVersions = scalaVersions)
 
-
-lazy val fieldLogger = (projectMatrix in file("fieldlogger"))
-  .settings(
-    name := "field-logger",
-    scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
-    //
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test
-  )
-  .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
-
 lazy val asyncLogger = (projectMatrix in file("async"))
   .settings(
     name := "async-logger",
@@ -252,7 +238,6 @@ val refs = api.projectRefs ++
            asyncLogger.projectRefs ++
            nameOfLogger.projectRefs ++
            diff.projectRefs ++
-           fieldLogger.projectRefs ++
            flowLogger.projectRefs ++
            traceLogger.projectRefs ++
            benchmarks.projectRefs
