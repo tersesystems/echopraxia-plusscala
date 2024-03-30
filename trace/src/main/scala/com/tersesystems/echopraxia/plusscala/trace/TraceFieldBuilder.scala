@@ -3,9 +3,7 @@ package com.tersesystems.echopraxia.plusscala.trace
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.plusscala.api.ListToFieldBuilderResultMethods
-import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
+import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, ListToFieldBuilderResultMethods, PresentationFieldBuilder, SourceCode, ValueTypeClasses}
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceSignature
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.string
@@ -48,7 +46,7 @@ trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
   }
 
   override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields =
-    new DefaultSourceFields(line, file, enc, args)
+    new DefaultSourceFields(SourceCode(line, file, enc), args)
 }
 
 object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder {
@@ -72,8 +70,8 @@ trait SourceFields {
   def loggerFields: Seq[Field]
 }
 
-class DefaultSourceFields(line: Line, file: File, enc: Enclosing, args: Args) extends SourceFields {
-  def signature: String = s"${enc.value}(${args.value.map(argumentTypes).mkString(",")})"
+class DefaultSourceFields(sc: SourceCode, args: Args) extends SourceFields {
+  def signature: String = s"${sc.enclosing.value}(${args.value.map(argumentTypes).mkString(",")})"
 
   def entryArguments(list: Seq[Text[_]]): String = {
     list.map(_.value).mkString(",")
@@ -89,19 +87,7 @@ class DefaultSourceFields(line: Line, file: File, enc: Enclosing, args: Args) ex
   )
 
   override lazy val loggerFields: Seq[Field] = {
-    // XXX since sourcecode data is static, we could cache the result given the inputs
-    // and save on some allocation.  Or would it be possible to turn this into a macro at
-    // and point to constant fields and values?
-    Seq(
-      Field
-        .keyValue(
-          "sourcecode",
-          Value.`object`(
-            Field.keyValue("file", Value.string(file.value)),
-            Field.keyValue("line", Value.number(line.value: java.lang.Integer)),
-            Field.keyValue("enclosing", Value.string(enc.value))
-          )
-        )
-    )
+    val fb = PresentationFieldBuilder
+    Seq(fb.sourceCode(sc))
   }
 }
