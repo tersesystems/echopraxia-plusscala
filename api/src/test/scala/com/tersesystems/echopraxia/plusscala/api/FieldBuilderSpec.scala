@@ -1,9 +1,12 @@
 package com.tersesystems.echopraxia.plusscala.api
 
+import com.tersesystems.echopraxia.api.Value
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.math.BigInteger
+import java.time.format.{DateTimeFormatter, FormatStyle}
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
@@ -111,6 +114,33 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       fb.keyValue("bool", bool)
     }
 
+    it("should work with a value attribute") {
+      val fb = MyFieldBuilder
+      val epoch = Instant.EPOCH
+
+      import fb.readableInstant // if it's not a dependent trait, you have to import it specifically :-/
+
+      fb.keyValue("instant", epoch).toString must be("instant=1/1/70, 12:00 AM")
+    }
+
+    it("should work with array of value attribute") {
+      val fb = MyFieldBuilder
+      val epoch = Instant.EPOCH
+
+      import fb.readableInstant // if it's not a dependent trait, you have to import it specifically :-/
+
+      fb.array("instants", Seq(epoch)).toString must be("[instants=1/1/70, 12:00 AM]")
+    }
+
   }
 
+  trait MyFieldBuilder extends PresentationFieldBuilder {
+    implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
+    implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+      val datetime = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+      val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+      Value.string(formatter.format(datetime))
+    }
+  }
+  object MyFieldBuilder extends MyFieldBuilder
 }
