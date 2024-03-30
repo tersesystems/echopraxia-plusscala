@@ -10,7 +10,9 @@ trait LoggerSupport[FB, LoggerType[_ <: FB]] { self =>
 
   def withFields(f: FB => FieldBuilderResult): LoggerType[FB]
 
-  //def withFields(fields: => Seq[Field]): LoggerType[FB]
+  def withFields(fields: => Seq[Field]): LoggerType[FB] = {
+    withFields(_ => FieldBuilderResult.list(fields.toArray))
+  }
   
   def withThreadContext: LoggerType[FB]
 

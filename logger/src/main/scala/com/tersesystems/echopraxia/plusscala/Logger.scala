@@ -44,10 +44,6 @@ object Logger {
       newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
     }
 
-    def withFields(fields: => Seq[Field]): Logger[FB] = {
-      withFields(_ => FieldBuilderResult.list(fields.toArray))
-    }
-    
     override def withThreadContext: Logger[FB] = {
       newLogger(
         newCoreLogger = core.withThreadContext(Utilities.threadContext())
