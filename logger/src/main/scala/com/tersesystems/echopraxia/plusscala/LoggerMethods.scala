@@ -8,12 +8,15 @@ import sourcecode._
 
 trait LoggerMethod[FB] {
 
+  def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
   def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
   def apply(message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
   def apply(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit
+
+  def apply(condition: Condition, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
   def apply(condition: Condition, message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit
 
@@ -35,6 +38,10 @@ object LoggerMethod {
     override def apply(condition: Condition, message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
 
     override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
+
+    override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
+
+    override def apply(condition: Condition, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
   }
 }
 

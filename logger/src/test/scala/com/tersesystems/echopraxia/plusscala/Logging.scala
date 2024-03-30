@@ -1,11 +1,12 @@
-package com.tersesystems.echopraxia.plusscala.fieldlogger
+package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.plusscala.api._
 
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
 import scala.reflect.{ClassTag, classTag}
-import com.tersesystems.echopraxia.plusscala.api._
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {
@@ -23,7 +24,7 @@ trait Logging extends LoggingBase {
   // Use class name for future
   implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
 
-  implicit val personToLog: ToLog[Person] = ToLog.create("person", p => ToObjectValue("firstName" -> p.firstName, "lastName" -> p.lastName))
+  implicit val personToLog: ToLog[Person] = ToLog.create("person", p => ToObjectValue("name" -> p.name, "age" -> p.age))
 
   implicit val titleToLog: ToLog[Title] = ToLog.create("title", t => ToValue(t.raw))
 
@@ -39,4 +40,46 @@ trait Logging extends LoggingBase {
 
   // Says we want a toString of $8.95 in a message template for a price
   implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
+
+  implicit val creditCardToName: ToName[CreditCard] = ToName.create("credit_card")
+  implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {
+    ToObjectValue(
+      sensitiveKeyValue("cc_number", cc.number),
+      "expiration_date" -> cc.expirationDate
+    )
+  }
+
+  def sensitiveKeyValue(name: String, value: String)(implicit cap: Sensitive = Censored): Field = {
+    cap match {
+      case Censored =>
+        name -> "[CENSORED]"
+      case Explicit =>
+        name -> value
+    }
+  }
+
+
+  sealed trait Sensitive
+
+  case object Censored extends Sensitive
+
+  case object Explicit extends Sensitive
 }
+
+trait MyFieldBuilder extends PresentationFieldBuilder with Logging {
+  implicit val personToValue: ToObjectValue[Person] = { (person: Person) =>
+    ToObjectValue(
+      keyValue("name", ToValue(person.name)),
+      keyValue("age", ToValue(person.age))
+    )
+  }
+
+  implicit val govtToValue: ToObjectValue[Government] = { (govt: Government) =>
+    ToObjectValue(
+      keyValue("name", ToValue(govt.name)),
+      keyValue("debt", ToValue(govt.debt))
+    )
+  }
+}
+
+object MyFieldBuilder extends MyFieldBuilder

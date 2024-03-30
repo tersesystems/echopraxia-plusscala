@@ -44,6 +44,10 @@ object Logger {
       newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
     }
 
+    def withFields(fields: => Seq[Field]): Logger[FB] = {
+      withFields(_ => FieldBuilderResult.list(fields.toArray))
+    }
+    
     override def withThreadContext: Logger[FB] = {
       newLogger(
         newCoreLogger = core.withThreadContext(Utilities.threadContext())
@@ -193,6 +197,9 @@ object Logger {
 
 class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB) extends LoggerMethod[FB] {
 
+  override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
+    apply(("{} " * fields.size).trim, fields: _*)
+
   override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     import scala.compat.java8.FunctionConverters._
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
@@ -220,6 +227,9 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
   ): Unit = {
     core.log(level, () => java.util.Collections.singletonList(sourceCodeField), condition.asJava, message, f.asJava, fieldBuilder)
   }
+
+  override def apply(condition: Condition, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
+    apply(condition, ("{} " * fields.size).trim, fields: _*)
 
   override def apply(condition: Condition, message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     import scala.compat.java8.FunctionConverters._

@@ -125,6 +125,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
             false
         }
       }
+
       logger.debug(
         condition,
         "complex object",
@@ -325,25 +326,3 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       .asInstanceOf[ListAppender[ILoggingEvent]]
   }
 }
-
-case class Person(name: String, age: Int)
-
-case class Government(name: String, debt: BigDecimal)
-
-trait MyFieldBuilder extends FieldBuilder {
-  implicit val personToValue: ToObjectValue[Person] = { (person: Person) =>
-    ToObjectValue(
-      keyValue("name", ToValue(person.name)),
-      keyValue("age", ToValue(person.age))
-    )
-  }
-
-  implicit val govtToValue: ToObjectValue[Government] = { (govt: Government) =>
-    ToObjectValue(
-      keyValue("name", ToValue(govt.name)),
-      keyValue("debt", ToValue(govt.debt))
-    )
-  }
-}
-
-object MyFieldBuilder extends MyFieldBuilder
