@@ -19,7 +19,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   describe("withCondition") {
 
     it("should use a scala withCondition") {
-      val condition: Condition = (level: Level, context: LoggingContext) => true
+      val condition: Condition = Condition.always
       logger.withCondition(condition)
     }
   }
