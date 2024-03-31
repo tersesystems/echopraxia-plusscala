@@ -3,6 +3,9 @@
     </appender>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${ECHOPRAXIA_STDOUT_LOGGING_LEVEL:-OFF}</level>
+        </filter>
         <encoder>
             <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex</pattern>
         </encoder>
