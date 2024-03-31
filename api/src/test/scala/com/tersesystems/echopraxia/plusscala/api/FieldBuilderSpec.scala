@@ -115,28 +115,19 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     }
 
     it("should work with a value attribute") {
-      pendingUntilFixed {
-        info("Broken - see https://github.com/tersesystems/echopraxia-plusscala/issues/79")
+      val fb = MyFieldBuilder
+      val epoch = Instant.EPOCH
 
-        val fb = MyFieldBuilder
-        val epoch = Instant.EPOCH
-
-        // import fb.readableInstant // if it's not a dependent trait, you have to import it specifically :-/
-
-        fb.keyValue("instant", epoch).toString must be("instant=1/1/70, 12:00 AM")
-      }
+      // this works only if ToValueAttribute is a path dependent type, and then hanging it off
+      // the singleton object will work.
+      fb.keyValue("instant", epoch).toString must be("instant=1/1/70, 12:00 AM")
     }
 
     it("should work with array of value attribute") {
-      pendingUntilFixed {
-        info("Broken - see https://github.com/tersesystems/echopraxia-plusscala/issues/79")
-
-        val fb    = MyFieldBuilder
-        val epoch = Instant.EPOCH
-        fb.array("instants", Seq(epoch)).toString must be("[instants=1/1/70, 12:00 AM]")
-      }
+      val fb    = MyFieldBuilder
+      val epoch = Instant.EPOCH
+      fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
     }
-
   }
 
   trait MyFieldBuilder extends PresentationFieldBuilder {

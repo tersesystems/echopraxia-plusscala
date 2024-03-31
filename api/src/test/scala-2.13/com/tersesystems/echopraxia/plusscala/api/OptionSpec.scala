@@ -12,7 +12,6 @@ import java.time.format.FormatStyle
 
 // The tests here compile in 2.13 but do not compile in 2.12
 class OptionSpec extends AnyWordSpec with Matchers with Logging {
-  implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
   "option" should {
 

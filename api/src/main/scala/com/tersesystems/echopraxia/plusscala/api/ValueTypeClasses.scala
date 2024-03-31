@@ -5,6 +5,7 @@ import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 
 import scala.annotation.implicitNotFound
+import com.tersesystems.echopraxia.api.Attributes
 
 trait ValueTypeClasses {
 
@@ -125,5 +126,103 @@ trait ValueTypeClasses {
       implicitly[ToObjectValue[T]].toValue(obj)
 
     def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
+  }
+
+  // Allows custom attributes on fields through implicits
+  trait ToValueAttributes[-T] {
+    def toValue(v: T): Value[_]
+    def toAttributes(value: Value[_]): Attributes
+  }
+
+  trait LowPriorityToValueAttributesImplicits {
+    // default low priority implicit that gets applied if nothing is found
+    implicit def empty[TV]: ToValueAttributes[TV] = new ToValueAttributes[TV] {
+      override def toValue(v: TV): Value[_]                  = Value.nullValue()
+      override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
+    }
+
+    implicit def iterableValueFormat[TV: ToValueAttributes]: ToValueAttributes[Iterable[TV]] = new ToValueAttributes[Iterable[TV]]() {
+      override def toValue(seq: collection.Iterable[TV]): Value[_] = {
+        import scala.collection.JavaConverters._
+        val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttributes[TV]].toValue(el)).toSeq
+        Value.array(list.asJava)
+      }
+
+      override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttributes[TV]].toAttributes(value)
+    }
+  }
+
+  object ToValueAttributes extends LowPriorityToValueAttributesImplicits {
+    def attributes(value: Value[_], ev: ToValueAttributes[_]): Attributes = ev.toAttributes(value)
+  }
+
+  import com.tersesystems.echopraxia.api.Attribute
+  import com.tersesystems.echopraxia.api.Attributes
+  import com.tersesystems.echopraxia.api.Field
+  import com.tersesystems.echopraxia.api.SimpleFieldVisitor
+  import com.tersesystems.echopraxia.api.Value
+  import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+
+  import java.lang
+
+  trait ToStringFormat[-T] extends ToValueAttributes[T] {
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
+  }
+
+  object ToStringFormat {
+    // Add a custom string format attribute using the passed in value
+    def withToStringFormat(value: Value[_]): Attribute[_] = {
+      PresentationHintAttributes.withToStringFormat(new SimpleFieldVisitor() {
+        override def visit(f: Field): Field = Field.keyValue(f.name(), value)
+      })
+    }
+  }
+
+  trait WithDisplayName[-T] extends ToValueAttributes[T] {
+    def displayName: String
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(WithDisplayName(displayName))
+  }
+
+  object WithDisplayName {
+    def apply(name: String): Attribute[_] = PresentationHintAttributes.withDisplayName(name)
+  }
+
+  trait AbbreviateAfter[-T] extends ToValueAttributes[T] {
+    def after: Int
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(AbbreviateAfter(after))
+  }
+
+  object AbbreviateAfter {
+    def apply(after: Int): Attribute[_] = PresentationHintAttributes.abbreviateAfter(after)
+  }
+
+  trait Elided[-T] extends ToValueAttributes[T] {
+    override def toAttributes(value: Value[_]): Attributes = Elided.attributes
+  }
+
+  object Elided {
+    val attributes: Attributes = Attributes.create(apply())
+
+    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
+  }
+
+  trait AsValueOnly[-T] extends ToValueAttributes[T] {
+    override def toAttributes(value: Value[_]): Attributes = AsValueOnly.attributes
+  }
+
+  object AsValueOnly {
+    val attributes: Attributes = Attributes.create(apply())
+
+    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
+  }
+
+  trait AsCardinal[-T] extends ToValueAttributes[T] {
+    override def toAttributes(value: Value[_]): Attributes = AsCardinal.attributes
+  }
+
+  object AsCardinal {
+    val attributes: Attributes = Attributes.create(apply())
+
+    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asCardinal()
   }
 }

@@ -16,8 +16,6 @@ import scala.collection.JavaConverters._
 class IterableSpec extends AnyWordSpec with Matchers with Logging {
 
   "iterable" should {
-    implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-
     // XXX check array depends on implicit
     // XXX check immutable iterable depends on implicit
     // XXX check mutable iterable depends on implicit
