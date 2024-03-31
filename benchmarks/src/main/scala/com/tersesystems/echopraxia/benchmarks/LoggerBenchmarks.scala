@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.LoggingBase
 import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class LoggerBenchmarks {
+class LoggerBenchmarks extends LoggingBase {
   import LoggerBenchmarks._
 
   @Benchmark
@@ -22,17 +23,17 @@ class LoggerBenchmarks {
 
   @Benchmark
   def infoWithStringArg(): Unit = {
-    logger.info("Hello {}", _.string("name", "world"))
+    logger.info("Hello {}", ("name" -> "world"))
   }
 
   @Benchmark
   def infoWithIntegerArg(): Unit = {
-    logger.info("1 + 1 = {}", _.number("result", 2))
+    logger.info("1 + 1 = {}", "result" -> 2)
   }
 
   @Benchmark
   def infoWithBooleanArg(): Unit = {
-    logger.info("return {}", _.bool("returnValue", true))
+    logger.info("return {}", "returnValue" -> true)
   }
 
   @Benchmark
@@ -47,7 +48,7 @@ class LoggerBenchmarks {
 
   @Benchmark
   def traceWithStringArg(): Unit = {
-    logger.trace("Hello {}", _.string("name", "world"))
+    logger.trace("Hello {}", "name" -> "world")
   }
 
 }

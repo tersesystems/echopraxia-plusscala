@@ -4,7 +4,7 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import com.tersesystems.echopraxia.api.{FieldBuilderResult, Value}
-import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder, SourceCode}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
@@ -121,7 +121,7 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
 
   trait SimpleTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
     override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields =
-      new DefaultSourceFields(line, file, enc, args)
+      new DefaultSourceFields(SourceCode(line, file, enc), args)
 
     override def entering(sourceFields: SourceFields): FieldBuilderResult = {
       list(sourceFields.argumentFields)

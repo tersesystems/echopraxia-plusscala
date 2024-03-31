@@ -17,7 +17,7 @@ object Main {
 
 
 class Printer extends Logging with HeterogenousFieldSupport {
-  private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger(getClass)
 
   private val USD = Currency.getInstance("USD")
 
