@@ -126,6 +126,15 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     it("should work with array of value attribute") {
       val fb    = MyFieldBuilder
       val epoch = Instant.EPOCH
+
+      fb.keyValue("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
+    }
+
+    it("should work with array of value attribute using fb.array") {
+      val fb    = MyFieldBuilder
+      val epoch = Instant.EPOCH
+
+      // found you :-D
       fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
     }
   }

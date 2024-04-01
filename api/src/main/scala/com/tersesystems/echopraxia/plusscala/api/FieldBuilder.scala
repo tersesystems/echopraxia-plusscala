@@ -64,14 +64,12 @@ trait ArgsFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMet
   // ------------------------------------------------------------------
   // array
 
-  def array[AV: ToArrayValue: ToValueAttributes](name: Name, value: AV): FieldType =
-    keyValue(name, ToArrayValue[AV](value))
+  def array[AV: ToArrayValue: ToValueAttributes](name: Name, value: AV): FieldType = keyValue(name, value)
 
   // ------------------------------------------------------------------
   // object
 
-  def obj[OV: ToObjectValue: ToValueAttributes](name: Name, value: OV): FieldType =
-    keyValue(name, ToObjectValue[OV](value))
+  def obj[OV: ToObjectValue: ToValueAttributes](name: Name, value: OV): FieldType = keyValue(name, value)
 
 }
 
