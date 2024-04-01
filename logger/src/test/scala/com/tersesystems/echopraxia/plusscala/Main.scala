@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Field
 
-import com.tersesystems.echopraxia.plusscala.api.HeterogenousFieldSupport
+import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
 
 import java.util.Currency
 import java.util.UUID
@@ -16,7 +16,7 @@ object Main {
 }
 
 
-class Printer extends Logging with HeterogenousFieldSupport {
+class Printer extends Logging with HeterogeneousFieldSupport {
   private val logger = LoggerFactory.getLogger(getClass)
 
   private val USD = Currency.getInstance("USD")
