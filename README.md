@@ -87,24 +87,25 @@ val seq = Seq("first" -> 1, "second" -> 2)
 logger.info("seq = {}", "listOfTuples" -> seq)
 ```
 
-There is a slight problem when you render lists that contain many different elements.  In this case you have to explicitly add `HeterogeneousFieldSupport` in, which will map iterables as arrays automatically.
+There is a slight problem when you render lists which do not have a common base type.  In this case you have to explicitly add `HeterogeneousFieldSupport` in, which will map iterables as arrays automatically, and then cast to `Seq[Field]`:
 
 ```scala
 trait Logging extends LoggingBase with HeterogeneousFieldSupport
 
-logger.info(Seq[Field]("name" -> "will", "admin" -> true))
+logger.info("list" -> Seq[Field]("name" -> "will", "admin" -> true))
 ```
 
 You can, of course, log exceptions automatically, either with or without a message.
 
 ```scala
 logger.error("something went wrong: {}", e)
+// this also works
 logger.error(e)
 ```
 
 ### Options, Either, and Future
 
-This also applies to wrappers like `Option`, `Either`, and `Future`, which `LoggingBase` handles automatically:
+Commonly used types like `Option`, `Either`, and `Future` are handled automatically by `LoggingBase`:
 
 ```scala
 val optInt: Option[Int] = None
@@ -174,6 +175,23 @@ implicit val personToValue: ToObjectValue[Person] = { person =>
 }
 ```
 
+You can also specify a common format for tuples and maps:
+
+```scala
+trait Logging extends LoggingBase {
+  implicit def tupleToValue[TVK: ToValue: ToValueAttributes, TVV: ToValue: ToValueAttributes]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+    ToObjectValue("key" -> k, "value" -> v)
+  }
+}
+```
+
+allows for rendering of a map as a series of tuples:
+
+```scala
+// people=[{key=person1, value={name=Person1, age=12}}, {key=person2, value={name=Person2, age=15}}]
+logger.info("people" -> Map("person1" -> person1, "person2" -> person2))
+```
+
 You can also include more complex logic in a `ToValue`, for example dealing with sensitive values can be handled by adding an implicit flag:
 
 ```scala
@@ -202,7 +220,7 @@ trait Logging extends LoggingBase {
 
 ### ToName
 
-Rather than using a tuple, you can specify a default name using `ToName`.  If a type has both `ToName` and `ToValue` specified on it, then you can pass in the object and have a field rendered automatically.
+Rather than using a tuple, you can specify a default name using `ToName`.
 
 The `ToName` type class looks like this:
 
@@ -212,19 +230,103 @@ trait ToName[-T] {
 }
 ```
 
-and is rendered
+and is defined as follows
 
 ```scala
-implicit val creditCardToName: ToName[CreditCard] = _ => "credit_card"
+trait Logging extends LoggingBase {
+  implicit val instantToName: ToName[Instant] = _ => "instant"
+}
 ```
 
-```scala
+If a type has both `ToName` and `ToValue` specified on it, then you can pass in the object and have a field rendered automatically.
 
+```scala
+val epoch = Instant.EPOCH
+logger.info(epoch) // instant=1970-01-01T00:00:00Z
+```
+
+This comes in very handy when using `Future`, for example:
+
+```scala
+trait Logging extends LoggingBase {
+  implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
+}
+```
+
+yields the future's type:
+
+```scala
+logger.info(Future.successful(true)) // future[boolean]={completed=true, success=true}
 ```
 
 ### ToField
 
-TODO
+Because `ToName` and `ToValue` are commonly specified together, you can set mappings for both at the same time using `ToField`.
+
+For example, rather than defining
+
+```scala
+case class Title(raw: String)    extends AnyVal
+
+trait Logging extends LoggingBase {
+  implicit val titleToName: ToName[Title] = _ => "title"
+  implicit val titleToValue: ToValue[Title] = t => ToValue(t.raw)
+}
+```
+
+You could define both with `ToField(toNameFunction, toFieldFunction)`:
+
+```scala
+trait Logging extends LoggingBase {
+  implicit val titleToField: ToField[Title] = ToField(_ => "title", t => ToValue(t.raw))
+}
+```
+
+This gets especially useful when you are building up complex state objects where the case class fields all line up:
+
+```scala
+trait Logging extends LoggingBase {
+  implicit val titleToField: ToField[Title] = ToField(_ => "title", t => ToValue(t.raw))
+
+  implicit val authorToField: ToField[Author] = ToField(_ => "author", a => ToValue(a.raw))
+
+  implicit val categoryToField: ToField[Category] = ToField(_ => "category", c => ToValue(c.raw))
+
+  implicit val bookToField: ToField[Book] = ToField(_ => "book", book => ToObjectValue(book.title, book.category, book.author, book.price))
+}
+```
+
+yields
+
+```scala
+val book1 = Book(
+  Category("reference"),
+  Author("Nigel Rees"),
+  Title("Sayings of the Century")
+)
+logger.info(book) // book={title=Sayings of the Century, category=reference, author=Nigel Rees}
+```
+
+## ToValueAttributes
+
+Echopraxia logs in both logfmt and in JSON.  In most cases this works pretty well, but there are some cases where JSON can be excessively verbose and not useful for line oriented debugging.  The `ToValueAttributes` type class handles these cases by customizing the presentation logic.
+
+Let's say you have a `Price` that consists of an amount and a currency.  You want to render the price as `price=$8.95` in oriented format, instead of every element of the case class.  This is addressed by `ToStringFormat` type class, which modifies the string produced in line oriented logging.
+
+```scala
+trait Logging extends LoggingBase {
+  implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))
+
+  implicit val priceToStringFormat: ToStringFormat[Price] = (price: Price) => {
+    import java.text.NumberFormat
+    val numberFormat = NumberFormat.getCurrencyInstance
+    numberFormat.setCurrency(price.currency)
+    ToValue(numberFormat.format(price.amount))
+  }
+}
+```
+
+TODO list the others
 
 ## Context
 
