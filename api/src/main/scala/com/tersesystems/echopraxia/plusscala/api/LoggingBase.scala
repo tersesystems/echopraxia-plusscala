@@ -5,9 +5,9 @@ package com.tersesystems.echopraxia.plusscala.api
  *
  * {{{
  *  trait Logging extends LoggingBase {
- *    implicit val currencyToLog: ToLog[Currency] = ToLog.create("currency", currency => ToValue(currency.getCurrencyCode))
+ *    implicit val currencyToField: ToField[Currency] = ToField(_ => "currency", currency => ToValue(currency.getCurrencyCode))
  *
- *    implicit val priceToLog: ToLog[Price] = ToLog.create("price", price => ToObjectValue(price.currency, "amount" -> price.amount))
+ *    implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))
  *
  *    // Renders price value as $8.95 in line oriented PatternLayout apppenders
  *    implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
@@ -35,5 +35,5 @@ trait LoggingBase
     with OptionValueTypes
     with EitherValueTypes
     with FutureValueTypes
-    with ToLogTypes
+    with ToFieldTypes
     with ThrowableToName
