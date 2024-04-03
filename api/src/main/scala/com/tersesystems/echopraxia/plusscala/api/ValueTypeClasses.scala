@@ -86,10 +86,10 @@ trait ValueTypeClasses {
       iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray: _*)
 
     implicit def arrayToArrayValue[V: ToValue]: ToArrayValue[Array[V]] = array => {
-
       Value.array(array.map(implicitly[ToValue[V]].toValue): _*)
     }
   }
+
   object ToArrayValue extends ToArrayValueImplicits {
     def apply[T: ToArrayValue](array: T): Value.ArrayValue =
       implicitly[ToArrayValue[T]].toValue(array)
@@ -125,11 +125,12 @@ trait ValueTypeClasses {
     def apply[T: ToObjectValue](obj: T): Value.ObjectValue =
       implicitly[ToObjectValue[T]].toValue(obj)
 
-    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
+    def apply(fields: Field*): Value.ObjectValue = apply(fields.toSeq)
   }
 
   // Allows custom attributes on fields through implicits
   trait ToValueAttributes[-T] {
+    // This is awkward, but we need to convert toValue when we have Iterable[TV]
     def toValue(v: T): Value[_]
     def toAttributes(value: Value[_]): Attributes
   }
@@ -165,6 +166,19 @@ trait ValueTypeClasses {
 
   import java.lang
 
+  /**
+   * This changes how the field renders in line format, useful for rendering complex objects with
+   * a summary.
+   *
+   * {{{
+   * class Foo {
+   *   def debugString: String = ...
+   * }
+   * implicit val fooToDebugString: ToStringFormat[Foo] = foo => ToValue(foo.debugString)
+   * }}}
+   *
+   * @tparam T the type.
+   */
   trait ToStringFormat[-T] extends ToValueAttributes[T] {
     override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
   }
@@ -178,8 +192,14 @@ trait ValueTypeClasses {
     }
   }
 
+  /**
+   * This changes the display name in line format, useful for human representation.
+   *
+   * @tparam T the type param
+   */
   trait WithDisplayName[-T] extends ToValueAttributes[T] {
     def displayName: String
+    override def toValue(v: T): Value[_] = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = Attributes.create(WithDisplayName(displayName))
   }
 
@@ -187,8 +207,15 @@ trait ValueTypeClasses {
     def apply(name: String): Attribute[_] = PresentationHintAttributes.withDisplayName(name)
   }
 
+
+  /**
+   * This abbreviates a string or Seq to abbreviate after the leading elements line format.
+   *
+   * @tparam T the type param
+   */
   trait AbbreviateAfter[-T] extends ToValueAttributes[T] {
     def after: Int
+    override def toValue(v: T): Value[_] = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = Attributes.create(AbbreviateAfter(after))
   }
 
@@ -196,7 +223,13 @@ trait ValueTypeClasses {
     def apply(after: Int): Attribute[_] = PresentationHintAttributes.abbreviateAfter(after)
   }
 
-  trait Elided[-T] extends ToValueAttributes[T] {
+  /**
+   * This elides (does not display) the given field in line format.
+   *
+   * @tparam T the type param
+   */
+  class Elided[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_] = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = Elided.attributes
   }
 
@@ -206,7 +239,13 @@ trait ValueTypeClasses {
     def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
   }
 
-  trait AsValueOnly[-T] extends ToValueAttributes[T] {
+  /**
+   * This class presents the field as "value only" in line format, without the key.
+   *
+   * @tparam T the type param
+   */
+  class AsValueOnly[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_] = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = AsValueOnly.attributes
   }
 
@@ -216,13 +255,18 @@ trait ValueTypeClasses {
     def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
   }
 
-  trait AsCardinal[-T] extends ToValueAttributes[T] {
+  /**
+   * This presents a string or seq as a cardinal in line format, showing the number of elements.
+   *
+   * @tparam T the type param
+   */
+  class AsCardinal[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_] = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = AsCardinal.attributes
   }
 
   object AsCardinal {
     val attributes: Attributes = Attributes.create(apply())
-
     def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asCardinal()
   }
 }

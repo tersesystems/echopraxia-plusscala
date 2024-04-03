@@ -8,7 +8,7 @@ import java.util.UUID
 
 class NameSpec extends AnyWordSpec with Matchers with Logging {
 
-  trait ToDerp[T] extends WithDisplayName[T] {
+  class ToDerp[T] extends WithDisplayName[T] {
     override val displayName = "derp"
   }
 
@@ -35,7 +35,7 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with displayName" in {
-      implicit def exceptionToDerp[T <: Throwable]: ToDerp[T] = e => ToValue(e)
+      implicit def exceptionToDerp[T <: Throwable]: ToDerp[T] = new ToDerp[T]()
 
       val field: Field = new IllegalStateException()
       field.toString must be(""""derp"=java.lang.IllegalStateException""")
