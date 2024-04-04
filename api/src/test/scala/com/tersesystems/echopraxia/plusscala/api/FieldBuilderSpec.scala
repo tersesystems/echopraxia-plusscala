@@ -1,12 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.{Field, Value}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.math.BigInteger
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Instant, LocalDateTime, ZoneOffset}
+
+import java.util.Currency
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
@@ -137,6 +139,21 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       // found you :-D
       fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
     }
+    
+    it("should work with object") {
+      val fb    = MyFieldBuilder
+
+      val objectField: Field = fb.obj("object", fb.keyValue("foo" -> "bar"))
+      objectField.toString must be("object={foo=bar}")
+    }
+
+    it("should work with object with toStringFormat") {
+      val fb    = MyFieldBuilder
+
+      val currency = Currency.getInstance("USD")
+      val objectField: Field = fb.obj("usCurrency", currency)
+      objectField.toString must be("usCurrency=$")
+    }
   }
 
   trait MyFieldBuilder extends PresentationFieldBuilder {
@@ -146,6 +163,12 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
       Value.string(formatter.format(datetime))
     }
+
+    implicit val currencyStringFormat: ToStringFormat[Currency] = c => ToValue(c.getSymbol)
+
+    implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) => ToObjectValue(
+      keyValue("currencyCode" -> currency.getCurrencyCode)
+    )
   }
   object MyFieldBuilder extends MyFieldBuilder
 }
