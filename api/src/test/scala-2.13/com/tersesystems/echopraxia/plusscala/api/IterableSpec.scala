@@ -24,6 +24,7 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
       val seq: Seq[Int] = Seq(1, 2, 3)
       val field: Field  = "test" -> seq
       field.name must be("test")
+      import scala.collection.JavaConverters._
       field.value must be(Value.array(seq.map(ToValue(_)).asJava))
       field.toString must be("test=[1, 2, 3]")
     }
