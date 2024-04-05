@@ -13,7 +13,7 @@ trait LoggerSupport[FB, LoggerType[_ <: FB]] { self =>
   def withFields(fields: => Seq[Field]): LoggerType[FB] = {
     withFields(_ => FieldBuilderResult.list(fields.toArray))
   }
-  
+
   def withThreadContext: LoggerType[FB]
 
   def withFieldBuilder[T <: FB](newBuilder: T): LoggerType[T]

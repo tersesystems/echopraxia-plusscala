@@ -6,8 +6,8 @@ trait ToName[-T] {
 }
 
 object ToName {
-  
+
   def apply[T: ToName](t: T): String = implicitly[ToName[T]].toName(t)
-  
+
   def create[T](name: String): ToName[T] = _ => name
 }

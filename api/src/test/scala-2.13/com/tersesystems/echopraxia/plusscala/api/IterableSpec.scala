@@ -70,7 +70,7 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
       val instant2 = Instant.ofEpochMilli(1000000)
 
       val fields: Seq[Field] = Seq[Field]("instant1" -> instant1, "instant2" -> instant2)
-      val field: Field = "test" -> fields
+      val field: Field       = "test" -> fields
       field.toString must be("test=[{instant1=1970-01-01T00:00:00Z}, {instant2=1970-01-01T00:16:40Z}]")
     }
   }

@@ -15,7 +15,6 @@ object Main {
   }
 }
 
-
 class Printer extends Logging with HeterogeneousFieldSupport {
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -88,7 +87,7 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     logger.info("oneTrueString" -> Seq(ToValue(1), ToValue(true), ToValue("string")))
 
     // You can also use "withFields" to render JSON on every message (this will not show in line format)
-    //logger.withFields(Seq(book1, person1)).info("testing")
+    // logger.withFields(Seq(book1, person1)).info("testing")
 
     // Can also log using class name
     logger.info(UUID.randomUUID)

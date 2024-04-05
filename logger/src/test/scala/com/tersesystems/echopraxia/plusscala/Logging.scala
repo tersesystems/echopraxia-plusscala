@@ -58,7 +58,6 @@ trait Logging extends LoggingBase {
     }
   }
 
-
   sealed trait Sensitive
 
   case object Censored extends Sensitive
