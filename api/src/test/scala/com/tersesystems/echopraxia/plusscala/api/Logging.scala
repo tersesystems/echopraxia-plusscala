@@ -8,14 +8,19 @@ import com.tersesystems.echopraxia.api.Attributes
 trait Logging extends LoggingBase with HeterogeneousFieldSupport {
   implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
-
-  trait ToValueAndAbbreviate[T] extends ToValueAttributes[T] {
+  trait AsValueOnlyAndAbbreviate[T] extends ToValueAttributes[T] {
     def after: Int
     def toValue(v: T): Value[_] = Value.nullValue
     def toAttributes(value: Value[_]): Attributes = {
       val abbreviateAfter = AbbreviateAfter(after)
       val attrs = abbreviateAfter.toAttributes(value)
       attrs.plusAll(AsValueOnly.attributes)
+    }
+  }
+
+  object AsValueOnlyAndAbbreviate {
+    def apply[T](a: Int): AsValueOnlyAndAbbreviate[T] = new AsValueOnlyAndAbbreviate[T]() {
+      val after = a
     }
   }
 }

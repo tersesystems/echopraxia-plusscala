@@ -1,8 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.*
+import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+
+import scala.collection.JavaConverters._
 
 import scala.annotation.implicitNotFound
 
@@ -145,7 +147,6 @@ trait ValueTypeClasses {
 
     implicit def iterableValueFormat[TV: ToValueAttributes]: ToValueAttributes[Iterable[TV]] = new ToValueAttributes[Iterable[TV]]() {
       override def toValue(seq: collection.Iterable[TV]): Value[_] = {
-        import scala.collection.JavaConverters.*
         val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttributes[TV]].toValue(el)).toSeq
         Value.array(list.asJava)
       }
