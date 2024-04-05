@@ -125,7 +125,9 @@ trait ValueTypeClasses {
     def apply[T: ToObjectValue](obj: T): Value.ObjectValue =
       implicitly[ToObjectValue[T]].toValue(obj)
 
-    def apply(fields: Field*): Value.ObjectValue = apply(fields.toSeq)
+    def apply(field: Field): Value.ObjectValue = Value.`object`(field)
+
+    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
   }
 
   // Allows custom attributes on fields through implicits
