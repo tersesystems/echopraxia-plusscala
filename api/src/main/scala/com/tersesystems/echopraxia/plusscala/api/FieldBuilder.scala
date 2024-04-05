@@ -95,13 +95,13 @@ trait StringNameArgsFieldBuilder extends ArgsFieldBuilder with HasName {
   override type Name = String
 
   override def keyValue[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType = {
-    val ev = implicitly[ToValueAttributes[V]]
+    val ev         = implicitly[ToValueAttributes[V]]
     val attributes = ev.toAttributes(ev.toValue(value))
     Utils.newField(key, ToValue(value), attributes, fieldClass)
   }
 
-  override def value[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType =  {
-    val ev = implicitly[ToValueAttributes[V]]
+  override def value[V: ToValue: ToValueAttributes](key: Name, value: V): FieldType = {
+    val ev         = implicitly[ToValueAttributes[V]]
     val attributes = ev.toAttributes(ev.toValue(value)).plus(PresentationHintAttributes.asValueOnly())
     Utils.newField(key, ToValue(value), attributes, fieldClass)
   }
@@ -111,13 +111,13 @@ trait StringNameTupleFieldBuilder extends TupleFieldBuilder {
   override type Name = String
 
   override def keyValue[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType = {
-    val ev = implicitly[ToValueAttributes[V]]
+    val ev         = implicitly[ToValueAttributes[V]]
     val attributes = ev.toAttributes(ev.toValue(tuple._2))
     Utils.newField(tuple._1, ToValue(tuple._2), attributes, fieldClass)
   }
 
   override def value[V: ToValue: ToValueAttributes](tuple: (Name, V)): FieldType = {
-    val ev = implicitly[ToValueAttributes[V]]
+    val ev         = implicitly[ToValueAttributes[V]]
     val attributes = ev.toAttributes(ev.toValue(tuple._2)).plus(PresentationHintAttributes.asValueOnly())
     Utils.newField(tuple._1, ToValue(tuple._2), attributes, fieldClass)
   }

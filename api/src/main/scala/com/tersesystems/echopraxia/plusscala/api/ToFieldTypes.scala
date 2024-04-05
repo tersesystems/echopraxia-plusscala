@@ -11,7 +11,7 @@ trait ToFieldTypes { self: ValueTypeClasses =>
 
   object ToField {
     def apply[TF](nameFunction: TF => String, valueFunction: TF => Value[_]): ToField[TF] = new ToField[TF] {
-      override val toName: ToName[TF] = t => nameFunction(t)
+      override val toName: ToName[TF]   = t => nameFunction(t)
       override val toValue: ToValue[TF] = t => valueFunction(t)
     }
   }

@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.*
 import com.tersesystems.echopraxia.api.Value.ObjectValue
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 import scala.annotation.implicitNotFound
-import com.tersesystems.echopraxia.api.Attributes
 
 trait ValueTypeClasses {
 
@@ -146,7 +145,7 @@ trait ValueTypeClasses {
 
     implicit def iterableValueFormat[TV: ToValueAttributes]: ToValueAttributes[Iterable[TV]] = new ToValueAttributes[Iterable[TV]]() {
       override def toValue(seq: collection.Iterable[TV]): Value[_] = {
-        import scala.collection.JavaConverters._
+        import scala.collection.JavaConverters.*
         val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttributes[TV]].toValue(el)).toSeq
         Value.array(list.asJava)
       }
@@ -159,18 +158,8 @@ trait ValueTypeClasses {
     def attributes(value: Value[_], ev: ToValueAttributes[_]): Attributes = ev.toAttributes(value)
   }
 
-  import com.tersesystems.echopraxia.api.Attribute
-  import com.tersesystems.echopraxia.api.Attributes
-  import com.tersesystems.echopraxia.api.Field
-  import com.tersesystems.echopraxia.api.SimpleFieldVisitor
-  import com.tersesystems.echopraxia.api.Value
-  import com.tersesystems.echopraxia.spi.PresentationHintAttributes
-
-  import java.lang
-
   /**
-   * This changes how the field renders in line format, useful for rendering complex objects with
-   * a summary.
+   * This changes how the field renders in line format, useful for rendering complex objects with a summary.
    *
    * {{{
    * class Foo {
@@ -179,96 +168,108 @@ trait ValueTypeClasses {
    * implicit val fooToDebugString: ToStringFormat[Foo] = foo => ToValue(foo.debugString)
    * }}}
    *
-   * @tparam T the type.
+   * @tparam T
+   *   the type.
    */
   trait ToStringFormat[-T] extends ToValueAttributes[T] {
-    override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringFormat.withToStringFormat(value))
-  }
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(withToStringFormat(value))
 
-  object ToStringFormat {
     // Add a custom string format attribute using the passed in value
-    def withToStringFormat(value: Value[_]): Attribute[_] = {
+    private def withToStringFormat(value: Value[_]): Attribute[_] = {
       PresentationHintAttributes.withToStringFormat(new SimpleFieldVisitor() {
         override def visit(f: Field): Field = Field.keyValue(f.name(), value)
       })
     }
   }
 
+  object ToStringFormat {
+    def apply[T](f: T => Value[_]): ToStringFormat[T] = new ToStringFormat[T]() {
+      override def toValue(v: T): Value[_] = f(v)
+    }
+  }
+
   /**
    * This changes the display name in line format, useful for human representation.
    *
-   * @tparam T the type param
+   * @tparam T
+   *   the type param
    */
   trait WithDisplayName[-T] extends ToValueAttributes[T] {
     def displayName: String
-    override def toValue(v: T): Value[_] = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = Attributes.create(WithDisplayName(displayName))
+    override def toValue(v: T): Value[_]                   = Value.nullValue()
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(PresentationHintAttributes.withDisplayName(displayName))
   }
 
   object WithDisplayName {
-    def apply(name: String): Attribute[_] = PresentationHintAttributes.withDisplayName(name)
+    def apply[T](name: String): WithDisplayName[T] = new WithDisplayName[T]() {
+      val displayName: String = name
+    }
   }
-
 
   /**
    * This abbreviates a string or Seq to abbreviate after the leading elements line format.
    *
-   * @tparam T the type param
+   * @tparam T
+   *   the type param
    */
   trait AbbreviateAfter[-T] extends ToValueAttributes[T] {
     def after: Int
-    override def toValue(v: T): Value[_] = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = Attributes.create(AbbreviateAfter(after))
+    override def toValue(v: T): Value[_]                   = Value.nullValue()
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(PresentationHintAttributes.abbreviateAfter(after))
   }
 
   object AbbreviateAfter {
-    def apply(after: Int): Attribute[_] = PresentationHintAttributes.abbreviateAfter(after)
+    def apply[T](a: Int): AbbreviateAfter[T] = new AbbreviateAfter[T]() {
+      override val after: Int = a
+    }
   }
 
   /**
    * This elides (does not display) the given field in line format.
    *
-   * @tparam T the type param
+   * @tparam T
+   *   the type param
    */
-  class Elided[-T] extends ToValueAttributes[T] {
-    override def toValue(v: T): Value[_] = Value.nullValue()
+  final class Elided[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_]                   = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = Elided.attributes
   }
 
   object Elided {
-    val attributes: Attributes = Attributes.create(apply())
-
-    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
+    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asElided())
+    def apply[T]: Elided[T]    = new Elided[T]()
   }
 
   /**
    * This class presents the field as "value only" in line format, without the key.
    *
-   * @tparam T the type param
+   * @tparam T
+   *   the type param
    */
-  class AsValueOnly[-T] extends ToValueAttributes[T] {
-    override def toValue(v: T): Value[_] = Value.nullValue()
+  final class AsValueOnly[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_]                   = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = AsValueOnly.attributes
   }
 
   object AsValueOnly {
-    val attributes: Attributes = Attributes.create(apply())
+    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asElided())
 
-    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asElided()
+    def apply[T]: AsValueOnly[T] = new AsValueOnly[T]()
   }
 
   /**
    * This presents a string or seq as a cardinal in line format, showing the number of elements.
    *
-   * @tparam T the type param
+   * @tparam T
+   *   the type param
    */
-  class AsCardinal[-T] extends ToValueAttributes[T] {
-    override def toValue(v: T): Value[_] = Value.nullValue()
+  final class AsCardinal[-T] extends ToValueAttributes[T] {
+    override def toValue(v: T): Value[_]                   = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = AsCardinal.attributes
   }
 
   object AsCardinal {
-    val attributes: Attributes = Attributes.create(apply())
-    def apply(): Attribute[lang.Boolean] = PresentationHintAttributes.asCardinal()
+    val attributes: Attributes  = Attributes.create(PresentationHintAttributes.asCardinal())
+    def apply[T]: AsCardinal[T] = new AsCardinal[T]()
   }
 }

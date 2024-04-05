@@ -37,7 +37,11 @@ object LoggerMethod {
 
     override def apply(condition: Condition, message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
 
-    override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
+    override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
+        line: Line,
+        file: File,
+        enclosing: Enclosing
+    ): Unit = ()
 
     override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = ()
 

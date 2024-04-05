@@ -7,8 +7,7 @@ import org.scalatest.matchers.must.Matchers
 import java.math.BigInteger
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Instant, LocalDateTime, ZoneOffset}
-
-import java.util.Currency
+import java.util.{Currency, UUID}
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
@@ -117,7 +116,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     }
 
     it("should work with a value attribute") {
-      val fb = MyFieldBuilder
+      val fb    = MyFieldBuilder
       val epoch = Instant.EPOCH
 
       // this works only if ToValueAttribute is a path dependent type, and then hanging it off
@@ -139,18 +138,18 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       // found you :-D
       fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
     }
-    
+
     it("should work with object") {
-      val fb    = MyFieldBuilder
+      val fb = MyFieldBuilder
 
       val objectField: Field = fb.obj("object", fb.keyValue("foo" -> "bar"))
       objectField.toString must be("object={foo=bar}")
     }
 
     it("should work with object with toStringFormat") {
-      val fb    = MyFieldBuilder
+      val fb = MyFieldBuilder
 
-      val currency = Currency.getInstance("USD")
+      val currency           = Currency.getInstance("USD")
       val objectField: Field = fb.obj("usCurrency", currency)
       objectField.toString must be("usCurrency=$")
     }
@@ -166,9 +165,12 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
     implicit val currencyStringFormat: ToStringFormat[Currency] = c => ToValue(c.getSymbol)
 
-    implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) => ToObjectValue(
-      keyValue("currencyCode" -> currency.getCurrencyCode)
-    )
+    implicit val valueOnlyAttribute: AsValueOnly[UUID] = AsValueOnly[UUID]
+
+    implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) =>
+      ToObjectValue(
+        keyValue("currencyCode" -> currency.getCurrencyCode)
+      )
   }
   object MyFieldBuilder extends MyFieldBuilder
 }
