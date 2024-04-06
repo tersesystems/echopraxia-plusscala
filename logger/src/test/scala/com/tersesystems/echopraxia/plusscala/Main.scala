@@ -10,6 +10,7 @@ import scala.concurrent.Future
 
 object Main {
   def main(args: Array[String]): Unit = {
+    System.setProperty("ECHOPRAXIA_STDOUT_LOGGING_LEVEL", "true")
     val printer = new Printer()
     printer.print()
   }
