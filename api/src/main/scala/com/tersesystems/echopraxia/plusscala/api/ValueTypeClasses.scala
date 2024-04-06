@@ -253,7 +253,7 @@ trait ValueTypeClasses {
   }
 
   object AsValueOnly {
-    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asElided())
+    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asValueOnly())
 
     def apply[T]: AsValueOnly[T] = new AsValueOnly[T]()
   }

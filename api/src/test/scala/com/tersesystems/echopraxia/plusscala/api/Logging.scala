@@ -10,7 +10,7 @@ trait Logging extends LoggingBase with HeterogeneousFieldSupport {
 
   trait AsValueOnlyAndAbbreviate[T] extends ToValueAttributes[T] {
     def after: Int
-    def toValue(v: T): Value[_] = Value.nullValue
+    def toValue(v: T): Value[_] = ToValue(v.toString)
     def toAttributes(value: Value[_]): Attributes = {
       val abbreviateAfter = AbbreviateAfter(after)
       val attrs = abbreviateAfter.toAttributes(value)
