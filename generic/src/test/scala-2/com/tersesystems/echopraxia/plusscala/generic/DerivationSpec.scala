@@ -1,8 +1,5 @@
 package com.tersesystems.echopraxia.plusscala.generic
 
-import com.tersesystems.echopraxia.api.Field
-
-import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
@@ -91,9 +88,12 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with value attributes") {
-     implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]()
+      object AsValueOnlyFieldBuilder extends AutoFieldBuilder {
+        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
+      }
 
-     val field = AutoFieldBuilder.keyValue("tuple", SomeId(1))
+
+     val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
      field.toString must be("1")
     }
   }
@@ -122,10 +122,21 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with value attributes") {
-     implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]()
-
-     val field = SemiAutoFieldBuilder.keyValue("tuple", SomeId(1))
+    object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
+      implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
+    }
+     val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
      field.toString must be("1")
+    }
+
+    it("should work with value attributes in list") {
+      object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
+        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
+      }
+
+      // XXX do we want valueonly to apply to this?
+     val field = AsValueOnlyFieldBuilder.keyValue("tuple", Seq(SomeId(1), SomeId(2)))
+     field.toString must be("[1, 2]")
     }
 
     it("should derive a tuple") {
