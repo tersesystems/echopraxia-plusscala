@@ -25,7 +25,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
   }
 
-  trait AutoFieldBuilder extends FieldBuilder with AutoLogging
+  trait AutoFieldBuilder  extends FieldBuilder with AutoLogging
   object AutoFieldBuilder extends AutoFieldBuilder
 
   trait SemiAutoLogging extends SemiAutoDerivation {
@@ -47,7 +47,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
   }
 
-  trait SemiAutoFieldBuilder extends PresentationFieldBuilder with SemiAutoLogging
+  trait SemiAutoFieldBuilder  extends PresentationFieldBuilder with SemiAutoLogging
   object SemiAutoFieldBuilder extends SemiAutoFieldBuilder
 
   // trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
@@ -69,7 +69,9 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
 
       val field = AutoFieldBuilder.keyValue("order" -> order)
-      field.toString must be("order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}")
+      field.toString must be(
+        "order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}"
+      )
     }
 
     it("should derive a case object") {
@@ -92,9 +94,8 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
       }
 
-
-     val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
-     field.toString must be("1")
+      val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
+      field.toString must be("1")
     }
   }
 
@@ -107,8 +108,10 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val lineItems    = Seq(LineItem(sku1, 1))
       val user         = User("user1", 2342331)
       val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
-      val field = SemiAutoFieldBuilder.keyValue("order", order)
-      field.toString must be("order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}")
+      val field        = SemiAutoFieldBuilder.keyValue("order", order)
+      field.toString must be(
+        "order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}"
+      )
     }
 
     it("should derive a case object") {
@@ -122,11 +125,11 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with value attributes") {
-    object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
-      implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
-    }
-     val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
-     field.toString must be("1")
+      object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
+        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
+      }
+      val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
+      field.toString must be("1")
     }
 
     it("should work with value attributes in list") {
@@ -135,16 +138,16 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       }
 
       // XXX do we want valueonly to apply to this?
-     val field = AsValueOnlyFieldBuilder.keyValue("tuple", Seq(SomeId(1), SomeId(2)))
-     field.toString must be("[1, 2]")
+      val field = AsValueOnlyFieldBuilder.keyValue("tuple", Seq(SomeId(1), SomeId(2)))
+      field.toString must be("[1, 2]")
     }
 
     it("should derive a tuple") {
       pendingUntilFixed {
         fail()
       }
-      //val field = SemiAutoFieldBuilder.keyValue("tuple", (1,2,3,4))
-      //field.toString must be("tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}")
+      // val field = SemiAutoFieldBuilder.keyValue("tuple", (1,2,3,4))
+      // field.toString must be("tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}")
     }
   }
 
