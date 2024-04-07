@@ -89,12 +89,13 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       field.toString must be("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
     }
 
-    it("should work with arrays") {
-      // XXX do we want this behavior?
-      implicit val intAsValueOnly: AsValueOnly[Int] = AsValueOnly[Int]
+    it("should do nothing to arrays") {
+      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
+      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
 
-      val field = ("tuple" -> Seq(1, 2))
-      field.toString must be("[1, 2]")
+      val uuid = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "tuple" -> Seq(uuid, uuid)
+      field.toString must be("tuple=[1, 2]")
     }
   }
 

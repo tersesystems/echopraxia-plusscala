@@ -139,7 +139,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
       // XXX do we want valueonly to apply to this?
       val field = AsValueOnlyFieldBuilder.keyValue("tuple", Seq(SomeId(1), SomeId(2)))
-      field.toString must be("[1, 2]")
+      field.toString must be("tuple=[1, 2]")
     }
 
     it("should derive a tuple") {
