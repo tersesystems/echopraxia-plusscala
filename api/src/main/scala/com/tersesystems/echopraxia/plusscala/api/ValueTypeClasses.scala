@@ -144,19 +144,23 @@ trait ValueTypeClasses {
       override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
     }
 
-    implicit def iterableValueFormat[TV: ToValueAttributes]: ToValueAttributes[Iterable[TV]] = new ToValueAttributes[Iterable[TV]]() {
-      override def toValue(seq: collection.Iterable[TV]): Value[_] = {
-        val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttributes[TV]].toValue(el)).toSeq
-        Value.array(list.asJava)
-      }
+    // Things that modify how values appear should apply to seqs and other packaging.
+    implicit def iterableValueFormat[TV: ValueModificationToValueAttributes]: ToValueAttributes[Iterable[TV]] =
+      new ValueModificationToValueAttributes[Iterable[TV]]() {
+        override def toValue(seq: collection.Iterable[TV]): Value[_] = {
+          val list: Seq[Value[_]] = seq.map(el => implicitly[ToValueAttributes[TV]].toValue(el)).toSeq
+          Value.array(list.asJava)
+        }
 
-      override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttributes[TV]].toAttributes(value)
-    }
+        override def toAttributes(value: Value[_]): Attributes = implicitly[ToValueAttributes[TV]].toAttributes(value)
+      }
   }
 
   object ToValueAttributes extends LowPriorityToValueAttributesImplicits {
     def attributes(value: Value[_], ev: ToValueAttributes[_]): Attributes = ev.toAttributes(value)
   }
+
+  trait ValueModificationToValueAttributes[-T] extends ToValueAttributes[T]
 
   /**
    * This changes how the field renders in line format, useful for rendering complex objects with a summary.
@@ -171,7 +175,7 @@ trait ValueTypeClasses {
    * @tparam T
    *   the type.
    */
-  trait ToStringFormat[-T] extends ToValueAttributes[T] {
+  trait ToStringFormat[-T] extends ValueModificationToValueAttributes[T] {
     override def toAttributes(value: Value[_]): Attributes = Attributes.create(withToStringFormat(value))
 
     // Add a custom string format attribute using the passed in value
@@ -212,7 +216,7 @@ trait ValueTypeClasses {
    * @tparam T
    *   the type param
    */
-  trait AbbreviateAfter[-T] extends ToValueAttributes[T] {
+  trait AbbreviateAfter[-T] extends ValueModificationToValueAttributes[T] {
     def after: Int
     override def toValue(v: T): Value[_]                   = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = Attributes.create(PresentationHintAttributes.abbreviateAfter(after))
@@ -263,7 +267,7 @@ trait ValueTypeClasses {
    * @tparam T
    *   the type param
    */
-  final class AsCardinal[-T] extends ToValueAttributes[T] {
+  class AsCardinal[-T] extends ValueModificationToValueAttributes[T] {
     override def toValue(v: T): Value[_]                   = Value.nullValue()
     override def toAttributes(value: Value[_]): Attributes = AsCardinal.attributes
   }

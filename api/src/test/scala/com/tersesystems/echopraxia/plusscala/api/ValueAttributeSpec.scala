@@ -43,6 +43,16 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       val field: Field = "array" -> Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
       field.toString must be("array=[1, 2, 3, 4...]")
     }
+
+    it("should abbreviate values in array") {
+      // if this doesn't work, it's a problem with the underlying attribute
+      implicit val abbreviateUUID: AbbreviateAfter[UUID] = AbbreviateAfter(4)
+      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString)
+
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "uuids" -> Seq(uuid, uuid)
+      field.toString must be("uuids=[eb14..., eb14...]")
+    }
   }
 
   describe("Elided") {
@@ -55,6 +65,17 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
       field.toString must be("download={email=user@example.org}")
+    }
+
+    it("should elide the value in seq") {
+      implicit val payloadAsElided: Elided[Payload]   = Elided[Payload]
+      implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
+      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
+
+      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
+      val field: Field = "downloads" -> Seq(download, download)
+      field.toString must be("downloads=[{email=user@example.org}, {email=user@example.org}]")
     }
   }
 
@@ -69,15 +90,25 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       val field: Field = "download" -> download
       field.toString must be("download={email=user@example.org, payload=|0|}")
     }
-  }
 
-  describe("ToValueAttribute") {
-    it("should compose two different attributes") {
-      implicit val abbreviateValueOnly: AsValueOnlyAndAbbreviate[UUID] = AsValueOnlyAndAbbreviate(4)
-      implicit val uuidToValue: ToValue[UUID]                          = uuid => ToValue(uuid.toString)
+    it("should cardinal a string") {
+      implicit val uuidAsCardinal: AsCardinal[UUID] = AsCardinal[UUID]
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString)
 
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("eb14...")
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "uuid" -> uuid
+      field.toString must be("uuid=|36|")
+    }
+
+    it("should cardinal a seq of strings") {
+      // if this doesn't work it's a problem with the underlying attribute, which
+      // should work like ToStringFormat
+      implicit val uuidAsCardinal: AsCardinal[UUID] = AsCardinal[UUID]
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString)
+
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "seq" -> Seq(uuid, uuid)
+      field.toString must be("seq=[|36|, |36|]")
     }
   }
 
@@ -90,12 +121,13 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       field.toString must be("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
     }
 
-    it("should work with arrays") {
-      // XXX do we want this behavior?
-      implicit val intAsValueOnly: AsValueOnly[Int] = AsValueOnly[Int]
+    it("should do nothing to arrays") {
+      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
+      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
 
-      val field: Field = ("tuple" -> Seq(1, 2))
-      field.toString must be("[1, 2]")
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "uuids" -> Seq(uuid, uuid)
+      field.toString must be("uuids=[eb1497ad-e3c1-45a3-8305-9d394a72afbe, eb1497ad-e3c1-45a3-8305-9d394a72afbe]")
     }
   }
 
@@ -106,6 +138,25 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
       val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       field.toString must be("\"unique id\"=eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+    }
+
+    it("should not change seqs") {
+      implicit val uuidDisplayName: WithDisplayName[UUID] = WithDisplayName[UUID]("unique id")
+      implicit val uuidToValue: ToValue[UUID]             = uuid => ToValue(uuid.toString)
+
+      // this is a field with ArrayValue, not a field with a ToValue[UUID]
+      val field: Field = "uuid" -> Seq(UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe"))
+      field.toString must be("uuid=[eb1497ad-e3c1-45a3-8305-9d394a72afbe]")
+    }
+  }
+
+  describe("AsValueOnlyAndAbbreviate") {
+    it("should compose two different attributes") {
+      implicit val abbreviateValueOnly: AsValueOnlyAndAbbreviate[UUID] = AsValueOnlyAndAbbreviate(4)
+      implicit val uuidToValue: ToValue[UUID]                          = uuid => ToValue(uuid.toString)
+
+      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      field.toString must be("eb14...")
     }
   }
 
