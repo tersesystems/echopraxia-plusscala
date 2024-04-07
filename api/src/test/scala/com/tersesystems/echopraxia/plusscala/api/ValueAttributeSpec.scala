@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Attributes
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -8,6 +10,22 @@ import org.scalatest.matchers.must.Matchers
 import java.util.{Base64, UUID}
 
 class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging {
+
+  trait AsValueOnlyAndAbbreviate[T] extends ToValueAttributes[T] {
+    def after: Int
+    def toValue(v: T): Value[_] = ToValue(v.toString)
+    def toAttributes(value: Value[_]): Attributes = {
+      val abbreviateAfter = AbbreviateAfter(after)
+      val attrs = abbreviateAfter.toAttributes(value)
+      attrs.plusAll(AsValueOnly.attributes)
+    }
+  }
+
+  object AsValueOnlyAndAbbreviate {
+    def apply[T](a: Int): AsValueOnlyAndAbbreviate[T] = new AsValueOnlyAndAbbreviate[T]() {
+      val after = a
+    }
+  }
 
   describe("AbbreviateAfter") {
     it("should abbreviate a string") {
