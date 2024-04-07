@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.generic
 
+import com.tersesystems.echopraxia.api.Field
+
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
@@ -22,12 +24,14 @@ final case class Order(paymentInfo: PaymentInfo, shippingInfo: ShippingInfo, lin
 
 class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  trait AutoFieldBuilder extends FieldBuilder with AutoDerivation {
+  trait AutoLogging extends AutoDerivation {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
   }
+
+  trait AutoFieldBuilder extends FieldBuilder with AutoLogging
   object AutoFieldBuilder extends AutoFieldBuilder
 
-  trait SemiAutoFieldBuilder extends FieldBuilder with SemiAutoDerivation {
+  trait SemiAutoLogging extends SemiAutoDerivation {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 
     // XXX there is an NPE bug in Magnolia -- the Instant implicit must be defined
@@ -45,67 +49,91 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     implicit lazy val someObjectToValue: ToValue[SomeObject.type] = gen[SomeObject.type]
     implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
   }
+
+  trait SemiAutoFieldBuilder extends PresentationFieldBuilder with SemiAutoLogging
   object SemiAutoFieldBuilder extends SemiAutoFieldBuilder
 
-  trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
+  // trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation
 
-  trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
+  // trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
 
-  trait ShortEither extends FieldBuilder with AutoDerivation with EitherValueTypes
+  // trait ShortEither extends FieldBuilder with AutoDerivation with EitherValueTypes
 
-  trait ShortOption extends AutoDerivation with OptionValueTypes
-
-  private val autoLogger = LoggerFactory.getLogger(getClass, AutoFieldBuilder)
+  // trait ShortOption extends AutoDerivation with OptionValueTypes
 
   describe("automatic derivation") {
 
     it("should derive a case class") {
-      val paymentInfo  = PaymentInfo("41111111", Instant.now())
+      val paymentInfo  = PaymentInfo("41111111", Instant.EPOCH)
       val shippingInfo = ShippingInfo("address 1", "address 2")
       val sku1         = Sku(232313, "some furniture")
       val lineItems    = Seq(LineItem(sku1, 1))
       val user         = User("user1", 2342331)
       val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
-      autoLogger.info("{}", _.keyValue("order", order))
+
+      val field = AutoFieldBuilder.keyValue("order" -> order)
+      field.toString must be("order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}")
     }
 
     it("should derive a case object") {
-      autoLogger.info("{}", _.keyValue("someObject", SomeObject))
+      val field = AutoFieldBuilder.keyValue("someObject", SomeObject)
+      field.toString must be("someObject=SomeObject")
     }
 
     it("should derive an anyval") {
-      autoLogger.info("{}", _.keyValue("someId", SomeId(1)))
+      val field = AutoFieldBuilder.keyValue("someId", SomeId(1))
+      field.toString must be("someId=1")
     }
 
     it("should derive a tuple") {
-      autoLogger.info("{}", _.keyValue("tuple", (1, 2, 3, 4)))
+      val field = AutoFieldBuilder.keyValue("tuple", (1, 2, 3, 4))
+      field.toString must be("tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}")
+    }
+
+    it("should work with value attributes") {
+     implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]()
+
+     val field = AutoFieldBuilder.keyValue("tuple", SomeId(1))
+     field.toString must be("1")
     }
   }
 
   describe("semi automatic derivation") {
-    val semiAutoLogger = LoggerFactory.getLogger(getClass, SemiAutoFieldBuilder)
 
     it("should derive a case class") {
-      val paymentInfo  = PaymentInfo("41111111", Instant.now())
+      val paymentInfo  = PaymentInfo("41111111", Instant.EPOCH)
       val shippingInfo = ShippingInfo("address 1", "address 2")
       val sku1         = Sku(232313, "some furniture")
       val lineItems    = Seq(LineItem(sku1, 1))
       val user         = User("user1", 2342331)
       val order        = Order(paymentInfo = paymentInfo, shippingInfo = shippingInfo, lineItems = lineItems, owner = user)
-      semiAutoLogger.info("{}", _.keyValue("order", order))
+      val field = SemiAutoFieldBuilder.keyValue("order", order)
+      field.toString must be("order={@type=com.tersesystems.echopraxia.plusscala.generic.Order, paymentInfo={@type=com.tersesystems.echopraxia.plusscala.generic.PaymentInfo, creditCardNumber=41111111, expirationDate=1970-01-01T00:00:00Z}, shippingInfo={@type=com.tersesystems.echopraxia.plusscala.generic.ShippingInfo, address1=address 1, address2=address 2}, lineItems=[{@type=com.tersesystems.echopraxia.plusscala.generic.LineItem, sku={@type=com.tersesystems.echopraxia.plusscala.generic.Sku, id=232313, description=some furniture}, quantity=1}], owner={@type=com.tersesystems.echopraxia.plusscala.generic.User, name=user1, id=2342331}}")
     }
 
     it("should derive a case object") {
-      semiAutoLogger.info("{}", _.keyValue("someObject", SomeObject))
+      val field = SemiAutoFieldBuilder.keyValue("someObject", SomeObject)
+      field.toString must be("someObject=SomeObject")
     }
 
     it("should derive an anyval") {
-      semiAutoLogger.info("{}", _.keyValue("someId", SomeId(1)))
+      val field = SemiAutoFieldBuilder.keyValue("someId", SomeId(1))
+      field.toString must be("someId=1")
+    }
+
+    it("should work with value attributes") {
+     implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]()
+
+     val field = SemiAutoFieldBuilder.keyValue("tuple", SomeId(1))
+     field.toString must be("1")
     }
 
     it("should derive a tuple") {
-      pending // of limited value :-/
-      // semiAutoLogger.info("{}", _.keyValue("tuple", (1,2,3,4)))
+      pendingUntilFixed {
+        fail()
+      }
+      //val field = SemiAutoFieldBuilder.keyValue("tuple", (1,2,3,4))
+      //field.toString must be("tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}")
     }
   }
 
