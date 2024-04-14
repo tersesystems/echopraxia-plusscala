@@ -15,3 +15,5 @@ trait HeterogeneousFieldSupport { self: ValueTypeClasses =>
   // Render iterables as arrays (user may want to render as object, so this is broken out)
   implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[Iterable[V]] = ToArrayValue.iterableToArrayValue[V]
 }
+
+object HeterogeneousFieldSupport extends HeterogeneousFieldSupport with ValueTypeClasses
