@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Attributes
 import com.tersesystems.echopraxia.plusscala.spi.Utils.newField
-
 import sourcecode._
 
 case class SourceCode(line: Line, file: File, enclosing: Enclosing)

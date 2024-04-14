@@ -1,13 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.api
-
-import com.tersesystems.echopraxia.plusscala.spi.Utils
-import com.tersesystems.echopraxia.spi.DefaultField
 import com.tersesystems.echopraxia.api.Field
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.must.Matchers
+import com.tersesystems.echopraxia.spi.DefaultField
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.predicates.all.NonEmpty
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.must.Matchers
 
 // refined doesn't exist in scala 3
 class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {

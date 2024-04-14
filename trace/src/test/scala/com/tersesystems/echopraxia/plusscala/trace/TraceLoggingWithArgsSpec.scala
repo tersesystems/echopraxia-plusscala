@@ -3,12 +3,19 @@ package com.tersesystems.echopraxia.plusscala.trace
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.api.{FieldBuilderResult, Value}
-import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder, SourceCode}
+import com.tersesystems.echopraxia.api.FieldBuilderResult
+import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.SourceCode
+import org.scalatest.Assertion
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{Assertion, BeforeAndAfterEach}
-import sourcecode.{Args, Enclosing, File, Line}
+import sourcecode.Args
+import sourcecode.Enclosing
+import sourcecode.File
+import sourcecode.Line
 
 import java.util
 import scala.jdk.CollectionConverters._

@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Field
-
+import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import sourcecode._
 

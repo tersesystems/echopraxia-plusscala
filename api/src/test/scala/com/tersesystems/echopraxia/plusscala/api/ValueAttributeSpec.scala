@@ -1,13 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, Value}
 import com.tersesystems.echopraxia.api.Attributes
-
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
-import java.util.{Base64, UUID}
+import java.util.Base64
+import java.util.UUID
 
 class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging {
 

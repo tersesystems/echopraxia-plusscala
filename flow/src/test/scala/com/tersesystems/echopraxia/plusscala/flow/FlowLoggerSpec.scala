@@ -4,9 +4,10 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import com.tersesystems.echopraxia.plusscala.api.Condition
+import org.scalatest.Assertion
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{Assertion, BeforeAndAfterEach}
 
 import java.util
 import scala.jdk.CollectionConverters._

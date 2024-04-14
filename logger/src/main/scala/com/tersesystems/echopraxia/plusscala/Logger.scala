@@ -1,12 +1,24 @@
 package com.tersesystems.echopraxia.plusscala
 
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.FieldBuilderResult.list
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Level, Value}
-import com.tersesystems.echopraxia.api.Level.{TRACE, DEBUG, INFO, WARN, ERROR}
-import com.tersesystems.echopraxia.plusscala.api.{Condition, PresentationFieldBuilder, SourceCode}
-import com.tersesystems.echopraxia.plusscala.spi.{DefaultMethodsSupport, LoggerSupport, Utils}
-import com.tersesystems.echopraxia.spi.{CoreLogger, FieldConstants, Utilities}
-import sourcecode.{Enclosing, File, Line}
+import com.tersesystems.echopraxia.api.Level
+import com.tersesystems.echopraxia.api.Level.DEBUG
+import com.tersesystems.echopraxia.api.Level.ERROR
+import com.tersesystems.echopraxia.api.Level.INFO
+import com.tersesystems.echopraxia.api.Level.TRACE
+import com.tersesystems.echopraxia.api.Level.WARN
+import com.tersesystems.echopraxia.plusscala.api.Condition
+import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.SourceCode
+import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
+import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
+import com.tersesystems.echopraxia.spi.CoreLogger
+import com.tersesystems.echopraxia.spi.Utilities
+import sourcecode.Enclosing
+import sourcecode.File
+import sourcecode.Line
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
