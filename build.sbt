@@ -1,6 +1,4 @@
 import sbt.Keys._
-import commandmatrix._
-import commandmatrix.extra._
 
 val echopraxiaVersion            = "3.2.0-SNAPSHOT"
 val scalatestVersion             = "3.2.18"
@@ -20,11 +18,6 @@ val scala212                     = "2.12.19"
 val scalaVersions = List(scala3, scala213, scala212)
 val ideScala = scala213
 
-// https://stackoverflow.com/questions/74340971/how-to-configure-intellij-to-manage-different-scala-versions
-val only1JvmScalaInIde = MatrixAction
-  .ForPlatforms(VirtualAxis.jvm)
-  .Configure(_.settings(ideSkipProject := (scalaVersion.value != ideScala)))
-
 initialize := {
   val _        = initialize.value // run the previous initialization
   val required = "17"
@@ -34,15 +27,7 @@ initialize := {
 
 inThisBuild(
   Seq(
-    // sbt-commandmatrix
-    commands ++= CrossCommand.single(
-      "test",
-      matrices = Seq(root),
-      dimensions = Seq(
-        Dimension.scala("2.13", fullFor3 = true),
-        Dimension.platform()
-      )
-    ),
+    crossScalaVersions := scalaVersions,
     semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
@@ -70,7 +55,7 @@ ThisBuild / Test / parallelExecution := false
 Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
 Global / excludeLintKeys += ideSkipProject
 
-lazy val api = (projectMatrix in file("api"))
+lazy val api = (project in file("api"))
   .settings(
     name := "api",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -96,9 +81,8 @@ lazy val api = (projectMatrix in file("api"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val generic = (projectMatrix in file("generic"))
+lazy val generic = (project in file("generic"))
   .settings(
     name := "generic",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -116,9 +100,8 @@ lazy val generic = (projectMatrix in file("generic"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api, logger % "test")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val logger = (projectMatrix in file("logger"))
+lazy val logger = (project in file("logger"))
   .settings(
     name := "logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -139,9 +122,8 @@ lazy val logger = (projectMatrix in file("logger"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val asyncLogger = (projectMatrix in file("async"))
+lazy val asyncLogger = (project in file("async"))
   .settings(
     name := "async-logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -150,9 +132,8 @@ lazy val asyncLogger = (projectMatrix in file("async"))
     libraryDependencies += "org.scalatest"              %% "scalatest" % scalatestVersion  % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val flowLogger = (projectMatrix in file("flow"))
+lazy val flowLogger = (project in file("flow"))
   .settings(
     name := "flow-logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -163,11 +144,11 @@ lazy val flowLogger = (projectMatrix in file("flow"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val nameOfLogger = (projectMatrix in file("nameof"))
+lazy val nameOfLogger = (project in file("nameof"))
   .settings(
     name := "nameof",
+    crossScalaVersions := List(scala212, scala213),
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -176,7 +157,6 @@ lazy val nameOfLogger = (projectMatrix in file("nameof"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = List(scala213, scala212)) // disable scala 3 for now
 
 // don't include dump for now
 //lazy val dump = (project in file("dump"))
@@ -187,7 +167,7 @@ lazy val nameOfLogger = (projectMatrix in file("nameof"))
 //    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
 //  ).dependsOn(api % "compile->compile;test->compile")
 
-lazy val diff = (projectMatrix in file("diff"))
+lazy val diff = (project in file("diff"))
   .settings(
     name := "diff",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -202,9 +182,8 @@ lazy val diff = (projectMatrix in file("diff"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val traceLogger = (projectMatrix in file("trace"))
+lazy val traceLogger = (project in file("trace"))
   .settings(
     name := "trace-logger",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -215,9 +194,8 @@ lazy val traceLogger = (projectMatrix in file("trace"))
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test
   )
   .dependsOn(api % "compile->compile;test->compile")
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-lazy val benchmarks = (projectMatrix in file("benchmarks"))
+lazy val benchmarks = (project in file("benchmarks"))
   .enablePlugins(JmhPlugin)
   .settings(
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
@@ -228,27 +206,15 @@ lazy val benchmarks = (projectMatrix in file("benchmarks"))
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % echopraxiaVersion
   )
   .dependsOn(api, logger, asyncLogger, flowLogger, traceLogger)
-  .jvmPlatform(scalaVersions = scalaVersions)
 
-val refs = api.projectRefs ++
-           generic.projectRefs ++
-           logger.projectRefs ++
-           asyncLogger.projectRefs ++
-           nameOfLogger.projectRefs ++
-           diff.projectRefs ++
-           flowLogger.projectRefs ++
-           traceLogger.projectRefs ++
-           benchmarks.projectRefs
-
-lazy val root = (projectMatrix in file("."))
+lazy val root = (project in file("."))
   .settings(
     name                                   := "echopraxia-plusscala",
     Compile / doc / sources                := Seq.empty,
     Compile / packageDoc / publishArtifact := false,
     publishArtifact                        := false,
     publish / skip                         := true
-  ).aggregate(refs: _*)
-  .jvmPlatform(scalaVersions = scalaVersions)
+  ).aggregate(api, generic, logger, asyncLogger, nameOfLogger, diff, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
