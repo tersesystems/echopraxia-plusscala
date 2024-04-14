@@ -162,7 +162,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
   trait MyFieldBuilder extends PresentationFieldBuilder {
     implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-    implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+    implicit val readableInstant: ToStringValue[Instant] = (v: Instant) => {
       val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
       val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
       Value.string(formatter.format(datetime))

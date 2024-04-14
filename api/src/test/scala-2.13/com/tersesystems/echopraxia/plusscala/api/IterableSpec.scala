@@ -11,6 +11,8 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+import scala.collection.JavaConverters._
+
 // The tests here compile in 2.13 but do not compile in 2.12
 class IterableSpec extends AnyWordSpec with Matchers with Logging {
 
@@ -37,7 +39,7 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work for objects with custom attributes" in {
-      implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+      implicit val readableInstant: ToStringValue[Instant] = (v: Instant) => {
         val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         ToValue(formatter.format(datetime))

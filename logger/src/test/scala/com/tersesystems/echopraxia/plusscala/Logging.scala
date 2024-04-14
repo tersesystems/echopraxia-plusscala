@@ -41,7 +41,7 @@ trait Logging extends LoggingBase {
   implicit val bookToField: ToField[Book] = ToField(_ => "book", book => ToObjectValue(book.title, book.category, book.author, book.price))
 
   // Says we want a toString of $8.95 in a message template for a price
-  implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
+  implicit val priceToStringValue: ToStringValue[Price] = (price: Price) => Value.string(price.toString)
 
   implicit val creditCardToName: ToName[CreditCard] = ToName.create("credit_card")
   implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {

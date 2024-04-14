@@ -7,6 +7,13 @@ import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 import scala.annotation.implicitNotFound
 import scala.collection.JavaConverters._
 
+import com.tersesystems.echopraxia.api.Attribute
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+
+import java.lang
+
+import scala.annotation.implicitNotFound
+
 trait ValueTypeClasses {
 
   /**
@@ -165,20 +172,20 @@ trait ValueTypeClasses {
    * class Foo {
    *   def debugString: String = ...
    * }
-   * implicit val fooToDebugString: ToStringFormat[Foo] = foo => ToValue(foo.debugString)
+   * implicit val fooToDebugString: ToStringValue[Foo] = foo => ToValue(foo.debugString)
    * }}}
    *
    * @tparam T
    *   the type.
    */
-  trait ToStringFormat[-T] extends ToValueAttributes[T] {
-    override def toAttributes(value: Value[_]): Attributes = Attributes.create(withToStringFormat(value))
+  trait ToStringValue[-T] extends ToValueAttributes[T] {
+    override def toAttributes(value: Value[_]): Attributes = Attributes.create(ToStringValue.withToStringValue(value))
+  }
 
+  object ToStringValue {
     // Add a custom string format attribute using the passed in value
-    private def withToStringFormat(value: Value[_]): Attribute[_] = {
-      PresentationHintAttributes.withToStringFormat(new SimpleFieldVisitor() {
-        override def visit(f: Field): Field = Field.keyValue(f.name(), value)
-      })
+    def withToStringValue(value: Value[_]): Attribute[_] = {
+      PresentationHintAttributes.withToStringValue(value.toString())
     }
   }
 
