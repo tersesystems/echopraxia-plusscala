@@ -27,6 +27,7 @@ initialize := {
 
 inThisBuild(
   Seq(
+    crossScalaVersions := scalaVersions,
     semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
@@ -147,6 +148,7 @@ lazy val flowLogger = (project in file("flow"))
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
     name := "nameof",
+    crossScalaVersions := List(scala212, scala213),
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
