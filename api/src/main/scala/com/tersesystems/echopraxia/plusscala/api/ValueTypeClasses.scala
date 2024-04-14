@@ -183,20 +183,16 @@ trait ValueTypeClasses {
   }
 
   object ToStringValue {
-    // Add a custom string format attribute using the passed in value
+    // Add a custom string value to render
     def withToStringValue(value: Value[_]): Attribute[_] = {
       PresentationHintAttributes.withToStringValue(value.toString())
     }
   }
 
-  object ToStringFormat {
-    def apply[T](f: T => Value[_]): ToStringFormat[T] = new ToStringFormat[T]() {
-      override def toValue(v: T): Value[_] = f(v)
-    }
-  }
-
   /**
    * This changes the display name in line format, useful for human representation.
+   *
+   * Only applicable to fields.
    *
    * @tparam T
    *   the type param
@@ -249,6 +245,8 @@ trait ValueTypeClasses {
 
   /**
    * This class presents the field as "value only" in line format, without the key.
+   *
+   * Only applicable to fields.
    *
    * @tparam T
    *   the type param

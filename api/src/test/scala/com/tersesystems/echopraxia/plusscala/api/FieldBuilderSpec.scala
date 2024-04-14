@@ -151,7 +151,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       objectField.toString must be("object={foo=bar}")
     }
 
-    it("should work with object with toStringFormat") {
+    it("should work with object with ToStringValue") {
       val fb = MyFieldBuilder
 
       val currency           = Currency.getInstance("USD")
@@ -168,7 +168,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       Value.string(formatter.format(datetime))
     }
 
-    implicit val currencyStringFormat: ToStringFormat[Currency] = c => ToValue(c.getSymbol)
+    implicit val currencyStringValue: ToStringValue[Currency] = c => ToValue(c.getSymbol)
 
     implicit val valueOnlyAttribute: AsValueOnly[UUID] = AsValueOnly[UUID]
 
