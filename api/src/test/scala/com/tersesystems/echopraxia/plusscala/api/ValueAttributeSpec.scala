@@ -93,7 +93,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       // XXX do we want this behavior?
       implicit val intAsValueOnly: AsValueOnly[Int] = AsValueOnly[Int]
 
-      val field = ("tuple" -> Seq(1, 2))
+      val field: Field = ("tuple" -> Seq(1, 2))
       field.toString must be("[1, 2]")
     }
   }
