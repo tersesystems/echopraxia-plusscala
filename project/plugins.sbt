@@ -25,7 +25,7 @@ addSbtPlugin("com.indoorvivants" % "sbt-commandmatrix" % "0.0.5")
 addSbtPlugin("org.jetbrains" % "sbt-ide-settings" % "1.1.0")
 
 // Must use bloop for scala 3
-addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.5.15")
+addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.5.17")
 
 // scalafix
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.12.0")

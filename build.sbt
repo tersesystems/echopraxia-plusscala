@@ -2,7 +2,7 @@ import sbt.Keys._
 import commandmatrix._
 import commandmatrix.extra._
 
-val echopraxiaVersion            = "3.1.2"
+val echopraxiaVersion            = "3.2.0-SNAPSHOT"
 val scalatestVersion             = "3.2.18"
 val logbackClassicVersion        = "1.5.3"
 val logstashVersion              = "7.4"
