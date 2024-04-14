@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Field
-
 import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
 
 import java.util.Currency

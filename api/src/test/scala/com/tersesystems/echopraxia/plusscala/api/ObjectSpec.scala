@@ -1,10 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.must.Matchers
-
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.Value
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.must.Matchers
 
 import scala.collection.JavaConverters._
 

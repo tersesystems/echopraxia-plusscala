@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.diff
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec

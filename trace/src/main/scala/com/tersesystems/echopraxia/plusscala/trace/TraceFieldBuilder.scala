@@ -3,13 +3,11 @@ package com.tersesystems.echopraxia.plusscala.trace
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.plusscala.api.{
-  FieldBuilder,
-  ListToFieldBuilderResultMethods,
-  PresentationFieldBuilder,
-  SourceCode,
-  ValueTypeClasses
-}
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.ListToFieldBuilderResultMethods
+import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.SourceCode
+import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceSignature
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.string

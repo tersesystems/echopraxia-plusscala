@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.api.Value.ObjectValue
+import com.tersesystems.echopraxia.api._
 import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
-import scala.collection.JavaConverters._
-
 import scala.annotation.implicitNotFound
+import scala.collection.JavaConverters._
 
 trait ValueTypeClasses {
 

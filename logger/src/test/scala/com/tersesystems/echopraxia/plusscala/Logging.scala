@@ -1,12 +1,14 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api._
 
-import java.util.{Currency, UUID}
+import java.util.Currency
+import java.util.UUID
 import scala.concurrent.Future
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {

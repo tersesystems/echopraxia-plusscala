@@ -1,8 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.spi.{FieldConstants, PresentationHintAttributes}
 import com.tersesystems.echopraxia.plusscala.spi.Utils
+import com.tersesystems.echopraxia.spi.FieldConstants
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 trait HasName {
   type Name

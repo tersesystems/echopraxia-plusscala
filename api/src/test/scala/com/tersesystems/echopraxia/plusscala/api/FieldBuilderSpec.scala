@@ -1,13 +1,18 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.Value
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.math.BigInteger
-import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{Instant, LocalDateTime, ZoneOffset}
-import java.util.{Currency, UUID}
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Currency
+import java.util.UUID
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
