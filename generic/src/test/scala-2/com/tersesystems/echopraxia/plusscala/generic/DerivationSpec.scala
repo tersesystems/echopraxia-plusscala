@@ -88,15 +88,6 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val field = AutoFieldBuilder.keyValue("tuple", (1, 2, 3, 4))
       field.toString must be("tuple={@type=scala.Tuple4, _1=1, _2=2, _3=3, _4=4}")
     }
-
-    it("should work with value attributes") {
-      object AsValueOnlyFieldBuilder extends AutoFieldBuilder {
-        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
-      }
-
-      val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
-      field.toString must be("1")
-    }
   }
 
   describe("semi automatic derivation") {
@@ -122,24 +113,6 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     it("should derive an anyval") {
       val field = SemiAutoFieldBuilder.keyValue("someId", SomeId(1))
       field.toString must be("someId=1")
-    }
-
-    it("should work with value attributes") {
-      object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
-        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
-      }
-      val field = AsValueOnlyFieldBuilder.keyValue("tuple", SomeId(1))
-      field.toString must be("1")
-    }
-
-    it("should work with value attributes in list") {
-      object AsValueOnlyFieldBuilder extends SemiAutoFieldBuilder {
-        implicit val idAsValueOnly: AsValueOnly[SomeId] = AsValueOnly[SomeId]
-      }
-
-      // XXX do we want valueonly to apply to this?
-      val field = AsValueOnlyFieldBuilder.keyValue("tuple", Seq(SomeId(1), SomeId(2)))
-      field.toString must be("tuple=[1, 2]")
     }
 
     it("should derive a tuple") {

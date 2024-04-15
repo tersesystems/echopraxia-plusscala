@@ -168,8 +168,6 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       ToValue(instant.toString).withToStringValue(s)
     }
 
-    implicit val valueOnlyAttribute: AsValueOnly[UUID] = AsValueOnly[UUID]
-
     implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) =>
       ToObjectValue(
         keyValue("currencyCode" -> currency.getCurrencyCode)

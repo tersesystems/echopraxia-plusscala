@@ -20,12 +20,8 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
     }
 
     it("should abbreviate an array") {
-      implicit class RichField(f: PresentationField) {
-        def abbreviateAfter(a: Int) = f.withAttributes(f.attributes().plus(PresentationHintAttributes.abbreviateAfter(a)))
-      }
-
-      val field: Field = "array" -> Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-      field.asInstanceOf[PresentationField].abbreviateAfter(4).toString must be("array=[1, 2, 3, 4...]")
+      val field: Field = "array" -> ToArrayValue(Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).abbreviateAfter(4)
+      field.asInstanceOf[PresentationField].toString must be("array=[1, 2, 3, 4...]")
     }
 
     it("should abbreviate values in array") {
@@ -40,9 +36,10 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
   describe("Elided") {
     it("should elide a field") {
-      implicit val payloadAsElided: Elided[Payload]   = Elided[Payload]
       implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => {
+        ToValue(Base64.getEncoder.encodeToString(c.value)).asElided
+      })
       implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
@@ -51,9 +48,8 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
     }
 
     it("should elide the value in seq") {
-      implicit val payloadAsElided: Elided[Payload]   = Elided[Payload]
       implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)).asElided)
       implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
@@ -89,45 +85,6 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       field.toString must be("seq=[|36|, |36|]")
     }
   }
-
-  describe("AsValueOnly") {
-    it("should render only the value") {
-      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
-      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-
-    it("should do nothing to arrays") {
-      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
-      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
-
-      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      val field: Field = "uuids" -> Seq(uuid, uuid)
-      field.toString must be("uuids=[eb1497ad-e3c1-45a3-8305-9d394a72afbe, eb1497ad-e3c1-45a3-8305-9d394a72afbe]")
-    }
-  }
-
-  describe("WithDisplayName") {
-    it("should render with a display name") {
-      implicit val uuidDisplayName: WithDisplayName[UUID] = WithDisplayName[UUID]("unique id")
-      implicit val uuidToValue: ToValue[UUID]             = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("\"unique id\"=eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-
-    it("should not change seqs") {
-      implicit val uuidDisplayName: WithDisplayName[UUID] = WithDisplayName[UUID]("unique id")
-      implicit val uuidToValue: ToValue[UUID]             = uuid => ToValue(uuid.toString)
-
-      // this is a field with ArrayValue, not a field with a ToValue[UUID]
-      val field: Field = "uuid" -> Seq(UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe"))
-      field.toString must be("uuid=[eb1497ad-e3c1-45a3-8305-9d394a72afbe]")
-    }
-  }
-
 }
 
 final case class Payload(value: Array[Byte]) extends AnyVal

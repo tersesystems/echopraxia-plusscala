@@ -49,6 +49,10 @@ class OptionSpec extends AnyWordSpec with Matchers with Logging {
         ToValue(v.toString).withToStringValue(formatter.format(datetime))
       }
       val field: Field = "test" -> Option(Instant.ofEpochMilli(0))
+      val attributes = field.value().attributes()
+      println(s"attributes = $attributes")
+
+      field.value().toString must be("1/1/70, 12:00 AM")
       field.toString must be("test=1/1/70, 12:00 AM")
     }
   }

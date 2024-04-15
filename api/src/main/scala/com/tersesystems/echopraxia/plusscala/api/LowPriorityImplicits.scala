@@ -28,6 +28,10 @@ trait LowPriorityImplicits {
 
   final implicit class RichValue[T](value: Value[T]) {
 
+    def asElided: Value[T] = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
+
     def asCardinal: Value[T] = {
       value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))
     }
@@ -42,6 +46,10 @@ trait LowPriorityImplicits {
   }
 
   final implicit class RichArrayValue(val value: ArrayValue) {
+
+    def asElided: ArrayValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
 
     def asCardinal: ArrayValue = {
       value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))
@@ -71,6 +79,10 @@ trait LowPriorityImplicits {
   }
 
   final implicit class RichObjectValue(value: ObjectValue) {
+
+    def asElided: ObjectValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
 
     def asCardinal: ObjectValue = {
       value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))

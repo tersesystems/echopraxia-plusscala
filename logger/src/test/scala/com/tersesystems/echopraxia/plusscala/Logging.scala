@@ -15,7 +15,7 @@ trait Logging extends LoggingBase {
 
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object
-  implicit def tupleToValue[TVK: ToValue: ToValueAttributes, TVV: ToValue: ToValueAttributes]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+  implicit def tupleToValue[TVK: ToValue: ToFieldAttributes, TVV: ToValue: ToFieldAttributes]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
     ToObjectValue("key" -> k, "value" -> v)
   }
 

@@ -2,10 +2,8 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.api._
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 import scala.annotation.implicitNotFound
-import scala.collection.JavaConverters._
 
 trait ValueTypeClasses {
 
@@ -128,75 +126,5 @@ trait ValueTypeClasses {
     def apply(field: Field): Value.ObjectValue = Value.`object`(field)
 
     def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
-  }
-
-  // Allows custom attributes on fields through implicits
-  trait ToValueAttributes[-T] {
-    // This is awkward, but we need to convert toValue when we have Iterable[TV]
-    def toValue(v: T): Value[_]
-    def toAttributes(value: Value[_]): Attributes
-  }
-
-  trait LowPriorityToValueAttributesImplicits {
-    // default low priority implicit that gets applied if nothing is found
-    implicit def empty[TV]: ToValueAttributes[TV] = new ToValueAttributes[TV] {
-      override def toValue(v: TV): Value[_]                  = Value.nullValue()
-      override def toAttributes(value: Value[_]): Attributes = Attributes.empty()
-    }
-  }
-
-  object ToValueAttributes extends LowPriorityToValueAttributesImplicits {
-    def attributes(value: Value[_], ev: ToValueAttributes[_]): Attributes = ev.toAttributes(value)
-  }
-
-  /**
-   * This changes the display name in line format, useful for human representation.
-   *
-   * @tparam T
-   *   the type param
-   */
-  trait WithDisplayName[-T] extends ToValueAttributes[T] {
-    def displayName: String
-    override def toValue(v: T): Value[_]                   = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = Attributes.create(PresentationHintAttributes.withDisplayName(displayName))
-  }
-
-  object WithDisplayName {
-    def apply[T](name: String): WithDisplayName[T] = new WithDisplayName[T]() {
-      val displayName: String = name
-    }
-  }
-
-  /**
-   * This elides (does not display) the given field in line format.
-   *
-   * @tparam T
-   *   the type param
-   */
-  final class Elided[-T] extends ToValueAttributes[T] {
-    override def toValue(v: T): Value[_]                   = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = Elided.attributes
-  }
-
-  object Elided {
-    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asElided())
-    def apply[T]: Elided[T]    = new Elided[T]()
-  }
-
-  /**
-   * This class presents the field as "value only" in line format, without the key.
-   *
-   * @tparam T
-   *   the type param
-   */
-  final class AsValueOnly[-T] extends ToValueAttributes[T] {
-    override def toValue(v: T): Value[_]                   = Value.nullValue()
-    override def toAttributes(value: Value[_]): Attributes = AsValueOnly.attributes
-  }
-
-  object AsValueOnly {
-    val attributes: Attributes = Attributes.create(PresentationHintAttributes.asValueOnly())
-
-    def apply[T]: AsValueOnly[T] = new AsValueOnly[T]()
   }
 }
