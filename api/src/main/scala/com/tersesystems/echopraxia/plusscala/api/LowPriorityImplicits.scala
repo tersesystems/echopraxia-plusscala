@@ -1,13 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.{Attributes, Field, Value, Condition => JCondition, FieldBuilderResult => JFieldBuilderResult, Level => JLevel, LoggingContext => JLoggingContext}
 import com.tersesystems.echopraxia.api.Value.ArrayValue
 import com.tersesystems.echopraxia.api.Value.ObjectValue
-import com.tersesystems.echopraxia.api.{Condition => JCondition}
-import com.tersesystems.echopraxia.api.{FieldBuilderResult => JFieldBuilderResult}
-import com.tersesystems.echopraxia.api.{Level => JLevel}
-import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 import java.util
 import java.util.stream
@@ -30,24 +26,75 @@ trait LowPriorityImplicits {
     def asScala: Level = Level.asScala(level)
   }
 
-  final implicit class RichArrayValue(arrayValue: ArrayValue) {
+  final implicit class RichValue[T](value: Value[T]) {
 
-    def +(value: Value[_]): ArrayValue = arrayValue.add(value)
+    def asElided: Value[T] = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
 
-    def ++(values: Traversable[Value[_]]): ArrayValue = addAll(values)
+    def asCardinal: Value[T] = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))
+    }
+
+    def abbreviateAfter(after: Int): Value[T] = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)))
+    }
+
+    def withToStringValue(s: String): Value[T] = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.withToStringValue(s)))
+    }
+  }
+
+  final implicit class RichArrayValue(val value: ArrayValue) {
+
+    def asElided: ArrayValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
+
+    def asCardinal: ArrayValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))
+    }
+
+    def abbreviateAfter(after: Int): ArrayValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)))
+    }
+
+    def withToStringValue(s: String): ArrayValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.withToStringValue(s)))
+    }
+
+    def +(v: Value[_]): ArrayValue = value.add(v)
+
+    def ++(vs: Traversable[Value[_]]): ArrayValue = addAll(vs)
 
     def addAll(newValues: Traversable[Value[_]]): ArrayValue = {
-      val joinedValues = new util.ArrayList(arrayValue.raw())
+      val joinedValues = new util.ArrayList(value.raw())
       for (f <- newValues) {
         joinedValues.add(f)
       }
       Value.array(joinedValues)
     }
 
-    def ++(newValues: util.Collection[Value[_]]): ArrayValue = arrayValue.addAll(newValues)
+    def ++(newValues: util.Collection[Value[_]]): ArrayValue = value.addAll(newValues)
   }
 
   final implicit class RichObjectValue(value: ObjectValue) {
+
+    def asElided: ObjectValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asElided()))
+    }
+
+    def asCardinal: ObjectValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()))
+    }
+
+    def abbreviateAfter(after: Int): ObjectValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)))
+    }
+
+    def withToStringValue(s: String): ObjectValue = {
+      value.withAttributes(value.attributes().plus(PresentationHintAttributes.withToStringValue(s)))
+    }
 
     def +(field: Field): ObjectValue = value.add(field)
 

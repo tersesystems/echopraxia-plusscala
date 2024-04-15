@@ -37,12 +37,10 @@ class EitherSpec extends AnyWordSpec with Matchers with Logging {
 
     "work with a custom attribute" in {
       implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString)
-      implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-
-      implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
-        val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+      implicit val instantToValue: ToValue[Instant] = instant => {
+        val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-        ToValue(formatter.format(datetime))
+        ToValue(instant.toString).withToStringValue(formatter.format(datetime))
       }
 
       val either: Either[UUID, Instant] = Right(Instant.ofEpochMilli(0))

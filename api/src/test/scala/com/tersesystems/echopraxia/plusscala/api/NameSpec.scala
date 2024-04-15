@@ -1,16 +1,13 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.PresentationField
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.util.UUID
 
 class NameSpec extends AnyWordSpec with Matchers with Logging {
-
-  class ToDerp[T] extends WithDisplayName[T] {
-    override val displayName = "derp"
-  }
 
   "named fields" should {
 
@@ -35,10 +32,8 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with displayName" in {
-      implicit def exceptionToDerp[T <: Throwable]: ToDerp[T] = new ToDerp[T]()
-
       val field: Field = new IllegalStateException()
-      field.toString must be(""""derp"=java.lang.IllegalStateException""")
+      field.asInstanceOf[PresentationField].withDisplayName("derp").toString must be(""""derp"=java.lang.IllegalStateException""")
     }
   }
 }

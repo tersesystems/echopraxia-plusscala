@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Attributes
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.{Attributes, Field, PresentationField, Value}
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -12,103 +11,87 @@ import java.util.UUID
 
 class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging {
 
-  trait AsValueOnlyAndAbbreviate[T] extends ToValueAttributes[T] {
-    def after: Int
-    def toValue(v: T): Value[_] = ToValue(v.toString)
-    def toAttributes(value: Value[_]): Attributes = {
-      val abbreviateAfter = AbbreviateAfter(after)
-      val attrs           = abbreviateAfter.toAttributes(value)
-      attrs.plusAll(AsValueOnly.attributes)
-    }
-  }
-
-  object AsValueOnlyAndAbbreviate {
-    def apply[T](a: Int): AsValueOnlyAndAbbreviate[T] = new AsValueOnlyAndAbbreviate[T]() {
-      val after = a
-    }
-  }
-
   describe("AbbreviateAfter") {
     it("should abbreviate a string") {
-      implicit val abbreviateUUID: AbbreviateAfter[UUID] = AbbreviateAfter(4)
-      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString)
+      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).abbreviateAfter(4)
 
       val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       field.toString must be("uuid=eb14...")
     }
 
     it("should abbreviate an array") {
-      implicit val abbreviateUUID: AbbreviateAfter[Seq[Int]] = AbbreviateAfter(4)
+      val field: Field = "array" -> ToArrayValue(Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).abbreviateAfter(4)
+      field.asInstanceOf[PresentationField].toString must be("array=[1, 2, 3, 4...]")
+    }
 
-      val field: Field = "array" -> Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-      field.toString must be("array=[1, 2, 3, 4...]")
+    it("should abbreviate values in array") {
+      // if this doesn't work, it's a problem with the underlying attribute
+      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).abbreviateAfter(4)
+
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "uuids" -> Seq(uuid, uuid)
+      field.toString must be("uuids=[eb14..., eb14...]")
     }
   }
 
   describe("Elided") {
     it("should elide a field") {
-      implicit val payloadAsElided: Elided[Payload]   = Elided[Payload]
       implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
       implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
-      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
+      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => {
+        val payloadField: Field = c.payload
+        ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
+      })
 
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
       field.toString must be("download={email=user@example.org}")
     }
+
+    it("should elide the value in seq") {
+      implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(c.value))
+      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => {
+        val payloadField: Field = c.payload
+        ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
+      })
+
+      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
+      val field: Field = "downloads" -> Seq(download, download)
+      field.toString must be("downloads=[{email=user@example.org}, {email=user@example.org}]")
+    }
   }
 
   describe("AsCardinal") {
     it("should cardinal an array of bytes") {
-      implicit val payloadAsCardinal: AsCardinal[Payload] = AsCardinal[Payload]
       implicit val emailToField: ToField[Email]           = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
+      implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToArrayValue(c.value).asCardinal)
       implicit val downloadToField: ToField[Download]     = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
-      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
+      val download     = Download(new Email("user@example.org"), Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
-      field.toString must be("download={email=user@example.org, payload=|0|}")
+      val payloadField: Field = Payload(Array.emptyByteArray)
+      payloadField.toString must be("payload=|0|")
+      val fieldString = field.toString
+      fieldString must be("download={email=user@example.org, payload=|0|}")
+    }
+
+    it("should cardinal a string") {
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asCardinal
+
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "uuid" -> uuid
+      field.toString must be("uuid=|36|")
+    }
+
+    it("should cardinal a seq of strings") {
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asCardinal
+
+      val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      val field: Field = "seq" -> Seq(uuid, uuid)
+      field.toString must be("seq=[|36|, |36|]")
     }
   }
-
-  describe("ToValueAttribute") {
-    it("should compose two different attributes") {
-      implicit val abbreviateValueOnly: AsValueOnlyAndAbbreviate[UUID] = AsValueOnlyAndAbbreviate(4)
-      implicit val uuidToValue: ToValue[UUID]                          = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("eb14...")
-    }
-  }
-
-  describe("AsValueOnly") {
-    it("should render only the value") {
-      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
-      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-
-    it("should work with arrays") {
-      // XXX do we want this behavior?
-      implicit val intAsValueOnly: AsValueOnly[Int] = AsValueOnly[Int]
-
-      val field: Field = ("tuple" -> Seq(1, 2))
-      field.toString must be("[1, 2]")
-    }
-  }
-
-  describe("WithDisplayName") {
-    it("should render with a display name") {
-      implicit val uuidDisplayName: WithDisplayName[UUID] = WithDisplayName[UUID]("unique id")
-      implicit val uuidToValue: ToValue[UUID]             = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("\"unique id\"=eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-  }
-
 }
 
 final case class Payload(value: Array[Byte]) extends AnyVal
