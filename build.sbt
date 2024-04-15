@@ -27,7 +27,6 @@ initialize := {
 
 inThisBuild(
   Seq(
-    crossScalaVersions := scalaVersions,
     semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
@@ -58,6 +57,7 @@ Global / excludeLintKeys += ideSkipProject
 lazy val api = (project in file("api"))
   .settings(
     name := "api",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     // Scala 3 doesn't need scala-reflect
     libraryDependencies ++= {
@@ -85,6 +85,7 @@ lazy val api = (project in file("api"))
 lazy val generic = (project in file("generic"))
   .settings(
     name := "generic",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += {
@@ -104,6 +105,7 @@ lazy val generic = (project in file("generic"))
 lazy val logger = (project in file("logger"))
   .settings(
     name := "logger",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -136,6 +138,7 @@ lazy val asyncLogger = (project in file("async"))
 lazy val flowLogger = (project in file("flow"))
   .settings(
     name := "flow-logger",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -170,6 +173,7 @@ lazy val nameOfLogger = (project in file("nameof"))
 lazy val diff = (project in file("diff"))
   .settings(
     name := "diff",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     // https://mvnrepository.com/artifact/com.flipkart.zjsonpatch/zjsonpatch
@@ -186,6 +190,7 @@ lazy val diff = (project in file("diff"))
 lazy val traceLogger = (project in file("trace"))
   .settings(
     name := "trace-logger",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -199,6 +204,7 @@ lazy val benchmarks = (project in file("benchmarks"))
   .enablePlugins(JmhPlugin)
   .settings(
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
+    crossScalaVersions := scalaVersions,
     Compile / doc / sources                             := Seq.empty,
     Compile / packageDoc / publishArtifact              := false,
     publishArtifact                                     := false,

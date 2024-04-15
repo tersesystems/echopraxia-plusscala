@@ -37,10 +37,11 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
   describe("Elided") {
     it("should elide a field") {
       implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => {
-        ToValue(Base64.getEncoder.encodeToString(c.value)).asElided
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
+      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => {
+        val payloadField: Field = c.payload
+        ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
       })
-      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
@@ -49,8 +50,11 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
     it("should elide the value in seq") {
       implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)).asElided)
-      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
+      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(c.value))
+      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => {
+        val payloadField: Field = c.payload
+        ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
+      })
 
       val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
       val field: Field = "downloads" -> Seq(download, download)
@@ -61,12 +65,15 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
   describe("AsCardinal") {
     it("should cardinal an array of bytes") {
       implicit val emailToField: ToField[Email]           = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)).asCardinal)
+      implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToArrayValue(c.value).asCardinal)
       implicit val downloadToField: ToField[Download]     = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
-      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
+      val download     = Download(new Email("user@example.org"), Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
-      field.toString must be("download={email=user@example.org, payload=|0|}")
+      val payloadField: Field = Payload(Array.emptyByteArray)
+      payloadField.toString must be("payload=|0|")
+      val fieldString = field.toString
+      fieldString must be("download={email=user@example.org, payload=|0|}")
     }
 
     it("should cardinal a string") {
