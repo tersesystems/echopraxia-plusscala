@@ -36,12 +36,12 @@ trait Logging extends LoggingBase {
 
   implicit val currencyToField: ToField[Currency] = ToField(_ => "currency", currency => ToValue(currency.getCurrencyCode))
 
-  implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))
+  implicit val priceToField: ToField[Price] = ToField(_ => "price", price => {
+    val o = ToObjectValue(price.currency, "amount" -> price.amount)
+    o.withToStringValue(price.toString)
+  })
 
   implicit val bookToField: ToField[Book] = ToField(_ => "book", book => ToObjectValue(book.title, book.category, book.author, book.price))
-
-  // Says we want a toString of $8.95 in a message template for a price
-  implicit val priceToStringValue: ToStringFormat[Price] = (price: Price) => Value.string(price.toString)
 
   implicit val creditCardToName: ToName[CreditCard] = ToName.create("credit_card")
   implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {

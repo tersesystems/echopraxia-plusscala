@@ -161,21 +161,19 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
   }
 
   trait MyFieldBuilder extends PresentationFieldBuilder {
-    implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
-    implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
-      val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
+    implicit val instantToValue: ToValue[Instant] = instant => {
+      val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
       val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-      Value.string(formatter.format(datetime))
+      val s = formatter.format(datetime)
+      ToValue(instant.toString).withToStringValue(s)
     }
-
-    implicit val currencyStringFormat: ToStringFormat[Currency] = c => ToValue(c.getSymbol)
 
     implicit val valueOnlyAttribute: AsValueOnly[UUID] = AsValueOnly[UUID]
 
     implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) =>
       ToObjectValue(
         keyValue("currencyCode" -> currency.getCurrencyCode)
-      )
+      ).withToStringValue(currency.getSymbol())
   }
   object MyFieldBuilder extends MyFieldBuilder
 }
