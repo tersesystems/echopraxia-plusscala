@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -12,7 +11,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Currency
-import java.util.UUID
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
@@ -171,7 +169,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     implicit val currencyToValue: ToObjectValue[Currency] = (currency: Currency) =>
       ToObjectValue(
         keyValue("currencyCode" -> currency.getCurrencyCode)
-      ).withToStringValue(currency.getSymbol())
+      ).withToStringValue(currency.getSymbol()).asObject()
   }
   object MyFieldBuilder extends MyFieldBuilder
 }

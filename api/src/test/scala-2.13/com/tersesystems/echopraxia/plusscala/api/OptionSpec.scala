@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class OptionSpec extends AnyWordSpec with Matchers with Logging {
+class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
 
   "option" should {
 
@@ -32,15 +32,16 @@ class OptionSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with objects" in {
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => ToValue(v.toString)
       val field: Field = "test" -> Option(Instant.ofEpochMilli(0))
       field.toString must be("test=1970-01-01T00:00:00Z")
     }
 
     "work with custom attributes" in {
-      implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
         val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-        ToValue(formatter.format(datetime))
+        ToValue(v.toString).withToStringValue(formatter.format(datetime))
       }
       val field: Field = "test" -> Option(Instant.ofEpochMilli(0))
       field.toString must be("test=1/1/70, 12:00 AM")

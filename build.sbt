@@ -15,7 +15,7 @@ val scala3                       = "3.4.0"
 val scala213                     = "2.13.13"
 val scala212                     = "2.12.19"
 
-val scalaVersions = List(scala3, scala213, scala212)
+val scalaVersions = List(scala212, scala213, scala3)
 val ideScala = scala213
 
 initialize := {

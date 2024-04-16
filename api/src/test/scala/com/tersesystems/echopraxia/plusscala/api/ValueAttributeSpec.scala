@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Attributes, Field, PresentationField, Value}
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.PresentationField
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -13,7 +13,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
   describe("AbbreviateAfter") {
     it("should abbreviate a string") {
-      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).abbreviateAfter(4)
+      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).asString().abbreviateAfter(4)
 
       val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       field.toString must be("uuid=eb14...")
@@ -26,7 +26,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
     it("should abbreviate values in array") {
       // if this doesn't work, it's a problem with the underlying attribute
-      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).abbreviateAfter(4)
+      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString).asString().abbreviateAfter(4)
 
       val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       val field: Field = "uuids" -> Seq(uuid, uuid)
@@ -68,7 +68,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
       implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToArrayValue(c.value).asCardinal)
       implicit val downloadToField: ToField[Download]     = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
 
-      val download     = Download(new Email("user@example.org"), Payload(Array.emptyByteArray))
+      val download     = Download(Email("user@example.org"), Payload(Array.emptyByteArray))
       val field: Field = "download" -> download
       val payloadField: Field = Payload(Array.emptyByteArray)
       payloadField.toString must be("payload=|0|")
@@ -77,7 +77,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
     }
 
     it("should cardinal a string") {
-      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asCardinal
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asString().asCardinal
 
       val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       val field: Field = "uuid" -> uuid
@@ -85,7 +85,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
     }
 
     it("should cardinal a seq of strings") {
-      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asCardinal
+      implicit val uuidToValue: ToValue[UUID]       = uuid => ToValue(uuid.toString).asString().asCardinal
 
       val uuid         = UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
       val field: Field = "seq" -> Seq(uuid, uuid)

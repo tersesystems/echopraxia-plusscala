@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class IterableSpec extends AnyWordSpec with Matchers with Logging {
+class IterableSpec extends AnyWordSpec with Matchers with LoggingBase with HeterogeneousFieldSupport {
 
   "iterable" should {
     // XXX check array depends on implicit
@@ -30,6 +30,9 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work for objects" in {
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
+        ToValue(v.toString)
+      }
       val instant1     = Instant.ofEpochMilli(0)
       val instant2     = Instant.ofEpochMilli(1000000)
       val field: Field = "test" -> Seq(instant1, instant2)
@@ -37,10 +40,10 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work for objects with custom attributes" in {
-      implicit val readableInstant: ToStringFormat[Instant] = (v: Instant) => {
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
         val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-        ToValue(formatter.format(datetime))
+        ToValue(v.toString).withToStringValue(formatter.format(datetime))
       }
 
       val instant1     = Instant.ofEpochMilli(0)
@@ -50,6 +53,10 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with set" in {
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
+        ToValue(v.toString)
+      }
+
       val instant1     = Instant.ofEpochMilli(0)
       val instant2     = Instant.ofEpochMilli(1000000)
       val field: Field = "test" -> Set(instant1, instant2)
@@ -59,6 +66,9 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     "work with fields using ToArrayValue" in {
       val instant1 = Instant.ofEpochMilli(0)
       val instant2 = Instant.ofEpochMilli(1000000)
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
+        ToValue(v.toString)
+      }
 
       val fields       = Seq[Field]("instant1" -> instant1, "instant2" -> instant2)
       val field: Field = "test" -> ToArrayValue(fields)
@@ -68,6 +78,9 @@ class IterableSpec extends AnyWordSpec with Matchers with Logging {
     "work with fields with just plain fields" in {
       val instant1 = Instant.ofEpochMilli(0)
       val instant2 = Instant.ofEpochMilli(1000000)
+      implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
+        ToValue(v.toString)
+      }
 
       val fields: Seq[Field] = Seq[Field]("instant1" -> instant1, "instant2" -> instant2)
       val field: Field       = "test" -> fields
