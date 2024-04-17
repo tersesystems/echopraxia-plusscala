@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion            = "3.2.0-SNAPSHOT"
+val echopraxiaVersion            = "3.2.0-RC1"
 val scalatestVersion             = "3.2.18"
 val logbackClassicVersion        = "1.5.3"
 val logstashVersion              = "7.4"
@@ -128,6 +128,7 @@ lazy val logger = (project in file("logger"))
 lazy val asyncLogger = (project in file("async"))
   .settings(
     name := "async-logger",
+    crossScalaVersions := scalaVersions,
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,

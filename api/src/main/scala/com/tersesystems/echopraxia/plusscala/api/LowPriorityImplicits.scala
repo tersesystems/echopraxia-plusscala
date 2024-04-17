@@ -8,7 +8,6 @@ import com.tersesystems.echopraxia.api.{Condition => JCondition}
 import com.tersesystems.echopraxia.api.{FieldBuilderResult => JFieldBuilderResult}
 import com.tersesystems.echopraxia.api.{Level => JLevel}
 import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 import java.util
 import java.util.stream
