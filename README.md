@@ -1,8 +1,44 @@
 # Scala API for Echopraxia
 
-[Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.  The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that works smoothly with Scala types and has a number of features to make debugging even smoother, including a "trace" logger and automatic type class derivation.
+[Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.  
 
-Echopraxia is compiled for Scala 2.12 and Scala 2.13.
+The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that leverages Scala features to provide type classes and source code information.  Echopraxia is compiled for Scala 2.12, 2.13, and 3.
+
+In practical terms, you define some type classes that set what the name and value of a class should be:
+
+```scala
+trait Logging extends LoggingBase {
+  implicit val uuidToField: ToField[UUID] = ToField(_ => "uuid", uuid => ToValue(uuid.toString))
+}
+```
+
+and then logging will provide both structured logging in JSON and line oriented format in logfmt:
+
+```scala
+class Processor extends Logging {
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  def process(): Unit {
+    logger.info(UUID.randomUUID) // uses implicit type class for UUID
+  }
+}
+```
+
+This will print out the uuid in [logfmt](https://www.brandur.org/logfmt) when used with a pattern format appender:
+
+```
+16:45:32.905 INFO  [main]: uuid=9e6805df-a211-4129-b96d-882e0d9eb609
+```
+
+and will print out JSON when using a structured logging appender like [logstash-logback-appender](https://github.com/logfellow/logstash-logback-encoder) or [Log4J2 template layout format](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html):
+
+```json
+{
+  "@timestamp": "...",
+  "level": "INFO",
+  "uuid": "9e6805df-a211-4129-b96d-882e0d9eb609"
+}
+```
 
 ## Examples
 
@@ -103,6 +139,12 @@ logger.error("something went wrong: {}", e)
 logger.error(e)
 ```
 
+There are some values that are awkward to represent using implicit conversion, such as when you want to render a `null` explicitly.  The logger comes with a field builder function that can be used for fine-grained control of arguments.  In this case, we can use `nullField` to render the field.
+
+```scala
+logger.debug("this will render foo=null -- {}", _.nullField("foo"))
+```
+
 ### Options, Either, and Future
 
 Commonly used types like `Option`, `Either`, and `Future` are handled automatically by `LoggingBase`:
@@ -128,7 +170,7 @@ logger.info("future" -> future) // future={completed=true, success=yay}
 
 ## Extending Logging
 
-Extending logging is done by extending the `ToValue`, `ToName`, and `ToValueAttributes` type classes that are packaged in `LoggingBase`.
+Extending logging is done by extending the `ToValue`, `ToName` type classes that are packaged in `LoggingBase`.
 
 ### ToValue
 
@@ -148,7 +190,7 @@ trait ValueTypeClasses {
 Let's start off by adding a `ToValue` for `java.time.Instant`, by converting it to a string.  There are already `ToValue` mappings for all the built-ins like string, boolean, and numbers, so calling `ToValue(instant.string)` will resolve the implicit and return a `Value[String]`.
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api.LoggingBase
+import com.tersesystems.echopraxia.plusscala.api._
 import java.time.Instant
 
 trait Logging extends LoggingBase {
@@ -179,7 +221,7 @@ You can also specify a common format for tuples and maps:
 
 ```scala
 trait Logging extends LoggingBase {
-  implicit def tupleToValue[TVK: ToValue: ToValueAttributes, TVV: ToValue: ToValueAttributes]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+  implicit def tupleToValue[TVK: ToValue, TVV: ToValue]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
     ToObjectValue("key" -> k, "value" -> v)
   }
 }
@@ -220,7 +262,9 @@ trait Logging extends LoggingBase {
 
 ### ToName
 
-Rather than using a tuple, you can specify a default name using `ToName`.
+Rather than using a tuple, you can specify a default name for a field using the `ToName` value class.
+
+
 
 The `ToName` type class looks like this:
 
