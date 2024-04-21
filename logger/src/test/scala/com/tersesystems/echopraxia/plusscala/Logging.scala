@@ -27,6 +27,8 @@ trait Logging extends LoggingBase {
 
   implicit val personToField: ToField[Person] = ToField(_ => "person", p => ToObjectValue("name" -> p.name, "age" -> p.age))
 
+  implicit val govtToValue: ToValue[Government] = govt => ToObjectValue("name" -> govt.name, "debt" -> govt.debt)
+
   implicit val titleToField: ToField[Title] = ToField(_ => "title", t => ToValue(t.raw))
 
   implicit val authorToField: ToField[Author] = ToField(_ => "author", a => ToValue(a.raw))
