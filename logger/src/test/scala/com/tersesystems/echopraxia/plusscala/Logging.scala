@@ -14,7 +14,7 @@ trait Logging extends LoggingBase {
 
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object
-  implicit def tupleToValue[TVK: ToValue, TVV: ToValue]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
+  implicit def tupleToValue[TVK: ToValue, TVV: ToValue]: ToValue[(TVK, TVV)] = { case (k, v) =>
     ToObjectValue("key" -> k, "value" -> v)
   }
 
@@ -67,21 +67,3 @@ trait Logging extends LoggingBase {
 
   case object Explicit extends Sensitive
 }
-
-trait MyFieldBuilder extends PresentationFieldBuilder with Logging {
-  implicit val personToValue: ToObjectValue[Person] = { (person: Person) =>
-    ToObjectValue(
-      keyValue("name", ToValue(person.name)),
-      keyValue("age", ToValue(person.age))
-    )
-  }
-
-  implicit val govtToValue: ToObjectValue[Government] = { (govt: Government) =>
-    ToObjectValue(
-      keyValue("name", ToValue(govt.name)),
-      keyValue("debt", ToValue(govt.debt))
-    )
-  }
-}
-
-object MyFieldBuilder extends MyFieldBuilder
