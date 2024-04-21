@@ -1,13 +1,8 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.{Field, FieldVisitor, PresentationField, Value, Condition => JCondition, FieldBuilderResult => JFieldBuilderResult, Level => JLevel, LoggingContext => JLoggingContext}
 import com.tersesystems.echopraxia.api.Value.ArrayValue
 import com.tersesystems.echopraxia.api.Value.ObjectValue
-import com.tersesystems.echopraxia.api.{Condition => JCondition}
-import com.tersesystems.echopraxia.api.{FieldBuilderResult => JFieldBuilderResult}
-import com.tersesystems.echopraxia.api.{Level => JLevel}
-import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
 
 import java.util
 import java.util.stream
@@ -28,6 +23,20 @@ trait LowPriorityImplicits {
   final implicit class RichLevel(level: JLevel) {
     @inline
     def asScala: Level = Level.asScala(level)
+  }
+
+  final implicit class RichField(field: Field) {
+    def asValueOnly: Field = {
+      field.asInstanceOf[PresentationField].asValueOnly()
+    }
+
+    def withDisplayName(displayName: String): Field = {
+      field.asInstanceOf[PresentationField].withDisplayName(displayName)
+    }
+
+    def asElided: Field = {
+      field.asInstanceOf[PresentationField].asElided()
+    }
   }
 
   final implicit class RichArrayValue(val value: ArrayValue) {

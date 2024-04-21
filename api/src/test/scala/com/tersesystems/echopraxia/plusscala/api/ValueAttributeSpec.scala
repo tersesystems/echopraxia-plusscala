@@ -21,7 +21,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
 
     it("should abbreviate an array") {
       val field: Field = "array" -> ToArrayValue(Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).abbreviateAfter(4)
-      field.asInstanceOf[PresentationField].toString must be("array=[1, 2, 3, 4...]")
+      field.toString must be("array=[1, 2, 3, 4...]")
     }
 
     it("should abbreviate values in array") {
@@ -42,7 +42,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
         _ => "download",
         c => {
           val payloadField: Field = c.payload
-          ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
+          ToObjectValue(c.email, payloadField.asElided)
         }
       )
 
@@ -58,7 +58,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
         _ => "download",
         c => {
           val payloadField: Field = c.payload
-          ToObjectValue(c.email, payloadField.asInstanceOf[PresentationField].asElided())
+          ToObjectValue(c.email, payloadField.asElided)
         }
       )
 
