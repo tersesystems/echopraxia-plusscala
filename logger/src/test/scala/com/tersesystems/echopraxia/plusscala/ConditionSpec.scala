@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.plusscala
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
+import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
@@ -10,15 +11,15 @@ import org.scalatest.matchers.must.Matchers
 
 import java.util
 
-class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging with HeterogeneousFieldSupport {
 
-  private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
+  private val logger = LoggerFactory.getLogger(getClass)
 
   describe("findBoolean") {
 
     it("should match") {
       val condition: Condition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
-      logger.debug(condition, "found a foo == true", _.bool("foo", true))
+      logger.debug(condition, "found a foo == true", "foo" -> true)
 
       matchThis("found a foo == true")
     }
@@ -32,7 +33,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     it("should return None if match is not boolean") {
       val condition: Condition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
-      logger.debug(condition, "found a foo == true", _.string("foo", "bar"))
+      logger.debug(condition, "found a foo == true", ("foo" -> "bar"))
 
       noMatch
     }
@@ -42,7 +43,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     it("should return some on match") {
       val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
-      logger.debug(condition, "found a foo == bar", _.string("foo", "bar"))
+      logger.debug(condition, "found a foo == bar", ("foo" -> "bar"))
 
       matchThis("found a foo == bar")
     }
@@ -56,7 +57,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     it("should none on wrong type") {
       val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
-      logger.debug(condition, "found a foo == bar", _.number("foo", 1))
+      logger.debug(condition, "found a foo == bar", ("foo" -> 1))
 
       noMatch
     }
@@ -65,7 +66,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   describe("findNumber") {
     it("should some on match") {
       val condition: Condition = (_, ctx) => ctx.findNumber("$.foo").exists(_.intValue() == 1)
-      logger.debug(condition, "found a number == 1", _.number("foo", 1))
+      logger.debug(condition, "found a number == 1", "foo" -> 1)
 
       matchThis("found a number == 1")
     }
@@ -106,7 +107,6 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         condition,
         "found a list with 1 in it!",
         fb => {
-          import fb._
           // have to explicitly make Seq[Value[_]] here
           fb.array("foo", Seq(ToValue("derp"), ToValue(1), ToValue(false)))
         }
@@ -126,20 +126,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         }
       }
 
-      logger.debug(
-        condition,
-        "complex object",
-        fb => {
-          fb.array(
-            "array",
-            Seq(
-              fb.number("a" -> 1),
-              fb.string("b" -> "two"),
-              fb.bool("c"   -> false)
-            )
-          )
-        }
-      )
+      logger.debug(condition, "complex object", "array" -> Seq[Field]("a" -> 1, "b" -> "two", "c" -> false))
     }
   }
 
@@ -179,15 +166,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         condition,
         "complex object",
-        fb =>
-          fb.obj(
-            "foo",
-            Seq(
-              fb.number("a" -> 1),
-              fb.string("b" -> "two"),
-              fb.bool("c"   -> false)
-            )
-          )
+        fb => fb.obj("foo", Seq[Field]("a" -> 1, "b" -> "two", "c" -> false))
       )
 
       matchThis("complex object")
@@ -210,7 +189,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("age") == 1
     }
-    logger.debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+    logger.debug(isWill, "match list", "person" -> Person("will", 1))
 
     matchThis("match list")
   }
@@ -221,7 +200,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("name") == "will"
     }
-    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("person" -> Person("will", 1)))
+    logger.debug(isWill, "match list", "person" -> Person("will", 1))
 
     matchThis("match list")
   }
@@ -260,7 +239,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     val usGovernment = Government("US", debt = BigDecimal("1100020323232341313413"))
-    logger.withFieldBuilder(MyFieldBuilder).debug(isWill, "match list", _.obj("government" -> usGovernment))
+    logger.debug(isWill, "match list", "government" -> usGovernment)
 
     matchThis("match list")
   }

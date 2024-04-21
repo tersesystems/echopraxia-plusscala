@@ -28,6 +28,7 @@ package com.tersesystems.echopraxia.plusscala.api
  */
 trait LoggingBase
     extends ValueTypeClasses
+    with NameValueClasses
     with FieldConversionImplicits
     with OptionValueTypes
     with EitherValueTypes
