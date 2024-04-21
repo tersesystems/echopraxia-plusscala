@@ -12,8 +12,7 @@ import java.util
 
 class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  trait MyFieldBuilder extends PresentationFieldBuilder with Logging
-  object MyFieldBuilder extends MyFieldBuilder
+  object MyFieldBuilder extends PresentationFieldBuilder with Logging
 
   private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 

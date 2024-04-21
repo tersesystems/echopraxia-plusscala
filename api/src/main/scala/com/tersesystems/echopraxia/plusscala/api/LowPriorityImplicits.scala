@@ -1,7 +1,14 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value.{ArrayValue, ObjectValue}
-import com.tersesystems.echopraxia.api.{Field, PresentationField, Value, Condition => JCondition, FieldBuilderResult => JFieldBuilderResult, Level => JLevel, LoggingContext => JLoggingContext}
+import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.PresentationField
+import com.tersesystems.echopraxia.api.Value
+import com.tersesystems.echopraxia.api.Value.ArrayValue
+import com.tersesystems.echopraxia.api.Value.ObjectValue
+import com.tersesystems.echopraxia.api.{Condition => JCondition}
+import com.tersesystems.echopraxia.api.{FieldBuilderResult => JFieldBuilderResult}
+import com.tersesystems.echopraxia.api.{Level => JLevel}
+import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
 
 import java.util
 import java.util.stream
