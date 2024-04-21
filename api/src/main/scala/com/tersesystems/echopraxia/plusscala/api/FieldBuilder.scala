@@ -87,19 +87,14 @@ trait PrimitiveArgsFieldBuilder extends ArgsFieldBuilder {
   def bool(name: String, boolean: Boolean): FieldType = keyValue(name, boolean)
 }
 
-trait SourceCodeFieldBuilder extends HasFieldClass {
-  def sourceCode(sourceCode: SourceCode): FieldType
+trait SourceCodeFieldBuilder {
+  def sourceCode(sourceCode: SourceCode): FieldBuilderResult
 }
 
 /**
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
-trait FieldBuilderBase
-    extends ArgsFieldBuilder
-    with TupleFieldBuilder
-    with PrimitiveTupleFieldBuilder
-    with PrimitiveArgsFieldBuilder
-    with SourceCodeFieldBuilder {
+trait FieldBuilderBase extends ArgsFieldBuilder with TupleFieldBuilder with SourceCodeFieldBuilder {
 
   override def keyValue[V: ToValue](name: String, value: V): FieldType = {
     Utils.newField(name, ToValue(value), Attributes.empty(), fieldClass)
@@ -117,7 +112,7 @@ trait FieldBuilderBase
     Utils.newField(tuple._1, ToValue(tuple._2), PresentationHintAttributes.valueOnlyAttributes, fieldClass)
   }
 
-  override def sourceCode(sourceCode: SourceCode): FieldType = {
+  override def sourceCode(sourceCode: SourceCode): FieldBuilderResult = {
     keyValue(ToName(sourceCode), ToValue(sourceCode))
   }
 }
@@ -125,7 +120,7 @@ trait FieldBuilderBase
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase {
+trait PresentationFieldBuilder extends FieldBuilderBase with PrimitiveTupleFieldBuilder with PrimitiveArgsFieldBuilder {
   override type FieldType = PresentationField
   override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
 }
@@ -135,7 +130,7 @@ trait PresentationFieldBuilder extends FieldBuilderBase {
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase {
+trait FieldBuilder extends FieldBuilderBase with PrimitiveTupleFieldBuilder with PrimitiveArgsFieldBuilder {
   override type FieldType = Field
   override protected def fieldClass: Class[Field] = classOf[Field]
 }
