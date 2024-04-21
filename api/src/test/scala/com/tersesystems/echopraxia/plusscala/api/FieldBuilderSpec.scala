@@ -162,7 +162,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     implicit val instantToValue: ToValue[Instant] = instant => {
       val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
       val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-      val s = formatter.format(datetime)
+      val s         = formatter.format(datetime)
       ToValue(instant.toString).withToStringValue(s)
     }
 

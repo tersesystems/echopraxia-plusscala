@@ -210,21 +210,21 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
   override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     import scala.compat.java8.FunctionConverters._
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), message, f1.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), message, f1.asJava, fieldBuilder)
   }
 
   override def apply(message: String, f: FB => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), message, f.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), message, f.asJava, fieldBuilder)
   }
 
   override def apply(message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     val f: FB => FieldBuilderResult = _ => onlyException(exception)
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), message, f.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), message, f.asJava, fieldBuilder)
   }
 
   override def apply(condition: Condition, message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     val f: FB => FieldBuilderResult = _ => onlyException(exception)
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), condition.asJava, message, f.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), condition.asJava, message, f.asJava, fieldBuilder)
   }
 
   override def apply(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
@@ -232,7 +232,7 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
       file: File,
       enclosing: Enclosing
   ): Unit = {
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), condition.asJava, message, f.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), condition.asJava, message, f.asJava, fieldBuilder)
   }
 
   override def apply(condition: Condition, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
@@ -241,13 +241,13 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
   override def apply(condition: Condition, message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     import scala.compat.java8.FunctionConverters._
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
-    core.log(level, () => java.util.Collections.singletonList(sourceCodeField), condition.asJava, message, f1.asJava, fieldBuilder)
+    core.log(level, () => sourceCodeField.fields(), condition.asJava, message, f1.asJava, fieldBuilder)
   }
 
   // -----------------------------------------------------------
   // Internal methods
 
-  private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): Field = {
+  private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
     val sc = SourceCode(line, file, enc)
     val fb = PresentationFieldBuilder
     fb.sourceCode(sc)

@@ -13,6 +13,8 @@ import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.Trac
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.string
 import sourcecode._
 
+import scala.collection.JavaConverters._
+
 trait TraceFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
 
   def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields
@@ -92,6 +94,6 @@ class DefaultSourceFields(sc: SourceCode, args: Args) extends SourceFields {
 
   override lazy val loggerFields: Seq[Field] = {
     val fb = PresentationFieldBuilder
-    Seq(fb.sourceCode(sc))
+    fb.sourceCode(sc).fields().asScala.toSeq
   }
 }
