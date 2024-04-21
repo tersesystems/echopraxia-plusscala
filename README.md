@@ -139,10 +139,27 @@ logger.error("something went wrong: {}", e)
 logger.error(e)
 ```
 
+## Field Builders
+
 There are some values that are awkward to represent using implicit conversion, such as when you want to render a `null` explicitly.  The logger comes with a field builder function that can be used for fine-grained control of arguments.  In this case, we can use `nullField` to render the field.
 
 ```scala
 logger.debug("this will render foo=null -- {}", _.nullField("foo"))
+```
+
+Field builders can take custom methods.  This is particularly when you want to add complex field conversion logic inside a logging statement that you don't want available to the enclosing class, i.e.
+
+```scala
+object MyFieldBuilder extends PresentationFieldBuilder with Logging {
+  def myComplexMethod(foo: Foo): Field = ???
+}
+
+val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
+
+log.info("User {} can do complex method {}", fb.list(
+  fb.keyValue("name" -> "will"),
+  fb.myComplexMethod(foo)
+))
 ```
 
 ### Options, Either, and Future
@@ -264,8 +281,6 @@ trait Logging extends LoggingBase {
 
 Rather than using a tuple, you can specify a default name for a field using the `ToName` value class.
 
-
-
 The `ToName` type class looks like this:
 
 ```scala
@@ -351,89 +366,27 @@ val book1 = Book(
 logger.info(book) // book={title=Sayings of the Century, category=reference, author=Nigel Rees}
 ```
 
-## ToValueAttributes
+## Value Presentation
 
-Echopraxia logs in both logfmt and in JSON.  In most cases this works pretty well, but there are some cases where JSON can be excessively verbose and not useful for line oriented debugging.  The `ToValueAttributes` type class handles these cases by customizing the presentation logic.
+### ToStringValue
 
-### ToStringFormat
-
-The `toStringFormat` attribute will rewrite the output for line oriented format.
-
-Let's say you have a `Price` that consists of an amount and a currency.  You want to render the price as `price=$8.95` in oriented format, instead of every element of the case class.
-
-```scala
-trait Logging extends LoggingBase {
-  implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))
-
-  implicit val priceToStringFormat: ToStringFormat[Price] = (price: Price) => {
-    import java.text.NumberFormat
-    val numberFormat = NumberFormat.getCurrencyInstance
-    numberFormat.setCurrency(price.currency)
-    ToValue(numberFormat.format(price.amount))
-  }
-}
-```
+TODO
 
 ### AbbreviateAfter
 
-The `abbreviateAfter` attribute abbreviates a string or array so that elements after the given maximum are not shown.
-
-```scala
-  describe("AbbreviateAfter") {
-    it("should abbreviate a string") {
-      implicit val abbreviateUUID: AbbreviateAfter[UUID] = AbbreviateAfter(4)
-      implicit val uuidToValue: ToValue[UUID]            = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("uuid=eb14...")
-    }
-
-    it("should abbreviate an array") {
-      implicit val abbreviateUUID: AbbreviateAfter[Seq[Int]] = AbbreviateAfter(4)
-
-      val field: Field = "array" -> Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-      field.toString must be("array=[1, 2, 3, 4...]")
-    }
-  }
-```
-
-### Elided
-
-The `elided` attribute elides a given field from being seen in line oriented format.
-
-```scala
-  describe("Elided") {
-    it("should elide a field") {
-      implicit val payloadAsElided: Elided[Payload]   = Elided[Payload]
-      implicit val emailToField: ToField[Email]       = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]   = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
-      implicit val downloadToField: ToField[Download] = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
-
-      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
-      val field: Field = "download" -> download
-      field.toString must be("download={email=user@example.org}")
-    }
-  }
-```
+TODO
 
 ### AsCardinal
 
 The `AsCardinal` attribute displays a string or array as the cardinal (amount) of elements.
 
-```scala
-  describe("AsCardinal") {
-    it("should cardinal an array of bytes") {
-      implicit val payloadAsCardinal: AsCardinal[Payload] = AsCardinal[Payload]
-      implicit val emailToField: ToField[Email]           = ToField[Email](_ => "email", c => ToValue(c.value))
-      implicit val payloadToField: ToField[Payload]       = ToField[Payload](_ => "payload", c => ToValue(Base64.getEncoder.encodeToString(c.value)))
-      implicit val downloadToField: ToField[Download]     = ToField[Download](_ => "download", c => ToObjectValue(c.email, c.payload))
+## Field Presentation
 
-      val download     = Download(new Email("user@example.org"), new Payload(Array.emptyByteArray))
-      val field: Field = "download" -> download
-      field.toString must be("download={email=user@example.org, payload=|0|}")
-    }
-  }
-```
+Field presentation alters both the name and the value of the field.
+
+### Elided
+
+The `elided` attribute elides a given field from being seen in line oriented format.
 
 ### AsValueOnly
 
