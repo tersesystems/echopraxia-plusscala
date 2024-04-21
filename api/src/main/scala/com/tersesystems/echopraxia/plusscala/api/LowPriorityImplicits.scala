@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.PresentationField
 import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.api.Value.ArrayValue
 import com.tersesystems.echopraxia.api.Value.ObjectValue
@@ -14,6 +15,7 @@ import java.util.stream
 import java.util.stream.Collectors
 
 trait LowPriorityImplicits {
+  implicit def fieldToPresentationField(field: Field): PresentationField = field.asInstanceOf[PresentationField]
 
   final implicit class RichCondition(javaCondition: JCondition) {
     @inline
