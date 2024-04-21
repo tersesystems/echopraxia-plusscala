@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Value
 
-trait ToFieldTypes { self: ValueTypeClasses =>
+trait ToFieldTypes { self: ValueTypeClasses with NameTypeClass =>
   // Provides easier packaging for ToName and ToValue
   trait ToField[-TF] {
     def toName: ToName[TF]

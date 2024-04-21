@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Value.ObjectValue
 import com.tersesystems.echopraxia.api._
+import com.tersesystems.echopraxia.plusscala.spi.Utils.newField
 
 import scala.annotation.implicitNotFound
 
@@ -56,6 +57,14 @@ trait ValueTypeClasses {
     // implicit val nullToValue: ToValue[Nothing] = bool => Value.nullValue()
 
     implicit val throwableToValue: ToValue[Throwable] = e => Value.exception(e)
+
+    implicit val sourceCodeToValue: ToValue[SourceCode] = { sc =>
+      ToObjectValue(
+        newField(SourceCode.File, ToValue(sc.file.value), Attributes.empty),
+        newField(SourceCode.Line, ToValue(sc.line.value: java.lang.Integer), Attributes.empty),
+        newField(SourceCode.Enclosing, ToValue(sc.enclosing.value), Attributes.empty)
+      )
+    }
   }
 
   object ToValue extends ToValueImplicits {

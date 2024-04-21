@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
+import com.tersesystems.echopraxia.spi.FieldConstants
+
 /**
  * This is a trait that should be extended by domain logging traits.
  *
@@ -28,10 +30,9 @@ package com.tersesystems.echopraxia.plusscala.api
  */
 trait LoggingBase
     extends ValueTypeClasses
-    with NameValueClasses
+    with NameTypeClass
     with FieldConversionImplicits
     with OptionValueTypes
     with EitherValueTypes
     with FutureValueTypes
     with ToFieldTypes
-    with ThrowableToName
