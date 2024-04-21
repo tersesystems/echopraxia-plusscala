@@ -35,9 +35,12 @@ trait Logging extends LoggingBase {
 
   implicit val currencyToField: ToField[Currency] = ToField(_ => "currency", currency => ToValue(currency.getCurrencyCode))
 
-  implicit val priceToField: ToField[Price] = ToField(_ => "price", price => {
-    ToObjectValue(price.currency, "amount" -> price.amount).withToStringValue(price.toString)
-  })
+  implicit val priceToField: ToField[Price] = ToField(
+    _ => "price",
+    price => {
+      ToObjectValue(price.currency, "amount" -> price.amount).withToStringValue(price.toString)
+    }
+  )
 
   implicit val bookToField: ToField[Book] = ToField(_ => "book", book => ToObjectValue(book.title, book.category, book.author, book.price))
 
