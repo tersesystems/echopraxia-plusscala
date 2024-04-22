@@ -162,6 +162,13 @@ logger.info("User {} can do complex method {}", fb.list(
 ))
 ```
 
+You can append fields together using `++` if you prefer to not use `fb.list`:
+
+```scala
+import com.tersesystems.echopraxia.api._
+logger.info("User {} can do complex method {}", fb => fb.keyValue("name" -> "will") ++ fb.myComplexMethod(foo))
+```
+
 Field builder functions have the advantage of being lazily evaluated, which makes them useful in a debugging context.  For example, if you are rendering a field for debugging, you may want to wrap it in a conditional to avoid unnecessary object creation:
 
 ```scala
