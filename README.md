@@ -1,6 +1,6 @@
 # Scala API for Echopraxia
 
-[Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.  
+[Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.
 
 The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that leverages Scala features to provide type classes and source code information.  Echopraxia is compiled for Scala 2.12, 2.13, and 3.
 
@@ -289,7 +289,7 @@ trait ToName[-T] {
 }
 ```
 
-and is defined as follows
+and is defined as an implicit like this:
 
 ```scala
 trait Logging extends LoggingBase {
@@ -366,64 +366,74 @@ val book1 = Book(
 logger.info(book) // book={title=Sayings of the Century, category=reference, author=Nigel Rees}
 ```
 
-## Value Presentation
-
-### ToStringValue
-
-TODO
-
-### AbbreviateAfter
-
-TODO
-
-### AsCardinal
-
-The `AsCardinal` attribute displays a string or array as the cardinal (amount) of elements.
-
 ## Field Presentation
 
-Field presentation alters both the name and the value of the field.
-
-### Elided
-
-The `elided` attribute elides a given field from being seen in line oriented format.
+There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message. You can do this by adding presentation hints to the field.
 
 ### AsValueOnly
 
-The `AsValueOnly` attribute will show only the field's value and not the field's name.
+The `asValueOnly` method has the effect of turning a "key=value" field into a "value" field in text format, just like the value method:
 
 ```scala
-  describe("AsValueOnly") {
-    it("should render only the value") {
-      implicit val uuidAsValueOnly: AsValueOnly[UUID] = AsValueOnly[UUID]
-      implicit val uuidToValue: ToValue[UUID]         = uuid => ToValue(uuid.toString)
-
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-
-    it("should work with arrays") {
-      implicit val intAsValueOnly: AsValueOnly[Int] = AsValueOnly[Int]
-      val field = ("tuple" -> Seq(1, 2))
-      field.toString must be("[1, 2]")
-    }
-  }
+val field: Field = "name" -> "value"
+field.asValueOnly.toString must be("value")
 ```
 
 ### Display Name
 
-The `WithDisplayName` attribute will display a human readable name instead of the field name.
+The `withDisplayName` method shows a human-readable string in text format bracketed in quotes:
 
 ```scala
-  describe("WithDisplayName") {
-    it("should render with a display name") {
-      implicit val uuidDisplayName: WithDisplayName[UUID] = WithDisplayName[UUID]("unique id")
-      implicit val uuidToValue: ToValue[UUID]             = uuid => ToValue(uuid.toString)
+val field: Field = "name" -> 1
+field.withDisplayName("human readable name").toString must be("\"human readable name\"=1")
+```
 
-      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-      field.toString must be("\"unique id\"=eb1497ad-e3c1-45a3-8305-9d394a72afbe")
-    }
-  }
+### Elided
+
+The `asElided` method will elide the field so that it is passed over and does not show in text format:
+
+```scala
+val field: Field = "name" -> 1
+field.asElided.toString must be("")
+```
+
+## Value Presentation
+
+Value presentation changes how values are rendered in a line oriented format, so that they are more human readable. Value presentation is different from field presentation in that the field name cannot be changed in value presentation.
+
+### AsCardinal
+
+The asCardinal method, when used on an array value or on a string value, displays the number of elements in the array bracketed by "|" characters in text format:
+
+```scala
+val cardinalField: Field = "elements" -> ToArrayValue(1,2,3).asCardinal();
+cardinalField.toString(); // renders elements=|3|
+```
+
+or for a string value:
+
+```scala
+val cardinalField: Field = "elements" -> ToValue("123").asString.asCardinal();
+cardinalField.toString(); // renders elements=|3|
+```
+
+### AbbreviateAfter
+
+The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
+
+```scala
+var abbrField = keyValue("abbreviatedField", Value.string(veryLongString).abbreviateAfter(5));
+abbrField.toString(); // renders abbreviatedField=12345...
+```
+
+### ToStringValue
+
+The `withToStringValue` uses a custom string for the value, providing something more human-readable. This is particularly useful in arrays and complex nested objects, where you may want a summary of the object rather than the full JSON rendering.
+
+```scala
+val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
+val instantField: Field = "instant" -> ToValue(instant.toString()).withToStringValue(formatter.format(instant));
+instantField.toString(); // renders ISO8601 in JSON, but 01/01/1970 with toString()
 ```
 
 ## Context
@@ -488,7 +498,7 @@ private val condition: Condition = Condition(_.fields.contains(willField))
 
 def conditionUsingFields() = {
   val thisPerson = Person("will", 1)
-  logger.info(condition, "person matches! {}", ("person" -> thisPerson))
+  logger.info(condition, "person matches! {}", "person" -> thisPerson)
 }
 ```
 
