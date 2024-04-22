@@ -42,7 +42,7 @@ and will print out JSON when using a structured logging appender like [logstash-
 
 ## Examples
 
-For the fastest possible way to try out Echopraxia, download and run the [Scala CLI script](https://github.com/tersesystems/smallest-dynamic-logging-example/).
+For the fastest possible way to try out Echopraxia, download and run the [Scala CLI script](https://github.com/tersesystems/smallest-dynamic-logging-example/blob/main/scala-cli/script.sc).
 
 Examples are available at [tersesystems/echopraxia-scala-example](https://github.com/tersesystems/echopraxia-scala-example) and [tersesystems/echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
@@ -50,7 +50,7 @@ Examples are available at [tersesystems/echopraxia-scala-example](https://github
 
 Q: What does this mean for developers?
 
-A: You can write code faster and with fewer bugs by using Echopraxia for debugging.  Echopraxia is oriented for "printf debugging", so all the `println` and `toString` methods that go into your code at development can be entered as logging statements.  Because logging statements are functions, they're only executed when they meet logging conditions, so the cost is low.   And because you can define fields using custom field builders, you can dump your internal state easily.  You can also easily disable a logger completely by adding `Condition.never`, which will switch it to a `no-op` statement.
+A: You can write code faster and with fewer bugs by using Echopraxia for debugging.  Echopraxia is oriented for "printf debugging", so all the `println` and `toString` methods that go into your code at development can be entered as logging statements.  You can [snapshot](https://www.scalactic.org/user_guide/Snapshots) and dump your internal state easily.  You can also easily disable or filter debug logging using conditions.
 
 Q: What does this mean for operations?
 
