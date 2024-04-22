@@ -156,10 +156,25 @@ object MyFieldBuilder extends PresentationFieldBuilder with Logging {
 
 val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
-log.info("User {} can do complex method {}", fb.list(
+logger.info("User {} can do complex method {}", fb.list(
   fb.keyValue("name" -> "will"),
   fb.myComplexMethod(foo)
 ))
+```
+
+Field builder functions have the advantage of being lazily evaluated, which makes them useful in a debugging context.  For example, if you are rendering a field for debugging, you may want to wrap it in a conditional to avoid unnecessary object creation:
+
+```scala
+if (logger.isLoggingDebug()) {
+  val field: Field = "foo" -> foo
+  logger.debug("use isLoggingDebug to avoid creation of field {}", field)
+}
+```
+
+This is not needed with field builder functions, as they are only executed when the log level is met.
+
+```scala
+logger.debug("This only creates field if logger.level >= DEBUG {}", _.keyValue("foo" -> foo"))
 ```
 
 ### Options, Either, and Future
