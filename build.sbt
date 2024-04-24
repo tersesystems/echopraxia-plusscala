@@ -9,6 +9,7 @@ val enumeratumVersion            = "1.7.3"
 val zjsonPatchVersion            = "0.4.16"
 val sourceCodeVersion            = "0.3.1"
 val scalaCollectionCompatVersion = "2.11.0"
+val refinedVersion               = "0.11.1"
 
 val scala3                       = "3.4.0"
 val scala213                     = "2.13.13"
@@ -73,6 +74,16 @@ lazy val api = (project in file("api"))
     libraryDependencies ++= compatLibraries(scalaVersion.value),
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     // tests
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq.empty
+        case other =>
+          Seq(
+            "eu.timepit"                 %% "refined"                  % refinedVersion        % Test
+          )
+      }
+    },
+    libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
     libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     // use logstash for testing
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -108,7 +119,6 @@ lazy val logger = (project in file("logger"))
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
