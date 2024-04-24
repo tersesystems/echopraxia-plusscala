@@ -15,16 +15,21 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
 
     it("should work with java.lang.Byte") {
       val byte = java.lang.Byte.MIN_VALUE
-      fb.keyValue(refineMV[NonEmpty]("byte"), byte)
+      val byteName: fb.Name = refineMV("byte")
+      fb.keyValue(byteName, byte)
     }
 
     it("should work with java.lang.Short") {
       val short = java.lang.Short.MIN_VALUE
-      fb.keyValue(refineMV[NonEmpty]("short"), short)
+      val shortName: fb.Name = refineMV("short")
+      fb.keyValue(shortName, short)
     }
   }
 
-  trait RefinedFieldBuilder extends PresentationFieldBuilder {
+  trait RefinedFieldBuilder extends FieldBuilderBase {
+    override type FieldType = Field
+    override protected def fieldClass: Class[Field] = classOf[Field]
+
     type Name = String Refined NonEmpty
 
     implicit val refinedToName: ToName[Name] = s => s.value

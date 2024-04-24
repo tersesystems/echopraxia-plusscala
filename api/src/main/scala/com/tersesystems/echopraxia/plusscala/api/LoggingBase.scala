@@ -34,3 +34,4 @@ trait LoggingBase
     with EitherValueTypes
     with FutureValueTypes
     with ToFieldTypes
+    with StringToNameImplicits
