@@ -4,6 +4,9 @@ import com.tersesystems.echopraxia.api.Field
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import enumeratum._
+import enumeratum.EnumEntry.Snakecase
+
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -48,7 +51,7 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
       field.name must be("America/Los_Angeles")
     }
 
-    "work with none" in {
+    "works with none" in {
       implicit val instantName: ToName[ZonedDateTime]           = zdt => zdt.getZone.toString
       implicit val optStringName: ToName[Option[ZonedDateTime]] = ToName.option(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")))
       implicit val zonedDateTimeToValue: ToValue[ZonedDateTime] = zdt => ToValue(zdt.toString)
@@ -57,5 +60,39 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
       val field: Field                      = optInstant -> optInstant
       field.name must be("UTC")
     }
+
+    "works with enum" in {
+      implicit def enumToName[T <: EnumEntry]: ToName[T] = t => t.entryName
+
+      val field: Field = Names.CreditCard -> "4111 1111 1111 1111"
+      field.name() must be("credit_card")
+    }
+  }
+
+  sealed trait Names extends EnumEntry with Snakecase
+
+  object Names extends Enum[Names] {
+
+    /*
+     `findValues` is a protected method that invokes a macro to find all `Greeting` object declarations inside an `Enum`
+
+     You use it to implement the `val values` member
+     */
+    val values = findValues
+
+    case object ExpirationDate extends Names
+
+    case object Number     extends Names
+    case object CreditCard extends Names
+
+    case object Book extends Names
+
+    case object Instant  extends Names
+    case object Title    extends Names
+    case object Author   extends Names
+    case object Category extends Names
+    case object Price    extends Names
+
+    case object Store extends Names
   }
 }
