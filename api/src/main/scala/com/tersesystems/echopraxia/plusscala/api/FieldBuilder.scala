@@ -10,81 +10,65 @@ trait HasFieldClass {
   protected def fieldClass: Class[_ <: FieldType] // concrete traits have to implement this
 }
 
-trait TupleFieldBuilder extends ValueTypeClasses with NameTypeClass with ListToFieldBuilderResultMethods with HasFieldClass {
-  def keyValue[V: ToValue](tuple: (String, V)): FieldType
-
-  def value[V: ToValue](tuple: (String, V)): FieldType
-
-  def exception(tuple: (String, Throwable)): FieldType = keyValue(tuple)
-
-  def array[AV: ToArrayValue](tuple: (String, AV)): FieldType = keyValue(tuple)
-
-  def obj[OV: ToObjectValue](tuple: (String, OV)): FieldType = keyValue(tuple)
-}
-
-trait PrimitiveTupleFieldBuilder extends TupleFieldBuilder {
-  def string(tuple: (String, String)): FieldType = keyValue(tuple)
-
-  def number[N: ToValue: Numeric](tuple: (String, N)): FieldType = keyValue(tuple)
-
-  def bool(tuple: (String, Boolean)): FieldType = keyValue(tuple)
-
-}
-
-/**
- * A field builder that is enhanced with ToValue, ToObjectValue, and ToArrayValue.
- */
-trait ArgsFieldBuilder extends ValueTypeClasses with NameTypeClass with ListToFieldBuilderResultMethods with HasFieldClass {
+trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
   // ------------------------------------------------------------------
   // keyValue
 
-  def keyValue[V: ToValue](name: String, value: V): FieldType
+  def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType
+  def keyValue[N: ToName, V: ToValue](tuple: (N, V)): FieldType
 
   // ------------------------------------------------------------------
   // value
 
-  def value[V: ToValue](name: String, value: V): FieldType
+  def value[N: ToName, V: ToValue](name: N, value: V): FieldType
+  def value[N: ToName, V: ToValue](tuple: (N, V)): FieldType
+}
 
-  // ------------------------------------------------------------------
-  // null
+trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+  def exception[N: ToName](tuple: (N, Throwable)): FieldType
+  def exception[N: ToName](name: N, ex: Throwable): FieldType
+  def exception(ex: Throwable): FieldType
+}
 
-  def nullField(name: String): FieldType = keyValue(name, Value.nullValue())
-
-  // ------------------------------------------------------------------
-  // exception
-
-  def exception(name: String, ex: Throwable): FieldType = keyValue(name, ex)
-
-  def exception(ex: Throwable): FieldType = keyValue(ToName(ex), ToValue(ex))
-
+/**
+ * A field builder that is enhanced with .
+ */
+trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
   // ------------------------------------------------------------------
   // array
 
-  def array[AV: ToArrayValue](name: String, value: AV): FieldType = keyValue(name, value)
+  def array[N: ToName, AV: ToArrayValue](name: N, value: AV): FieldType
+  def array[N: ToName, AV: ToArrayValue](tuple: (N, AV)): FieldType
 
   // ------------------------------------------------------------------
   // object
 
-  def obj[OV: ToObjectValue](name: String, value: OV): FieldType = keyValue(name, value)
-
+  def obj[N: ToName, OV: ToObjectValue](name: N, value: OV): FieldType
+  def obj[N: ToName, OV: ToObjectValue](tuple: (N, OV)): FieldType
 }
 
-trait PrimitiveArgsFieldBuilder extends ArgsFieldBuilder {
-
+trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
   // ------------------------------------------------------------------
   // string
 
-  def string(name: String, string: String): FieldType = keyValue(name, string)
+  def string[N: ToName](name: N, value: String): FieldType
+  def string[N: ToName](tuple: (N, String)): FieldType
 
   // ------------------------------------------------------------------
   // number
 
-  def number[N: ToValue: Numeric](name: String, number: N): FieldType = keyValue(name, number)
+  def number[N: ToName, NV: ToValue: Numeric](name: N, value: NV): FieldType
+  def number[N: ToName, NV: ToValue: Numeric](tuple: (N, NV)): FieldType
 
   // ------------------------------------------------------------------
   // boolean
 
-  def bool(name: String, boolean: Boolean): FieldType = keyValue(name, boolean)
+  def bool[N: ToName](name: N, value: Boolean): FieldType
+  def bool[N: ToName](tuple: (N, Boolean)): FieldType
+}
+
+trait NullFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+  def nullField[N: ToName](name: N): FieldType
 }
 
 trait SourceCodeFieldBuilder {
@@ -94,33 +78,66 @@ trait SourceCodeFieldBuilder {
 /**
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
-trait FieldBuilderBase extends ArgsFieldBuilder with TupleFieldBuilder with SourceCodeFieldBuilder {
+trait FieldBuilderBase
+    extends KeyValueFieldBuilder
+    with ArrayObjFieldBuilder
+    with PrimitiveFieldBuilder
+    with ExceptionFieldBuilder
+    with SourceCodeFieldBuilder
+    with NullFieldBuilder
+    with ListToFieldBuilderResultMethods {
 
-  override def keyValue[V: ToValue](name: String, value: V): FieldType = {
-    Utils.newField(name, ToValue(value), Attributes.empty(), fieldClass)
+  override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {
+    Utils.newField(ToName(name), ToValue(value), Attributes.empty(), fieldClass)
   }
 
-  override def value[V: ToValue](name: String, value: V): FieldType = {
-    Utils.newField(name, ToValue(value), PresentationHintAttributes.valueOnlyAttributes(), fieldClass)
+  override def value[N: ToName, V: ToValue](name: N, value: V): FieldType = {
+    Utils.newField(ToName(name), ToValue(value), PresentationHintAttributes.valueOnlyAttributes(), fieldClass)
   }
 
-  override def keyValue[V: ToValue](tuple: (String, V)): FieldType = {
-    Utils.newField(tuple._1, ToValue(tuple._2), Attributes.empty(), fieldClass)
+  override def keyValue[N: ToName, V: ToValue](tuple: (N, V)): FieldType = {
+    Utils.newField(ToName(tuple._1), ToValue(tuple._2), Attributes.empty(), fieldClass)
   }
 
-  override def value[V: ToValue](tuple: (String, V)): FieldType = {
-    Utils.newField(tuple._1, ToValue(tuple._2), PresentationHintAttributes.valueOnlyAttributes, fieldClass)
+  override def value[N: ToName, V: ToValue](tuple: (N, V)): FieldType = {
+    Utils.newField(ToName(tuple._1), ToValue(tuple._2), PresentationHintAttributes.valueOnlyAttributes, fieldClass)
   }
 
-  override def sourceCode(sourceCode: SourceCode): FieldBuilderResult = {
-    keyValue(ToName(sourceCode), ToValue(sourceCode))
-  }
+  override def sourceCode(sourceCode: SourceCode): FieldBuilderResult = keyValue(sourceCode, sourceCode)
+
+  override def nullField[N: ToName](name: N): FieldType = keyValue(name, Value.nullValue())
+
+  override def array[N: ToName, AV: ToArrayValue](name: N, value: AV): FieldType = keyValue(name, value)
+
+  override def array[N: ToName, AV: ToArrayValue](tuple: (N, AV)): FieldType = keyValue(tuple)
+
+  override def obj[N: ToName, OV: ToObjectValue](name: N, value: OV): FieldType = keyValue(name, value)
+
+  override def obj[N: ToName, OV: ToObjectValue](tuple: (N, OV)): FieldType = keyValue(tuple)
+
+  override def string[N: ToName](name: N, value: String): FieldType = keyValue(name, value)
+
+  override def string[N: ToName](tuple: (N, String)): FieldType = keyValue(tuple)
+
+  override def number[N: ToName, NV: ToValue: Numeric](name: N, value: NV): FieldType = keyValue(name, value)
+
+  override def number[N: ToName, NV: ToValue: Numeric](tuple: (N, NV)): FieldType = keyValue(tuple)
+
+  override def bool[N: ToName](name: N, value: Boolean): FieldType = keyValue(name, value)
+
+  override def bool[N: ToName](tuple: (N, Boolean)): FieldType = keyValue(tuple)
+
+  override def exception[N: ToName](tuple: (N, Throwable)): FieldType = keyValue(tuple)
+
+  override def exception[N: ToName](name: N, value: Throwable): FieldType = keyValue(name, value)
+
+  override def exception(ex: Throwable): FieldType = keyValue(ex, ex)
 }
 
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase with PrimitiveTupleFieldBuilder with PrimitiveArgsFieldBuilder {
+trait PresentationFieldBuilder extends FieldBuilderBase {
   override type FieldType = PresentationField
   override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
 }
@@ -130,7 +147,7 @@ trait PresentationFieldBuilder extends FieldBuilderBase with PrimitiveTupleField
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase with PrimitiveTupleFieldBuilder with PrimitiveArgsFieldBuilder {
+trait FieldBuilder extends FieldBuilderBase {
   override type FieldType = Field
   override protected def fieldClass: Class[Field] = classOf[Field]
 }
