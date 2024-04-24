@@ -7,7 +7,7 @@ import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 trait HasFieldClass {
   type FieldType <: Field
 
-  protected def fieldClass: Class[_ <: FieldType] // concrete traits have to implement this
+  protected def fieldClass: Class[_ <: FieldType]
 }
 
 trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
@@ -75,17 +75,27 @@ trait SourceCodeFieldBuilder {
   def sourceCode(sourceCode: SourceCode): FieldBuilderResult
 }
 
+trait ListFieldBuilder extends FieldBuilderResultTypeClasses {
+  def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
+
+  def list(fields: Field*): FieldBuilderResult = list(fields)
+}
+
 /**
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
-trait FieldBuilderBase
+trait FieldBuilderBase[FT <: Field]
     extends KeyValueFieldBuilder
     with ArrayObjFieldBuilder
     with PrimitiveFieldBuilder
     with ExceptionFieldBuilder
     with SourceCodeFieldBuilder
     with NullFieldBuilder
-    with ListToFieldBuilderResultMethods {
+    with ListFieldBuilder {
+
+  override type FieldType = FT
+
+  override protected def fieldClass: Class[FieldType] = classOf[FieldType]
 
   override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {
     Utils.newField(ToName(name), ToValue(value), Attributes.empty(), fieldClass)
@@ -137,20 +147,14 @@ trait FieldBuilderBase
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase with StringToNameImplicits {
-  override type FieldType = PresentationField
-  override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
-}
+trait PresentationFieldBuilder extends FieldBuilderBase[PresentationField] with StringToNameImplicits
 
 /**
  * Singleton object for PresentationFieldBuilder.
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase with StringToNameImplicits {
-  override type FieldType = Field
-  override protected def fieldClass: Class[Field] = classOf[Field]
-}
+trait FieldBuilder extends FieldBuilderBase[Field] with StringToNameImplicits
 
 /**
  * Singleton object for FieldBuilder
