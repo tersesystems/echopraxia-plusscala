@@ -8,7 +8,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
-import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
 class NameSpec extends AnyWordSpec with Matchers with Logging {
 
