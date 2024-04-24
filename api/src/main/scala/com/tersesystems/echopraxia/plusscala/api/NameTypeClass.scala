@@ -21,6 +21,7 @@ trait NameTypeClass {
   }
 
   object ToName extends LowPriorityToNames {
+    def option[T: ToName](fallback: T): ToName[Option[T]] = (optT: Option[T]) => apply(optT.getOrElse(fallback))
 
     def apply[T: ToName](t: T): String = implicitly[ToName[T]].toName(t)
   }
