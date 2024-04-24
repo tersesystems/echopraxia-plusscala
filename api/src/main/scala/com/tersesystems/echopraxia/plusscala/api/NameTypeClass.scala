@@ -12,17 +12,17 @@ trait NameTypeClass {
     def toName(t: T): String
   }
 
-  trait LowPriorityToNames {
+  object ToName {
     implicit def throwableToName[T <: Throwable]: ToName[T] = _ => FieldConstants.EXCEPTION
 
     implicit val sourceCodeToName: ToName[SourceCode] = _ => SourceCode.SourceCode
 
-    implicit val stringToName: ToName[String] = identity
-  }
-
-  object ToName extends LowPriorityToNames {
     def option[T: ToName](fallback: T): ToName[Option[T]] = (optT: Option[T]) => apply(optT.getOrElse(fallback))
 
     def apply[T: ToName](t: T): String = implicitly[ToName[T]].toName(t)
   }
+}
+
+trait StringToNameImplicits { this: NameTypeClass =>
+  implicit val stringToName: ToName[String] = identity
 }

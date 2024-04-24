@@ -137,7 +137,7 @@ trait FieldBuilderBase
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase {
+trait PresentationFieldBuilder extends FieldBuilderBase with StringToNameImplicits {
   override type FieldType = PresentationField
   override protected def fieldClass: Class[PresentationField] = classOf[PresentationField]
 }
@@ -147,7 +147,7 @@ trait PresentationFieldBuilder extends FieldBuilderBase {
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase {
+trait FieldBuilder extends FieldBuilderBase with StringToNameImplicits {
   override type FieldType = Field
   override protected def fieldClass: Class[Field] = classOf[Field]
 }
