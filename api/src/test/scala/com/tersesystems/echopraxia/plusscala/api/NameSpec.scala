@@ -1,12 +1,13 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.PresentationField
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.UUID
-import java.time.{Instant, ZoneId, ZoneOffset, ZonedDateTime}
 
 class NameSpec extends AnyWordSpec with Matchers with Logging {
 
