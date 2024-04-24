@@ -55,7 +55,7 @@ trait ArgsFieldBuilder extends ValueTypeClasses with NameTypeClass with ListToFi
 
   def exception(name: String, ex: Throwable): FieldType = keyValue(name, ex)
 
-  def exception(ex: Throwable): FieldType = Field.keyValue(ToName(ex), ToValue(ex), fieldClass)
+  def exception(ex: Throwable): FieldType = keyValue(ToName(ex), ToValue(ex))
 
   // ------------------------------------------------------------------
   // array
