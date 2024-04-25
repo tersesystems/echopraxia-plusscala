@@ -17,6 +17,6 @@ trait FieldConversionImplicits { self: ValueTypeClasses with NameTypeClass =>
   // Creates a field, this is private so it's not exposed to traits that extend this
   @inline
   private def newField[TN: ToName, TV: ToValue](name: TN, tv: TV): Field = {
-    Utils.newField(implicitly[ToName[TN]].toName(name), ToValue(tv), Attributes.empty)
+    Utils.newField(implicitly[ToName[TN]].toName(Option(name)), ToValue(tv), Attributes.empty)
   }
 }

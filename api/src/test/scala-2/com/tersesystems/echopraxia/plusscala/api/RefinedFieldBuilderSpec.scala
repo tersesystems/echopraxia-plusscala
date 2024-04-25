@@ -32,7 +32,7 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
 
     type Name = String Refined NonEmpty
 
-    implicit val refinedToName: ToName[Name] = s => s.value
+    implicit val refinedToName: ToName[Name] = _.map(_.value).orNull
   }
 
   object RefinedFieldBuilder extends RefinedFieldBuilder

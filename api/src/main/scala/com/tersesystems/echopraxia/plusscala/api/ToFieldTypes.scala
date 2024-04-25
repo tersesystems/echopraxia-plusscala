@@ -10,7 +10,7 @@ trait ToFieldTypes { self: ValueTypeClasses with NameTypeClass =>
   }
 
   object ToField {
-    def apply[TF](nameFunction: TF => String, valueFunction: TF => Value[_]): ToField[TF] = new ToField[TF] {
+    def apply[TF](nameFunction: Option[TF] => String, valueFunction: TF => Value[_]): ToField[TF] = new ToField[TF] {
       override val toName: ToName[TF]   = t => nameFunction(t)
       override val toValue: ToValue[TF] = t => valueFunction(t)
     }
