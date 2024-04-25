@@ -4,9 +4,10 @@ import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.plusscala.api.ListToFieldBuilderResultMethods
+import com.tersesystems.echopraxia.plusscala.api.ListFieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.SourceCode
+import com.tersesystems.echopraxia.plusscala.api.StringToNameImplicits
 import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceSignature
@@ -15,7 +16,7 @@ import sourcecode._
 
 import scala.collection.JavaConverters._
 
-trait TraceFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMethods {
+trait TraceFieldBuilder extends ValueTypeClasses with ListFieldBuilder {
 
   def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields
 
@@ -33,29 +34,28 @@ trait TraceFieldBuilder extends ValueTypeClasses with ListToFieldBuilderResultMe
 }
 
 trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
-  import DefaultTraceFieldBuilder._
 
   override val enteringTemplate: String = "{}: {} - ({})"
   override val exitingTemplate: String  = "{}: {} - ({}) => {}"
   override val throwingTemplate: String = "{}: {} - ({}) ! {}"
 
   override def entering(sourceFields: SourceFields): FieldBuilderResult = {
-    list(Seq(entryTag) ++ sourceFields.argumentFields)
+    list(Seq(DefaultTraceFieldBuilder.entryTag) ++ sourceFields.argumentFields)
   }
 
   override def exiting(sourceFields: SourceFields, retValue: Value[_]): FieldBuilderResult = {
-    list(Seq(exitTag) ++ sourceFields.argumentFields :+ value(TraceResult, retValue))
+    list(Seq(DefaultTraceFieldBuilder.exitTag) ++ sourceFields.argumentFields :+ value(DefaultTraceFieldBuilder.TraceResult, retValue))
   }
 
   override def throwing(sourceFields: SourceFields, ex: Throwable): FieldBuilderResult = {
-    list(Seq(throwingTag) ++ sourceFields.argumentFields :+ exception(ex))
+    list(Seq(DefaultTraceFieldBuilder.throwingTag) ++ sourceFields.argumentFields :+ exception(ex))
   }
 
   override def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields =
     new DefaultSourceFields(SourceCode(line, file, enc), args)
 }
 
-object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder {
+object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder with StringToNameImplicits {
   val TraceTag: String = "traceTag"
   val Entry: String    = "entry"
   val Exit: String     = "exit"

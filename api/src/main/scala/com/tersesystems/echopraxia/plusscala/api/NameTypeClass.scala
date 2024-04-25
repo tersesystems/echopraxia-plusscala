@@ -2,12 +2,16 @@ package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.spi.FieldConstants
 
+import scala.annotation.implicitNotFound
+
 /**
  * Add this trait to get access to the ToName type class.
  */
 trait NameTypeClass {
   // this needs to be a dependent type because implicit type resolution only works on a
   // field builder if it's dependent to the type itself.
+
+  @implicitNotFound("Could not find an implicit ToName[${T}]")
   trait ToName[-T] {
     def toName(t: T): String
   }
@@ -23,6 +27,6 @@ trait NameTypeClass {
   }
 }
 
-trait StringToNameImplicits { this: NameTypeClass =>
+trait StringToNameImplicits extends NameTypeClass {
   implicit val stringToName: ToName[String] = identity
 }

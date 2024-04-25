@@ -26,19 +26,9 @@ trait FieldBuilderResultTypeClasses {
     implicit val arrayToFieldBuilderResult: ToFieldBuilderResult[Array[Field]] = FieldBuilderResult.list(_)
   }
 
-  object LowPriorityToFieldBuilderResult {}
-
   object ToFieldBuilderResult extends LowPriorityToFieldBuilderResult {
     def apply[T: ToFieldBuilderResult](input: T): FieldBuilderResult =
       implicitly[ToFieldBuilderResult[T]].toResult(input)
   }
-
-}
-
-trait ListToFieldBuilderResultMethods extends FieldBuilderResultTypeClasses {
-
-  def list(fields: Field*): FieldBuilderResult = list(fields)
-
-  def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
 
 }
