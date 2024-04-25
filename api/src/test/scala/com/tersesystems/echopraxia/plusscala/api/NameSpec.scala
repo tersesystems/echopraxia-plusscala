@@ -6,7 +6,6 @@ import enumeratum._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -41,8 +40,7 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with option" in {
-      implicit val instantName: ToName[ZonedDateTime]           = zdt => zdt.getZone.toString
-      implicit val optStringName: ToName[Option[ZonedDateTime]] = ToName.option(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")))
+      implicit val zonedName: ToName[ZonedDateTime]           = optZone => optZone.map(_.getZone.toString).orNull
       implicit val zonedDateTimeToValue: ToValue[ZonedDateTime] = zdt => ToValue(zdt.toString)
 
       val optInstant: Option[ZonedDateTime] = Some(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")))
@@ -51,17 +49,16 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "works with none" in {
-      implicit val instantName: ToName[ZonedDateTime]           = zdt => zdt.getZone.toString
-      implicit val optStringName: ToName[Option[ZonedDateTime]] = ToName.option(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")))
+      implicit val instantName: ToName[ZonedDateTime]           = optZone => optZone.map(_.getZone.toString).orNull
       implicit val zonedDateTimeToValue: ToValue[ZonedDateTime] = zdt => ToValue(zdt.toString)
 
       val optInstant: Option[ZonedDateTime] = None
       val field: Field                      = optInstant -> optInstant
-      field.name must be("UTC")
+      field.name must be("echopraxia-unknown-1")
     }
 
     "works with enum" in {
-      implicit def enumToName[T <: EnumEntry]: ToName[T] = t => t.entryName
+      implicit def enumToName[T <: EnumEntry]: ToName[T] = _.map(_.entryName).orNull
 
       val field: Field = Names.CreditCard -> "4111 1111 1111 1111"
       field.name() must be("credit_card")

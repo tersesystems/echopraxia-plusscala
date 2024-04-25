@@ -13,7 +13,7 @@ trait NameTypeClass {
 
   @implicitNotFound("Could not find an implicit ToName[${T}]")
   trait ToName[-T] {
-    def toName(t: T): String
+    def toName(t: Option[T]): String
   }
 
   object ToName {
@@ -21,12 +21,12 @@ trait NameTypeClass {
 
     implicit val sourceCodeToName: ToName[SourceCode] = _ => SourceCode.SourceCode
 
-    def option[T: ToName](fallback: T): ToName[Option[T]] = (optT: Option[T]) => apply(optT.getOrElse(fallback))
+    implicit def optNameToName[T: ToName]: ToName[Option[T]] = (t: Option[Option[T]]) => implicitly[ToName[T]].toName(t.flatten)
 
-    def apply[T: ToName](t: T): String = implicitly[ToName[T]].toName(t)
+    def apply[T: ToName](t: T): String = implicitly[ToName[T]].toName(Option(t))
   }
 }
 
 trait StringToNameImplicits extends NameTypeClass {
-  implicit val stringToName: ToName[String] = identity
+  implicit val stringToName: ToName[String] = _.orNull
 }

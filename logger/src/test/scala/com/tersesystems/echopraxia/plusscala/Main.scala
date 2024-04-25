@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
 import java.util.Currency
 import java.util.UUID
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 object Main {
   def main(args: Array[String]): Unit = {
