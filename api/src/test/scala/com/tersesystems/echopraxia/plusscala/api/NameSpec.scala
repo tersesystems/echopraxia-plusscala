@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.plusscala.api
 
 import com.tersesystems.echopraxia.api.Field
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-
-import enumeratum._
-import enumeratum.EnumEntry.Snakecase
 
 import java.time.Instant
 import java.time.ZoneId

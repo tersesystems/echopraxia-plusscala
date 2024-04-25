@@ -84,7 +84,7 @@ trait ListFieldBuilder extends FieldBuilderResultTypeClasses {
 /**
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
-trait FieldBuilderBase[FT <: Field]
+trait FieldBuilderBase
     extends KeyValueFieldBuilder
     with ArrayObjFieldBuilder
     with PrimitiveFieldBuilder
@@ -92,10 +92,6 @@ trait FieldBuilderBase[FT <: Field]
     with SourceCodeFieldBuilder
     with NullFieldBuilder
     with ListFieldBuilder {
-
-  override type FieldType = FT
-
-  override protected def fieldClass: Class[FieldType] = classOf[FieldType]
 
   override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {
     Utils.newField(ToName(name), ToValue(value), Attributes.empty(), fieldClass)
@@ -147,14 +143,20 @@ trait FieldBuilderBase[FT <: Field]
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase[PresentationField] with StringToNameImplicits
+trait PresentationFieldBuilder extends FieldBuilderBase with StringToNameImplicits {
+  override type FieldType = PresentationField
+  override def fieldClass: Class[FieldType] = classOf[FieldType]
+}
 
 /**
  * Singleton object for PresentationFieldBuilder.
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase[Field] with StringToNameImplicits
+trait FieldBuilder extends FieldBuilderBase with StringToNameImplicits {
+  override type FieldType = Field
+  override def fieldClass: Class[FieldType] = classOf[FieldType]
+}
 
 /**
  * Singleton object for FieldBuilder

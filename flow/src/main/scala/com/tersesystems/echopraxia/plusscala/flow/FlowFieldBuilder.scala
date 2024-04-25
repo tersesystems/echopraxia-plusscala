@@ -21,8 +21,6 @@ trait FlowFieldBuilder extends ValueTypeClasses {
 }
 
 trait DefaultFlowFieldBuilder extends FieldBuilder with FlowFieldBuilder {
-  import DefaultFlowFieldBuilder._
-
   override val enteringTemplate: String = "{}"
 
   override val exitingTemplate: String = "{} => {}"
@@ -30,15 +28,15 @@ trait DefaultFlowFieldBuilder extends FieldBuilder with FlowFieldBuilder {
   override val throwingTemplate: String = "{} ! {}"
 
   override def entering: FieldBuilderResult = {
-    entryTag
+    DefaultFlowFieldBuilder.entryTag
   }
 
   override def exiting(retValue: Value[_]): FieldBuilderResult = {
-    list(exitTag, value(Result, retValue))
+    list(DefaultFlowFieldBuilder.exitTag, value(DefaultFlowFieldBuilder.Result, retValue))
   }
 
   override def throwing(ex: Throwable): FieldBuilderResult = {
-    list(throwingTag, exception(ex))
+    list(DefaultFlowFieldBuilder.throwingTag, exception(ex))
   }
 }
 

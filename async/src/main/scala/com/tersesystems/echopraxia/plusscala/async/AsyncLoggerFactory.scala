@@ -10,9 +10,9 @@ import com.tersesystems.echopraxia.spi.CoreLoggerFactory
 object AsyncLoggerFactory {
   val FQCN: String = classOf[DefaultAsyncLoggerMethods[_]].getName
 
-  val fieldBuilder: FieldBuilder = new FieldBuilder {}
+  val fieldBuilder: FieldBuilder.type = FieldBuilder
 
-  def getLogger(name: String): AsyncLogger[FieldBuilder] = {
+  def getLogger(name: String): AsyncLogger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     AsyncLogger(core, fieldBuilder)
   }
@@ -22,7 +22,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): AsyncLogger[FieldBuilder] = {
+  def getLogger(clazz: Class[_]): AsyncLogger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     AsyncLogger(core, fieldBuilder)
   }
@@ -32,7 +32,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger: AsyncLogger[FieldBuilder] = {
+  def getLogger: AsyncLogger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     AsyncLogger(core, fieldBuilder)
   }
