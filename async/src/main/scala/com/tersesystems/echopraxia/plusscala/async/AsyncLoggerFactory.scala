@@ -17,7 +17,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB](name: String, fieldBuilder: FB): AsyncLogger[FB] = {
+  def getLogger[FB <: Singleton](name: String, fieldBuilder: FB): AsyncLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     AsyncLogger(core, fieldBuilder)
   }
@@ -27,7 +27,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB](clazz: Class[_], fieldBuilder: FB): AsyncLogger[FB] = {
+  def getLogger[FB <: Singleton](clazz: Class[_], fieldBuilder: FB): AsyncLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     AsyncLogger(core, fieldBuilder)
   }
@@ -37,7 +37,7 @@ object AsyncLoggerFactory {
     AsyncLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB](fieldBuilder: FB): AsyncLogger[FB] = {
+  def getLogger[FB <: Singleton](fieldBuilder: FB): AsyncLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     AsyncLogger(core, fieldBuilder)
   }

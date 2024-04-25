@@ -9,13 +9,18 @@ import com.tersesystems.echopraxia.spi.Utilities
 
 import scala.compat.java8.FunctionConverters._
 
-trait FlowLogger[FB <: FlowFieldBuilder] extends FlowLoggerMethods[FB] with LoggerSupport[FB, FlowLogger] with DefaultMethodsSupport[FB]
+trait FlowLogger[FB <: FlowFieldBuilder with Singleton]
+    extends FlowLoggerMethods[FB]
+    with LoggerSupport[FB, FlowLogger]
+    with DefaultMethodsSupport[FB]
 
 object FlowLogger {
 
-  def apply[FB <: FlowFieldBuilder](c: CoreLogger, fb: FB): FlowLogger[FB] = new Impl(c, fb)
+  def apply[FB <: FlowFieldBuilder with Singleton](c: CoreLogger, fb: FB): FlowLogger[FB] = new Impl(c, fb)
 
-  class Impl[FB <: FlowFieldBuilder](val core: CoreLogger, val fieldBuilder: FB) extends FlowLogger[FB] with DefaultFlowLoggerMethods[FB] {
+  class Impl[FB <: FlowFieldBuilder with Singleton](val core: CoreLogger, val fieldBuilder: FB)
+      extends FlowLogger[FB]
+      with DefaultFlowLoggerMethods[FB] {
 
     override def name: String = core.getName
 
@@ -38,7 +43,7 @@ object FlowLogger {
       )
     }
 
-    def withFieldBuilder[NEWFB <: FlowFieldBuilder](newFieldBuilder: NEWFB): FlowLogger[NEWFB] = {
+    def withFieldBuilder[NEWFB <: FlowFieldBuilder with Singleton](newFieldBuilder: NEWFB): FlowLogger[NEWFB] = {
       newLogger(newFieldBuilder = newFieldBuilder)
     }
 
@@ -48,7 +53,7 @@ object FlowLogger {
     }
 
     @inline
-    private def newLogger[T <: FlowFieldBuilder](
+    private def newLogger[T <: FlowFieldBuilder with Singleton](
         newCoreLogger: CoreLogger = core,
         newFieldBuilder: T = fieldBuilder
     ): FlowLogger[T] =
@@ -56,7 +61,7 @@ object FlowLogger {
   }
 
   object NoOp {
-    def apply[FB <: FlowFieldBuilder](c: CoreLogger, fb: FB): FlowLogger[FB] = new NoOp[FB] {
+    def apply[FB <: FlowFieldBuilder with Singleton](c: CoreLogger, fb: FB): FlowLogger[FB] = new NoOp[FB] {
       override def name: String = c.getName
 
       override def core: CoreLogger = c
@@ -73,7 +78,7 @@ object FlowLogger {
     }
   }
 
-  trait NoOp[FB <: FlowFieldBuilder] extends FlowLogger[FB] {
+  trait NoOp[FB <: FlowFieldBuilder with Singleton] extends FlowLogger[FB] {
     override def trace[B: ToValue](attempt: => B): B                       = attempt
     override def trace[B: ToValue](condition: Condition)(attempt: => B): B = attempt
     override def debug[B: ToValue](attempt: => B): B                       = attempt

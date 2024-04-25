@@ -22,15 +22,15 @@ import sourcecode.Line
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
-trait Logger[FB] extends LoggerMethods[FB] with LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB]
+trait Logger[FB <: Singleton] extends LoggerMethods[FB] with LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB]
 
 object Logger {
 
-  def apply[FB](core: CoreLogger, fieldBuilder: FB): Logger[FB] = new Impl[FB](core, fieldBuilder)
+  def apply[FB <: Singleton](core: CoreLogger, fieldBuilder: FB): Logger[FB] = new Impl[FB](core, fieldBuilder)
 
   /**
    */
-  class Impl[FB](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] {
+  class Impl[FB <: Singleton](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] {
 
     private val traceMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(Level.TRACE, core, fieldBuilder)
     private val debugMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(Level.DEBUG, core, fieldBuilder)
@@ -61,12 +61,12 @@ object Logger {
       )
     }
 
-    override def withFieldBuilder[NEWFB](newFieldBuilder: NEWFB): Logger[NEWFB] = {
+    override def withFieldBuilder[NEWFB <: Singleton](newFieldBuilder: NEWFB): Logger[NEWFB] = {
       newLogger(newFieldBuilder = newFieldBuilder)
     }
 
     @inline
-    private def newLogger[T](
+    private def newLogger[T <: Singleton](
         newCoreLogger: CoreLogger = core,
         newFieldBuilder: T = fieldBuilder
     ): Logger[T] =
@@ -150,7 +150,7 @@ object Logger {
     def error: LoggerMethod[FB] = errorMethod
   }
 
-  trait NoOp[FB] extends Logger[FB] {
+  trait NoOp[FB <: Singleton] extends Logger[FB] {
     override def isTraceEnabled: Boolean = false
 
     override def isTraceEnabled(condition: Condition): Boolean = false
@@ -184,7 +184,7 @@ object Logger {
   }
 
   object NoOp {
-    def apply[FB](c: CoreLogger, fb: FB): NoOp[FB] = new NoOp[FB] {
+    def apply[FB <: Singleton](c: CoreLogger, fb: FB): NoOp[FB] = new NoOp[FB] {
       override def name: String = c.getName
 
       override def core: CoreLogger = c

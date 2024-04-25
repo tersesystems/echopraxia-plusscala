@@ -10,18 +10,18 @@ import com.tersesystems.echopraxia.spi.Utilities
 import java.util.concurrent.Executor
 import scala.compat.java8.FunctionConverters._
 
-trait AsyncLogger[FB] extends AsyncLoggerMethods[FB] with LoggerSupport[FB, AsyncLogger] with DefaultMethodsSupport[FB] {
+trait AsyncLogger[FB <: Singleton] extends AsyncLoggerMethods[FB] with LoggerSupport[FB, AsyncLogger] with DefaultMethodsSupport[FB] {
   def withExecutor(executor: Executor): AsyncLogger[FB]
 }
 
 object AsyncLogger {
 
-  def apply[FB](core: CoreLogger, fieldBuilder: FB): AsyncLogger[FB] = new Impl(core, fieldBuilder)
+  def apply[FB <: Singleton](core: CoreLogger, fieldBuilder: FB): AsyncLogger[FB] = new Impl(core, fieldBuilder)
 
   /**
    * Async Logger with source code enabled.
    */
-  class Impl[FB](val core: CoreLogger, val fieldBuilder: FB) extends AsyncLogger[FB] with DefaultAsyncLoggerMethods[FB] {
+  class Impl[FB <: Singleton](val core: CoreLogger, val fieldBuilder: FB) extends AsyncLogger[FB] with DefaultAsyncLoggerMethods[FB] {
 
     override def name: String = core.getName
 
@@ -48,11 +48,11 @@ object AsyncLogger {
       newCoreLogger = core.withThreadContext(Utilities.threadContext())
     )
 
-    override def withFieldBuilder[T](newBuilder: T): AsyncLogger[T] =
+    override def withFieldBuilder[T <: Singleton](newBuilder: T): AsyncLogger[T] =
       newLogger(newFieldBuilder = newBuilder)
 
     @inline
-    private def newLogger[T](
+    private def newLogger[T <: Singleton](
         newCoreLogger: CoreLogger = core,
         newFieldBuilder: T = fieldBuilder
     ): AsyncLogger[T] =
@@ -60,7 +60,7 @@ object AsyncLogger {
 
   }
 
-  trait NoOp[FB] extends AsyncLogger[FB] {
+  trait NoOp[FB <: Singleton] extends AsyncLogger[FB] {
     override def ifTraceEnabled(consumer: Handle => Unit): Unit = {}
 
     override def ifTraceEnabled(condition: Condition)(consumer: Handle => Unit): Unit = {}
@@ -144,7 +144,7 @@ object AsyncLogger {
 
   object NoOp {
 
-    def apply[FB](c: CoreLogger, fb: FB): AsyncLogger[FB] = new NoOp[FB] {
+    def apply[FB <: Singleton](c: CoreLogger, fb: FB): AsyncLogger[FB] = new NoOp[FB] {
       override def name: String = c.getName
 
       override def core: CoreLogger = c

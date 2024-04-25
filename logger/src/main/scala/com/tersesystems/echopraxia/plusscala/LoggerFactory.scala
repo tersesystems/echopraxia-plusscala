@@ -22,12 +22,12 @@ object LoggerFactory {
     Logger(core, fieldBuilder)
   }
 
-  def getLogger[FB](name: String, fieldBuilder: FB): Logger[FB] = {
+  def getLogger[FB <: Singleton](name: String, fieldBuilder: FB): Logger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     Logger(core, fieldBuilder)
   }
 
-  def getLogger[FB](clazz: Class[_], fieldBuilder: FB): Logger[FB] = {
+  def getLogger[FB <: Singleton](clazz: Class[_], fieldBuilder: FB): Logger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     Logger(core, fieldBuilder)
   }
@@ -37,7 +37,7 @@ object LoggerFactory {
     Logger(core, fieldBuilder)
   }
 
-  def getLogger[FB](fieldBuilder: FB): Logger[FB] = {
+  def getLogger[FB <: Singleton](fieldBuilder: FB): Logger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     Logger(core, fieldBuilder)
   }
