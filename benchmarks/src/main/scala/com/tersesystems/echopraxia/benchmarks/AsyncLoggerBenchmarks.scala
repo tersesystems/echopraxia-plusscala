@@ -1,8 +1,6 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.plusscala.async.AsyncLogger
 import com.tersesystems.echopraxia.plusscala.async.AsyncLoggerFactory
 import org.openjdk.jmh.annotations._
 
@@ -25,17 +23,17 @@ class AsyncLoggerBenchmarks {
 
   @Benchmark
   def infoWithStringArg(): Unit = {
-    logger.info("Hello {}", _.keyValue("name", "world"))
+    logger.info("Hello {}", _.string("name", "world"))
   }
 
   @Benchmark
   def infoWithIntegerArg(): Unit = {
-    logger.info("1 + 1 = {}", _.keyValue("result", 2))
+    logger.info("1 + 1 = {}", _.number("result", 2))
   }
 
   @Benchmark
   def infoWithBooleanArg(): Unit = {
-    logger.info("return {}", _.keyValue("returnValue", true))
+    logger.info("return {}", _.bool("returnValue", true))
   }
 
   @Benchmark
@@ -56,7 +54,7 @@ class AsyncLoggerBenchmarks {
 
 object AsyncLoggerBenchmarks {
   // logger with no executor, at all.
-  private val logger: AsyncLogger[FieldBuilder.type] = AsyncLoggerFactory.getLogger.withExecutor(new Executor {
+  private val logger = AsyncLoggerFactory.getLogger.withExecutor(new Executor {
     override def execute(command: Runnable): Unit = {}
   })
 
