@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.plusscala.api
 /**
  * This trait resolves `Either` directly to the relevant value.
  */
-trait EitherValueTypes { self: ValueTypeClasses =>
+trait EitherToValueImplicits { self: ValueTypeClasses =>
   implicit def eitherToValue[L: ToValue, R: ToValue]: ToValue[Either[L, R]] = {
     case Left(left)   => ToValue(left)
     case Right(right) => ToValue(right)

@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.benchmarks
 import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.api.LoggingBase
+import com.tersesystems.echopraxia.plusscala.api.StringToNameImplicits
 import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class LoggerBenchmarks extends LoggingBase {
+class LoggerBenchmarks extends LoggingBase with StringToNameImplicits {
   import LoggerBenchmarks._
 
   @Benchmark

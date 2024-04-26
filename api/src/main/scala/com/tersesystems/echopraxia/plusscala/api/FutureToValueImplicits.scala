@@ -7,7 +7,7 @@ import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
 
-trait FutureValueTypes { self: ValueTypeClasses =>
+trait FutureToValueImplicits { self: ValueTypeClasses =>
   implicit def futureToValue[T: ToValue]: ToValue[Future[T]] = { f =>
     f.value match {
       case Some(value) =>

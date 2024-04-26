@@ -4,7 +4,7 @@ package com.tersesystems.echopraxia.plusscala.api
  * This is a trait that should be extended by domain logging traits.
  *
  * {{{
- *  trait Logging extends LoggingBase {
+ *  trait Logging extends LoggingBase with StringToNameImplicits {
  *    implicit val currencyToField: ToField[Currency] = ToField(_ => "currency", currency => ToValue(currency.getCurrencyCode))
  *
  *    implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))
@@ -29,9 +29,8 @@ package com.tersesystems.echopraxia.plusscala.api
 trait LoggingBase
     extends ValueTypeClasses
     with NameTypeClass
+    with FieldTypeClass
+    with OptionToValueImplicits
+    with EitherToValueImplicits
+    with FutureToValueImplicits
     with FieldConversionImplicits
-    with OptionValueTypes
-    with EitherValueTypes
-    with FutureValueTypes
-    with ToFieldTypes
-    with StringToNameImplicits

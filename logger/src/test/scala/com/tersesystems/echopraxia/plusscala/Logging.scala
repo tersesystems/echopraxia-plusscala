@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 import scala.reflect.classTag
 
 // Each package can add its own mappings
-trait Logging extends LoggingBase {
+trait Logging extends LoggingBase with StringToNameImplicits {
 
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object

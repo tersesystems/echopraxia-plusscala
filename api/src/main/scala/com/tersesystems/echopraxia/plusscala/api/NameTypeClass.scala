@@ -3,10 +3,9 @@ package com.tersesystems.echopraxia.plusscala.api
 import com.tersesystems.echopraxia.spi.FieldConstants
 
 import scala.annotation.implicitNotFound
-
-import scala.util.Try
-import scala.util.Success
 import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 /**
  * Add this trait to get access to the ToName type class.
@@ -39,20 +38,22 @@ trait OptionToNameImplicits extends NameTypeClass {
 
 trait EitherToNameImplicits extends NameTypeClass {
   implicit def eitherToName[L: ToName, R: ToName]: ToName[Either[L, R]] = {
-    case Some(either) => either match {
-      case Left(l: L) => ToName(l)
-      case Right(r: R) => ToName(r)
-    }
+    case Some(either) =>
+      either match {
+        case Left(l: L)  => ToName(l)
+        case Right(r: R) => ToName(r)
+      }
     case None => null
   }
 }
 
 trait TryToNameImplicits extends NameTypeClass {
   implicit def tryToName[T: ToName]: ToName[Try[T]] = {
-    case Some(t) => t match {
-      case Success(v: T) => ToName(v)
-      case Failure(e) => ToName(e)
-    }
+    case Some(t) =>
+      t match {
+        case Success(v: T) => ToName(v)
+        case Failure(e)    => ToName(e)
+      }
     case None => implicitly[ToName[T]].toName(None)
   }
 }
