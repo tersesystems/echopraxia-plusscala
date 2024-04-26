@@ -91,7 +91,9 @@ trait FieldBuilderBase
     with ExceptionFieldBuilder
     with SourceCodeFieldBuilder
     with NullFieldBuilder
-    with ListFieldBuilder {
+    with ListFieldBuilder
+    with FieldConversionImplicits
+    with LowPriorityImplicits {
 
   override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {
     Utils.newField(ToName(name), ToValue(value), Attributes.empty(), fieldClass)

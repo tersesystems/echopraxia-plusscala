@@ -162,7 +162,7 @@ logger.info("User {} can do complex method {}", fb.list(
 ))
 ```
 
-You can append fields together using `++` if you prefer to not use `fb.list`:
+You can append fields together using `++` from `LowPriorityImplicits` if you prefer to not use `fb.list`:
 
 ```scala
 import com.tersesystems.echopraxia.api._
@@ -306,12 +306,14 @@ Rather than using a tuple, you can specify a default name for a field using the 
 The `ToName` type class looks like this:
 
 ```scala
-trait ToName[-T] {
-  def toName(t: T): String
+trait NameTypeClass {
+  trait ToName[-T] {
+    def toName(t: Option[T]): String
+  }
 }
 ```
 
-and is defined as an implicit like this:
+and is typically defined as an implicit like this:
 
 ```scala
 trait Logging extends LoggingBase {
