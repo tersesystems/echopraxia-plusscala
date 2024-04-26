@@ -2,7 +2,12 @@ package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
+import com.tersesystems.echopraxia.plusscala.api.OptionToNameImplicits
+import com.tersesystems.echopraxia.plusscala.api.TryToNameImplicits
+import com.tersesystems.echopraxia.plusscala.api.EitherToNameImplicits
 import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
+
+import scala.util.Try
 
 import java.util.Currency
 import java.util.UUID
@@ -17,13 +22,15 @@ object Main {
 }
 
 class NoImplicits {
-  object MyFieldBuilder extends PresentationFieldBuilder with Logging
+  object MyFieldBuilder extends PresentationFieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
   private val USD = Currency.getInstance("USD")
 
   private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
   logger.info("{}", _.keyValue("foo" -> "foo"))
-  logger.info("{}", _.keyValue(USD))
+  logger.info("{}", _.keyValue(Option(USD)))
+  val either: Either[Currency, String] = Left(USD)
+  logger.info("{}", _.keyValue(either))
   logger.info(
     "{}",
     fb => {

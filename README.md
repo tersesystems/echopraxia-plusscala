@@ -321,6 +321,8 @@ trait Logging extends LoggingBase {
 }
 ```
 
+There are traits that provide implicits that can resolve common effects, such as `OptionToNameImplicits`, `TryToNameImplicits`, and `EitherToNameImplicits`.
+
 If a type has both `ToName` and `ToValue` specified on it, then you can pass in the object and have a field rendered automatically.
 
 ```scala
