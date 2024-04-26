@@ -1,12 +1,12 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.plusscala.api.{FieldConversionImplicits, HeterogeneousFieldSupport, LowPriorityImplicits, PresentationFieldBuilder}
+import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
+import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 
 import java.util.Currency
 import java.util.UUID
 import scala.concurrent.Future
-import scala.reflect.ClassTag
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -16,7 +16,7 @@ object Main {
   }
 }
 
-class NoLogging {
+class NoImplicits {
   object MyFieldBuilder extends PresentationFieldBuilder with Logging
   private val USD = Currency.getInstance("USD")
 
@@ -24,10 +24,13 @@ class NoLogging {
 
   logger.info("{}", _.keyValue("foo" -> "foo"))
   logger.info("{}", _.keyValue(USD))
-  logger.info("{}", fb => {
-    import fb._
-    list("foo" -> "foo", USD)
-  })
+  logger.info(
+    "{}",
+    fb => {
+      import fb._
+      list("foo" -> "foo", USD)
+    }
+  )
 }
 
 class Printer extends Logging with HeterogeneousFieldSupport {

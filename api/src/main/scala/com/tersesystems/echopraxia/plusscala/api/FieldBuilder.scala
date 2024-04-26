@@ -15,13 +15,19 @@ trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClass with HasF
   // keyValue
 
   def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType
+
   def keyValue[N: ToName, V: ToValue](tuple: (N, V)): FieldType
+
+  def keyValue[F: ToName: ToValue](field: F): FieldType
 
   // ------------------------------------------------------------------
   // value
 
   def value[N: ToName, V: ToValue](name: N, value: V): FieldType
+
   def value[N: ToName, V: ToValue](tuple: (N, V)): FieldType
+
+  def value[F: ToName: ToValue](field: F): FieldType
 }
 
 trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
@@ -99,16 +105,24 @@ trait FieldBuilderBase
     Utils.newField(ToName(name), ToValue(value), Attributes.empty(), fieldClass)
   }
 
-  override def value[N: ToName, V: ToValue](name: N, value: V): FieldType = {
-    Utils.newField(ToName(name), ToValue(value), PresentationHintAttributes.valueOnlyAttributes(), fieldClass)
+  override def keyValue[F: ToName: ToValue](field: F): FieldType = {
+    Utils.newField(ToName(field), ToValue(field), Attributes.empty(), fieldClass)
   }
 
   override def keyValue[N: ToName, V: ToValue](tuple: (N, V)): FieldType = {
     Utils.newField(ToName(tuple._1), ToValue(tuple._2), Attributes.empty(), fieldClass)
   }
 
+  override def value[N: ToName, V: ToValue](name: N, value: V): FieldType = {
+    Utils.newField(ToName(name), ToValue(value), PresentationHintAttributes.valueOnlyAttributes(), fieldClass)
+  }
+
   override def value[N: ToName, V: ToValue](tuple: (N, V)): FieldType = {
     Utils.newField(ToName(tuple._1), ToValue(tuple._2), PresentationHintAttributes.valueOnlyAttributes, fieldClass)
+  }
+
+  override def value[F: ToName: ToValue](field: F): FieldType = {
+    Utils.newField(ToName(field), ToValue(field), PresentationHintAttributes.valueOnlyAttributes(), fieldClass)
   }
 
   override def sourceCode(sourceCode: SourceCode): FieldBuilderResult = keyValue(sourceCode, sourceCode)
