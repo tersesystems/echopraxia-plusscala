@@ -40,7 +40,7 @@ class NameSpec extends AnyWordSpec with Matchers with Logging {
     }
 
     "work with option" in {
-      implicit val zonedName: ToName[ZonedDateTime]           = optZone => optZone.map(_.getZone.toString).orNull
+      implicit val zonedName: ToName[ZonedDateTime]             = optZone => optZone.map(_.getZone.toString).orNull
       implicit val zonedDateTimeToValue: ToValue[ZonedDateTime] = zdt => ToValue(zdt.toString)
 
       val optInstant: Option[ZonedDateTime] = Some(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")))
