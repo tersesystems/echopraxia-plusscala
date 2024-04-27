@@ -51,9 +51,9 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   // trait ValueOnly extends FieldBuilder with SemiAutoDerivation with ValueCaseClassDerivation
 
-  trait ShortEither extends FieldBuilder with AutoDerivation with EitherValueTypes
+  trait ShortEither extends FieldBuilder with AutoDerivation with EitherToValueImplicits
 
-  trait ShortOption extends FieldBuilder with AutoDerivation with OptionValueTypes
+  trait ShortOption extends FieldBuilder with AutoDerivation with OptionToValueImplicits
 
   private val autoLogger = LoggerFactory.getLogger(getClass, AutoFieldBuilder)
 

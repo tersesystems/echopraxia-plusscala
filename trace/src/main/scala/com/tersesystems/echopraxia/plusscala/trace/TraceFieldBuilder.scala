@@ -55,7 +55,7 @@ trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
     new DefaultSourceFields(SourceCode(line, file, enc), args)
 }
 
-object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder with StringToNameImplicits {
+object DefaultTraceFieldBuilder extends DefaultTraceFieldBuilder {
   val TraceTag: String = "traceTag"
   val Entry: String    = "entry"
   val Exit: String     = "exit"

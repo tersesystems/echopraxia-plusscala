@@ -4,7 +4,7 @@ import com.tersesystems.echopraxia.api.Attributes
 import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.spi.Utils
 
-trait FieldConversionImplicits { self: ValueTypeClasses with NameTypeClass =>
+trait FieldConversionImplicits { self: ValueTypeClasses with NameTypeClasses =>
 
   // Convert a tuple into a field.  This does most of the heavy lifting.
   // i.e logger.info("foo" -> foo) becomes logger.info(Field.keyValue("foo", ToValue(foo)))

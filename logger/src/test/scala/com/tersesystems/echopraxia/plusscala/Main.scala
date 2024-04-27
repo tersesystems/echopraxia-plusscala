@@ -1,13 +1,11 @@
 package com.tersesystems.echopraxia.plusscala
 
 import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.plusscala.api.EitherToNameImplicits
 import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
 import com.tersesystems.echopraxia.plusscala.api.OptionToNameImplicits
-import com.tersesystems.echopraxia.plusscala.api.TryToNameImplicits
-import com.tersesystems.echopraxia.plusscala.api.EitherToNameImplicits
 import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
-
-import scala.util.Try
+import com.tersesystems.echopraxia.plusscala.api.TryToNameImplicits
 
 import java.util.Currency
 import java.util.UUID
