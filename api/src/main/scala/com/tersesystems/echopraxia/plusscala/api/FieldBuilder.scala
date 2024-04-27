@@ -10,7 +10,7 @@ trait HasFieldClass {
   protected def fieldClass: Class[_ <: FieldType]
 }
 
-trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
+trait KeyValueFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
   // ------------------------------------------------------------------
   // keyValue
 
@@ -30,7 +30,7 @@ trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClasses with Ha
   def value[F: ToName: ToValue](field: F): FieldType
 }
 
-trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
+trait ExceptionFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
   def exception[N: ToName](tuple: (N, Throwable)): FieldType
   def exception[N: ToName](name: N, ex: Throwable): FieldType
   def exception(ex: Throwable): FieldType
@@ -39,7 +39,7 @@ trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClasses with H
 /**
  * A field builder that is enhanced with .
  */
-trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
+trait ArrayObjFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
   // ------------------------------------------------------------------
   // array
 
@@ -53,7 +53,7 @@ trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClasses with Ha
   def obj[N: ToName, OV: ToObjectValue](tuple: (N, OV)): FieldType
 }
 
-trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
+trait PrimitiveFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
   // ------------------------------------------------------------------
   // string
 
@@ -73,7 +73,7 @@ trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClasses with H
   def bool[N: ToName](tuple: (N, Boolean)): FieldType
 }
 
-trait NullFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
+trait NullFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
   def nullField[N: ToName](name: N): FieldType
 }
 
@@ -81,7 +81,7 @@ trait SourceCodeFieldBuilder {
   def sourceCode(sourceCode: SourceCode): FieldBuilderResult
 }
 
-trait ListFieldBuilder extends FieldBuilderResultTypeClasses {
+trait ListFieldBuilder { this: FieldBuilderResultTypeClasses =>
   def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
 
   def list(fields: Field*): FieldBuilderResult = list(fields)
@@ -91,14 +91,18 @@ trait ListFieldBuilder extends FieldBuilderResultTypeClasses {
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
 trait FieldBuilderBase
-    extends KeyValueFieldBuilder
+    extends LoggingTypeClasses
+    with FieldBuilderResultTypeClasses
+    with HasFieldClass
+    with KeyValueFieldBuilder
     with ArrayObjFieldBuilder
     with PrimitiveFieldBuilder
     with ExceptionFieldBuilder
     with SourceCodeFieldBuilder
     with NullFieldBuilder
     with ListFieldBuilder
-    with FieldConversionImplicits
+    with LoggingToValueImplicits
+    with LoggingToNameImplicits
     with LowPriorityImplicits {
 
   override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {
@@ -159,7 +163,7 @@ trait FieldBuilderBase
 /**
  * A field builder that uses PresentationField.
  */
-trait PresentationFieldBuilder extends FieldBuilderBase with StringToNameImplicits {
+trait PresentationFieldBuilder extends FieldBuilderBase {
   override type FieldType = PresentationField
   override protected def fieldClass: Class[FieldType] = classOf[FieldType]
 }
@@ -169,7 +173,7 @@ trait PresentationFieldBuilder extends FieldBuilderBase with StringToNameImplici
  */
 object PresentationFieldBuilder extends PresentationFieldBuilder
 
-trait FieldBuilder extends FieldBuilderBase with StringToNameImplicits {
+trait FieldBuilder extends FieldBuilderBase {
   override type FieldType = Field
   override protected def fieldClass: Class[FieldType] = classOf[FieldType]
 }
