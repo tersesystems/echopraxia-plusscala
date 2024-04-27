@@ -29,7 +29,7 @@ package com.tersesystems.echopraxia.plusscala.api
  * }
  * }}}
  */
-trait LoggingBase extends LoggingTypeClasses with FieldConversionImplicits with LoggingToValueImplicits with LoggingToNameImplicits
+trait LoggingBase extends LoggingTypeClasses with LoggingToValueImplicits with LoggingToNameImplicits with FieldConversionImplicits
 
 /**
  * This trait aggregates the ToValue, ToName, and ToField type classes together for convenience.

@@ -4,10 +4,10 @@ import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.api.FieldBuilderResult
 import com.tersesystems.echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilderResultTypeClasses
 import com.tersesystems.echopraxia.plusscala.api.ListFieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.SourceCode
-import com.tersesystems.echopraxia.plusscala.api.StringToNameImplicits
 import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceSignature
@@ -16,7 +16,7 @@ import sourcecode._
 
 import scala.collection.JavaConverters._
 
-trait TraceFieldBuilder extends ValueTypeClasses with ListFieldBuilder {
+trait TraceFieldBuilder extends ValueTypeClasses with FieldBuilderResultTypeClasses with ListFieldBuilder {
 
   def sourceFields(implicit line: Line, file: File, enc: Enclosing, args: Args): SourceFields
 
