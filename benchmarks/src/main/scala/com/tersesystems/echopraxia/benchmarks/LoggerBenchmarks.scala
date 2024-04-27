@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class LoggerBenchmarks extends LoggingBase with StringToNameImplicits {
+class LoggerBenchmarks extends LoggingBase {
   import LoggerBenchmarks._
 
   @Benchmark

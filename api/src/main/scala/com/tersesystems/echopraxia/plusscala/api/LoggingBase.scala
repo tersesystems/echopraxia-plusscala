@@ -29,16 +29,23 @@ package com.tersesystems.echopraxia.plusscala.api
  * }
  * }}}
  */
-trait LoggingBase extends LoggingTypeClasses with LoggingToValueImplicits with StringToNameImplicits
+trait LoggingBase extends LoggingTypeClasses with FieldConversionImplicits with LoggingToValueImplicits with LoggingToNameImplicits
 
 /**
- * This trait aggregates all the type classes together for convenience.
+ * This trait aggregates the ToValue, ToName, and ToField type classes together for convenience.
  */
-trait LoggingTypeClasses extends ValueTypeClasses with NameTypeClass with FieldTypeClass
+trait LoggingTypeClasses extends ValueTypeClasses with NameTypeClasses with FieldTypeClasses
 
 /**
- * This trait aggregates ToValue and field conversion implicits for using in field conversion for convenience.
+ * This trait aggregates ToValue implicits for convenience.
  */
-trait LoggingToValueImplicits extends FieldConversionImplicits with OptionToValueImplicits with EitherToValueImplicits with FutureToValueImplicits {
-  this: ValueTypeClasses with NameTypeClass with FieldTypeClass =>
+trait LoggingToValueImplicits extends OptionToValueImplicits with EitherToValueImplicits with FutureToValueImplicits {
+  this: ValueTypeClasses =>
+}
+
+/**
+ * This trait aggregates ToName implicits for convenience.
+ */
+trait LoggingToNameImplicits extends StringToNameImplicits with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits {
+  this: NameTypeClasses =>
 }

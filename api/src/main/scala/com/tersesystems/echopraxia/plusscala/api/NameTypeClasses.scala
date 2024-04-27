@@ -10,7 +10,7 @@ import scala.util.Try
 /**
  * Add this trait to get access to the ToName type class.
  */
-trait NameTypeClass {
+trait NameTypeClasses {
   // this needs to be a dependent type because implicit type resolution only works on a
   // field builder if it's dependent to the type itself.
 
@@ -28,31 +28,31 @@ trait NameTypeClass {
   }
 }
 
-trait StringToNameImplicits extends NameTypeClass {
+trait StringToNameImplicits { this: NameTypeClasses =>
   implicit val stringToName: ToName[String] = _.orNull
 }
 
-trait OptionToNameImplicits extends NameTypeClass {
+trait OptionToNameImplicits { this: NameTypeClasses =>
   implicit def optionToName[T: ToName]: ToName[Option[T]] = (t: Option[Option[T]]) => implicitly[ToName[T]].toName(t.flatten)
 }
 
-trait EitherToNameImplicits extends NameTypeClass {
+trait EitherToNameImplicits { this: NameTypeClasses =>
   implicit def eitherToName[L: ToName, R: ToName]: ToName[Either[L, R]] = {
     case Some(either) =>
       either match {
-        case Left(l: L)  => ToName(l)
-        case Right(r: R) => ToName(r)
+        case Left(l)  => ToName(l)
+        case Right(r) => ToName(r)
       }
     case None => null
   }
 }
 
-trait TryToNameImplicits extends NameTypeClass {
+trait TryToNameImplicits { this: NameTypeClasses =>
   implicit def tryToName[T: ToName]: ToName[Try[T]] = {
     case Some(t) =>
       t match {
-        case Success(v: T) => ToName(v)
-        case Failure(e)    => ToName(e)
+        case Success(v) => ToName(v)
+        case Failure(e) => ToName(e)
       }
     case None => implicitly[ToName[T]].toName(None)
   }

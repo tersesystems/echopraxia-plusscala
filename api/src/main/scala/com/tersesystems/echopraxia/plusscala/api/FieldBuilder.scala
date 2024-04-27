@@ -10,7 +10,7 @@ trait HasFieldClass {
   protected def fieldClass: Class[_ <: FieldType]
 }
 
-trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
   // ------------------------------------------------------------------
   // keyValue
 
@@ -30,7 +30,7 @@ trait KeyValueFieldBuilder extends ValueTypeClasses with NameTypeClass with HasF
   def value[F: ToName: ToValue](field: F): FieldType
 }
 
-trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
   def exception[N: ToName](tuple: (N, Throwable)): FieldType
   def exception[N: ToName](name: N, ex: Throwable): FieldType
   def exception(ex: Throwable): FieldType
@@ -39,7 +39,7 @@ trait ExceptionFieldBuilder extends ValueTypeClasses with NameTypeClass with Has
 /**
  * A field builder that is enhanced with .
  */
-trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
   // ------------------------------------------------------------------
   // array
 
@@ -53,7 +53,7 @@ trait ArrayObjFieldBuilder extends ValueTypeClasses with NameTypeClass with HasF
   def obj[N: ToName, OV: ToObjectValue](tuple: (N, OV)): FieldType
 }
 
-trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
   // ------------------------------------------------------------------
   // string
 
@@ -73,7 +73,7 @@ trait PrimitiveFieldBuilder extends ValueTypeClasses with NameTypeClass with Has
   def bool[N: ToName](tuple: (N, Boolean)): FieldType
 }
 
-trait NullFieldBuilder extends ValueTypeClasses with NameTypeClass with HasFieldClass {
+trait NullFieldBuilder extends ValueTypeClasses with NameTypeClasses with HasFieldClass {
   def nullField[N: ToName](name: N): FieldType
 }
 
