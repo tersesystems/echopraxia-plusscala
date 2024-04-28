@@ -91,10 +91,14 @@ To import the Scala API, add the following:
 import com.tersesystems.echopraxia.plusscala._
 import com.tersesystems.echopraxia.plusscala.api.LoggingBase
 
-trait Logging extends LoggingBase
+trait Logging extends LoggingBase {
+  // add implicits for your classes here
+}
+
+object CustomFieldBuilder extends PresentationFieldBuilder with Logging
 
 class Example extends Logging {
-  val logger = LoggerFactory.getLogger
+  val logger = LoggerFactory.getLogger(CustomFieldBuilder)
 
   def doStuff: Unit = {
     logger.info("do some stuff")
@@ -151,14 +155,14 @@ Field builders can take custom methods.  This is particularly when you want to a
 
 ```scala
 object MyFieldBuilder extends PresentationFieldBuilder with Logging {
-  def myComplexMethod(foo: Foo): Field = ???
+  def state1(foo: Foo): Field = keyValue(foo, foo).withDisplayName("foo in state one")
 }
 
 val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
 logger.info("User {} can do complex method {}", fb.list(
   fb.keyValue("name" -> "will"),
-  fb.myComplexMethod(foo)
+  fb.state1(foo)
 ))
 ```
 
