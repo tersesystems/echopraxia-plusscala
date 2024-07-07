@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val echopraxiaVersion            = "3.2.0"
+val echopraxiaVersion            = "3.2.1"
 val scalatestVersion             = "3.2.18"
 val logbackClassicVersion        = "1.5.3"
 val logstashVersion              = "7.4"
