@@ -36,10 +36,4 @@ object LoggerFactory {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     Logger(core, fieldBuilder)
   }
-
-  def getLogger[FB <: Singleton](fieldBuilder: FB): Logger[FB] = {
-    val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
-    Logger(core, fieldBuilder)
-  }
-
 }
