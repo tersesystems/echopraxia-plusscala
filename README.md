@@ -436,7 +436,7 @@ Value presentation changes how values are rendered in a line oriented format, so
 The asCardinal method, when used on an array value or on a string value, displays the number of elements in the array bracketed by "|" characters in text format:
 
 ```scala
-val cardinalField: Field = "elements" -> ToArrayValue(1,2,3).asCardinal();
+val cardinalField: Field = "elements" -> ToValue(1,2,3).asArray.asCardinal();
 cardinalField.toString(); // renders elements=|3|
 ```
 
@@ -452,7 +452,7 @@ cardinalField.toString(); // renders elements=|3|
 The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
 
 ```scala
-var abbrField = keyValue("abbreviatedField", Value.string(veryLongString).abbreviateAfter(5));
+var abbrField = keyValue("abbreviatedField", ToValue(veryLongString).asString.abbreviateAfter(5));
 abbrField.toString(); // renders abbreviatedField=12345...
 ```
 
