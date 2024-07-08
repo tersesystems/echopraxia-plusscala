@@ -1,14 +1,52 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import com.tersesystems.echopraxia.api.{Field, Value}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
+import java.lang.StackWalker.StackFrame
 import java.util.Base64
 import java.util.UUID
+import java.util.stream.Collectors
+import scala.collection.compat.immutable.LazyList
+import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
+import scala.compat.java8.StreamConverters.RichStream
+import scala.jdk.CollectionConverters.asScalaBufferConverter
 
 class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging {
+
+  describe("ToStringValue") {
+    it("should work on a value") {
+      implicit val uuidToValue: ToValue[UUID] = uuid => ToValue(uuid.toString).asString().withToStringValue("derp")
+
+      val field: Field = "uuid" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+      field.toString must be("uuid=derp")
+    }
+
+    it("should work on an array of values") {
+      implicit val uuidToValue: ToValue[UUID] = uuid => ToValue(uuid.toString).asString().withToStringValue("derp")
+
+      ToArrayValue(
+        Seq[Field](
+          "uuid1" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe"),
+          "uuid2" -> UUID.fromString("eb1497ad-e3c1-45a3-8305-9d394a72afbe")
+        )
+      ).toString must be("[{uuid1=derp}, {uuid2=derp}]")
+    }
+
+    it("should work on complex objects") {
+      implicit val frameToValue: ToValue[StackWalker.StackFrame] = element => ToObjectValue(
+        "method_name" -> element.getMethodName,
+        "file_name" -> element.getFileName,
+        "class_name" -> element.getClassName,
+        "line_number" -> element.getLineNumber
+      ).withToStringValue("derp")
+
+      val value: Value[_] = StackWalker.getInstance.walk[Value[_]](_.toScala(LazyList).map(ToValue(_)).head)
+      value.toString must be("derp")
+    }
+  }
 
   describe("AbbreviateAfter") {
     it("should abbreviate a string") {
