@@ -9,7 +9,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.UUID
 
 class EitherSpec extends AnyWordSpec with Matchers with Logging {
@@ -39,13 +38,13 @@ class EitherSpec extends AnyWordSpec with Matchers with Logging {
       implicit val uuidToValue: ToValue[UUID] = uuid => ToValue(uuid.toString)
       implicit val instantToValue: ToValue[Instant] = instant => {
         val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
-        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+        val formatter = DateTimeFormatter.ofPattern("M/d/YY hh:mm a")
         ToValue(instant.toString).withToStringValue(formatter.format(datetime))
       }
 
       val either: Either[UUID, Instant] = Right(Instant.ofEpochMilli(0))
       val field: Field                  = "test" -> either
-      field.toString must be("test=1/1/70, 12:00 AM")
+      field.toString must be("test=1/1/70 12:00 AM")
     }
   }
 

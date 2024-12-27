@@ -8,8 +8,7 @@ import org.scalatest.matchers.must.Matchers
 
 import java.util.Base64
 import java.util.UUID
-import scala.collection.compat.immutable.LazyList
-import scala.compat.java8.StreamConverters.RichStream
+import scala.jdk.StreamConverters.StreamHasToScala
 
 class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with Logging {
 

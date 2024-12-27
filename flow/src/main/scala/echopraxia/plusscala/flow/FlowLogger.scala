@@ -7,7 +7,7 @@ import echopraxia.plusscala.logging.api.Condition
 import echopraxia.plusscala.logging.api.DefaultMethodsSupport
 import echopraxia.plusscala.logging.api.LoggerSupport
 
-import scala.compat.java8.FunctionConverters._
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 trait FlowLogger[FB <: FlowFieldBuilder with Singleton]
     extends FlowLoggerMethods[FB]

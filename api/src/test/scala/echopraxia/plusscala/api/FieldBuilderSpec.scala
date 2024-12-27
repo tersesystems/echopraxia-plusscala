@@ -9,7 +9,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Currency
 
 class FieldBuilderSpec extends AnyFunSpec with Matchers {
@@ -124,14 +123,14 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
 
       // this works only if ToValueAttribute is a path dependent type, and then hanging it off
       // the singleton object will work.
-      fb.keyValue("instant", epoch).toString must be("instant=1/1/70, 12:00 AM")
+      fb.keyValue("instant", epoch).toString must be("instant=1/1/70 12:00 AM")
     }
 
     it("should work with array of value attribute") {
       val fb    = MyFieldBuilder
       val epoch = Instant.EPOCH
 
-      fb.keyValue("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
+      fb.keyValue("instants", Seq(epoch)).toString must be("instants=[1/1/70 12:00 AM]")
     }
 
     it("should work with array of value attribute using fb.array") {
@@ -139,7 +138,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
       val epoch = Instant.EPOCH
 
       // found you :-D
-      fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70, 12:00 AM]")
+      fb.array("instants", Seq(epoch)).toString must be("instants=[1/1/70 12:00 AM]")
     }
 
     it("should work with object") {
@@ -161,7 +160,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
   trait MyFieldBuilder extends FieldBuilder {
     implicit val instantToValue: ToValue[Instant] = instant => {
       val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
-      val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+      val formatter = DateTimeFormatter.ofPattern("M/d/YY hh:mm a")
       val s         = formatter.format(datetime)
       ToValue(instant.toString).withToStringValue(s)
     }

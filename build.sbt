@@ -4,18 +4,15 @@ val echopraxiaVersion            = "4.0.0"
 val scalatestVersion             = "3.2.18"
 val logbackClassicVersion        = "1.5.3"
 val logstashVersion              = "8.0"
-val scalaJavaVersion             = "1.0.2"
 val enumeratumVersion            = "1.7.3"
 val zjsonPatchVersion            = "0.4.16"
 val sourceCodeVersion            = "0.3.1"
-val scalaCollectionCompatVersion = "2.11.0"
 val refinedVersion               = "0.11.1"
 
 val scala3                       = "3.4.0"
 val scala213                     = "2.13.13"
-val scala212                     = "2.12.19"
 
-val scalaVersions = List(scala212, scala213, scala3)
+val scalaVersions = List(scala213, scala3)
 val ideScala = scala213
 
 initialize := {
@@ -27,6 +24,7 @@ initialize := {
 
 inThisBuild(
   Seq(
+    scalaVersion := scala213,
     semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
@@ -36,7 +34,7 @@ ThisBuild / organization := "com.tersesystems.echopraxia.plusscala"
 ThisBuild / homepage     := Some(url("https://github.com/tersesystems/echopraxia-plusscala"))
 
 ThisBuild / startYear := Some(2021)
-ThisBuild / licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+ThisBuild / licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -70,8 +68,6 @@ lazy val api = (project in file("api"))
     semanticdbEnabled := true, // enable SemanticDB
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
-    libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % scalaJavaVersion,
-    libraryDependencies ++= compatLibraries(scalaVersion.value),
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     // tests
     libraryDependencies ++= {
@@ -163,7 +159,7 @@ lazy val flowLogger = (project in file("flow"))
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
     name := "nameof",
-    crossScalaVersions := List(scala212, scala213),
+    crossScalaVersions := List(scala213),
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
@@ -226,16 +222,6 @@ lazy val root = (project in file("."))
     traceLogger,
     benchmarks)
 
-def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, n)) if n == 12 =>
-      // only need collection compat in 2.12
-      Seq("org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompatVersion)
-    case other =>
-      Nil
-  }
-}
-
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((3, _)) =>
@@ -273,26 +259,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "8",
         "-Vimplicits",
         "-Vtype-diffs",
-        "-Xsource:3-cross"
-      )
-    case Some((2, n)) if n == 12 =>
-      Seq(
-        "-unchecked",
-        "-deprecation",
-        "-feature",
-        "-encoding",
-        "UTF-8",
-        "-language:implicitConversions",
-        "-language:higherKinds",
-        "-language:existentials",
-        "-language:postfixOps",
-        "-Xlint",
-        "-Ywarn-dead-code",
-        "-Yrangepos",
-        "-Yno-adapted-args",
-        "-Ywarn-unused-import", // Scala 2.x only, required by `RemoveUnused`
-        "-release",
-        "8",
       )
   }
 }

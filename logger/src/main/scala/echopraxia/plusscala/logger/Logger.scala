@@ -15,7 +15,7 @@ import sourcecode.Enclosing
 import sourcecode.File
 import sourcecode.Line
 
-import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 trait Logger[FB <: Singleton] extends LoggerMethods[FB] with LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB]
 
@@ -204,7 +204,6 @@ class LoggerMethodWithLevel[FB](level: JLevel, core: CoreLogger, fieldBuilder: F
     apply(("{} " * fields.size).trim, fields: _*)
 
   override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-    import scala.compat.java8.FunctionConverters._
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
     core.log(level, () => sourceCodeField.fields(), message, f1.asJava, fieldBuilder)
   }
@@ -235,7 +234,6 @@ class LoggerMethodWithLevel[FB](level: JLevel, core: CoreLogger, fieldBuilder: F
     apply(condition, ("{} " * fields.size).trim, fields: _*)
 
   override def apply(condition: Condition, message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-    import scala.compat.java8.FunctionConverters._
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
     core.log(level, () => sourceCodeField.fields(), condition.asJava, message, f1.asJava, fieldBuilder)
   }
