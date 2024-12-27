@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.Field
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -158,7 +158,7 @@ class FieldBuilderSpec extends AnyFunSpec with Matchers {
     }
   }
 
-  trait MyFieldBuilder extends PresentationFieldBuilder {
+  trait MyFieldBuilder extends FieldBuilder {
     implicit val instantToValue: ToValue[Instant] = instant => {
       val datetime  = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
       val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)

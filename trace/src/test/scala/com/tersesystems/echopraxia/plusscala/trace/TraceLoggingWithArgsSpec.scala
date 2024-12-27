@@ -3,11 +3,11 @@ package com.tersesystems.echopraxia.plusscala.trace
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.Value
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import echopraxia.api.FieldBuilderResult
+import echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.SourceCode
+import echopraxia.plusscala.logging.api.Condition
 import org.scalatest.Assertion
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.dump
 
-import com.tersesystems.echopraxia.api.Value
+import echopraxia.api.Value
 
 import scala.language.experimental.macros
 

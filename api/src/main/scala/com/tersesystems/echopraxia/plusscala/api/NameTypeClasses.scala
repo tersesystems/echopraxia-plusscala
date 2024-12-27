@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.spi.FieldConstants
+import echopraxia.api.FieldConstants
 
 import scala.annotation.implicitNotFound
 import scala.util.Failure

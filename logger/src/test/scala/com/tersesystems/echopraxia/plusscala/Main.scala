@@ -1,11 +1,13 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.plusscala.api.EitherToNameImplicits
-import com.tersesystems.echopraxia.plusscala.api.HeterogeneousFieldSupport
-import com.tersesystems.echopraxia.plusscala.api.OptionToNameImplicits
-import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
-import com.tersesystems.echopraxia.plusscala.api.TryToNameImplicits
+import echopraxia.api.Field
+import com.tersesystems.echopraxia.plusscala.api.{
+  EitherToNameImplicits,
+  FieldBuilder,
+  HeterogeneousFieldSupport,
+  OptionToNameImplicits,
+  TryToNameImplicits
+}
 
 import java.util.Currency
 import java.util.UUID
@@ -20,7 +22,7 @@ object Main {
 }
 
 class NoImplicits {
-  object MyFieldBuilder extends PresentationFieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
+  object MyFieldBuilder extends FieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
   private val USD = Currency.getInstance("USD")
 
   private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)

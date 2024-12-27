@@ -1,8 +1,7 @@
-package com.tersesystems.echopraxia.plusscala.api
+package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.api.{Condition => JCondition}
-import com.tersesystems.echopraxia.api.{Level => JLevel}
-import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
+import echopraxia.api.Value.{ArrayValue, ObjectValue}
+import echopraxia.logging.api.{Condition => JCondition, Level => JLevel, LoggingContext => JLoggingContext}
 
 trait Condition {
 
@@ -82,6 +81,30 @@ object Condition {
   val diagnostic: Condition = (level: Level, _: LoggingContext) => level.isLessOrEqual(Level.DEBUG)
 
   val operational: Condition = (level: Level, _: LoggingContext) => level.isGreaterOrEqual(Level.INFO)
+
+  def booleanMatch(fieldName: String, f: Boolean => Boolean): Condition = {
+    JCondition.booleanMatch(fieldName, t => f(t.raw())).asScala
+  }
+
+  def numberMatch(fieldName: String, f: Number => Boolean): Condition = {
+    JCondition.numberMatch(fieldName, t => f(t.asNumber().raw())).asScala
+  }
+
+  def stringMatch(fieldName: String, f: String => Boolean): Condition = {
+    JCondition.stringMatch(fieldName, p => f(p.raw())).asScala
+  }
+
+  def nullMatch(fieldName: String): Condition = {
+    JCondition.nullMatch(fieldName).asScala
+  }
+
+  def objectMatch(fieldName: String, f: ObjectValue => Boolean): Condition = {
+    JCondition.objectMatch(fieldName, p => f(p.asObject())).asScala
+  }
+
+  def arrayMatch(fieldName: String, f: ArrayValue => Boolean): Condition = {
+    JCondition.arrayMatch(fieldName, p => f(p.asArray())).asScala
+  }
 
   def exactly(exactLevel: Level): Condition = (level: Level, _: LoggingContext) => level.isEqual(exactLevel)
 

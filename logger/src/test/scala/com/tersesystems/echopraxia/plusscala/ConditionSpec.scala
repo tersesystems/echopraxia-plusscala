@@ -4,6 +4,7 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import com.tersesystems.echopraxia.plusscala.api._
+import echopraxia.plusscala.logging.api.{Condition, JsonPathCondition, Level}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -12,28 +13,28 @@ import java.util
 
 class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
-  object MyFieldBuilder extends PresentationFieldBuilder with Logging
+  object MyFieldBuilder extends FieldBuilder with Logging
 
   private val logger = LoggerFactory.getLogger(getClass, MyFieldBuilder)
 
   describe("findBoolean") {
 
     it("should match") {
-      val condition: Condition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
+      val condition: JsonPathCondition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
       logger.debug(condition, "found a foo == true", _.bool("foo", true))
 
       matchThis("found a foo == true")
     }
 
     it("should return None if no match") {
-      val condition: Condition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
+      val condition: JsonPathCondition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
       logger.debug(condition, "found a foo == true")
 
       noMatch
     }
 
     it("should return None if match is not boolean") {
-      val condition: Condition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
+      val condition: JsonPathCondition = (_, ctx) => ctx.findBoolean("$.foo").getOrElse(false)
       logger.debug(condition, "found a foo == true", _.string("foo", "bar"))
 
       noMatch
@@ -43,21 +44,21 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   describe("findString") {
 
     it("should return some on match") {
-      val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
+      val condition: JsonPathCondition = (_, ctx) => ctx.findString("$.foo").contains("bar")
       logger.debug(condition, "found a foo == bar", _.string("foo", "bar"))
 
       matchThis("found a foo == bar")
     }
 
     it("should none on no match") {
-      val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
+      val condition: JsonPathCondition = (_, ctx) => ctx.findString("$.foo").contains("bar")
       logger.debug(condition, "found a foo == bar")
 
       noMatch
     }
 
     it("should none on wrong type") {
-      val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
+      val condition: JsonPathCondition = (_, ctx) => ctx.findString("$.foo").contains("bar")
       logger.debug(condition, "found a foo == bar", _.number("foo", 1))
 
       noMatch
@@ -66,7 +67,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("findNumber") {
     it("should some on match") {
-      val condition: Condition = (_, ctx) => ctx.findNumber("$.foo").exists(_.intValue() == 1)
+      val condition: JsonPathCondition = (_, ctx) => ctx.findNumber("$.foo").exists(_.intValue() == 1)
       logger.debug(condition, "found a number == 1", _.number("foo", 1))
 
       matchThis("found a number == 1")
@@ -75,7 +76,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("findNull") {
     it("should work with findNull") {
-      val condition: Condition = (_, ctx) => ctx.findNull("$.foo")
+      val condition: JsonPathCondition = (_, ctx) => ctx.findNull("$.foo")
       logger.debug(condition, "found a null!", _.nullField("foo"))
 
       matchThis("found a null!")
@@ -84,7 +85,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("findList") {
     it("should work with list of same type") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         val list   = ctx.findList("$.foo")
         val result = list.contains("derp")
         result
@@ -99,7 +100,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should work with list with different type values") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         val nummatch = ctx.findList("$.foo").contains(1)
         val strmatch = ctx.findList("$.foo").contains("derp")
         nummatch && strmatch
@@ -118,7 +119,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should match on list containing objects") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         val obj = ctx.findList("$.array")
         obj.head match {
           case map: Map[String, Any] =>
@@ -148,14 +149,14 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   describe("object") {
     it("should match on simple object") {
       logger
-        .withCondition((_, ctx) => ctx.findObject("$.foo").get("key").equals("value"))
+        .withCondition(JsonPathCondition((_, ctx) => ctx.findObject("$.foo").get("key").equals("value")))
         .debug("simple map", fb => fb.obj("foo", fb.string("key" -> "value")))
 
       matchThis("simple map")
     }
 
     it("should not match on no argument") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         ctx.findObject("$.foo").isDefined
       }
       logger.debug(condition, "no match", _.number("bar", 1))
@@ -164,7 +165,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should not match on incorrect type") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         ctx.findObject("$.foo").isDefined
       }
       logger.debug(condition, "no match", _.number("foo", 1))
@@ -173,7 +174,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     }
 
     it("should match on a complex object") {
-      val condition: Condition = (_, ctx) => {
+      val condition: JsonPathCondition = (_, ctx) => {
         val obj         = ctx.findObject("$.foo")
         val value1: Any = obj.get("a")
         value1 == (1)
@@ -197,7 +198,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   } // object
 
   it("should match on list") {
-    val condition: Condition = (_, ctx) => {
+    val condition: JsonPathCondition = (_, ctx) => {
       val opt: Seq[Any] = ctx.findList("$.foo")
       opt.nonEmpty
     }
@@ -207,7 +208,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should make a list contain scala maps with int") {
-    val isWill = Condition { (_: Level, context: LoggingContext) =>
+    val isWill = JsonPathCondition { context =>
       val list = context.findList("$.person[?(@.name == 'will')]")
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("age") == 1
@@ -218,7 +219,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should make a list contain scala maps with string") {
-    val isWill = Condition { (_: Level, context: LoggingContext) =>
+    val isWill = JsonPathCondition { context =>
       val list = context.findList("$.person[?(@.name == 'will')]")
       val map  = list.head.asInstanceOf[Map[String, Any]]
       map("name") == "will"
@@ -229,7 +230,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should make a list contain scala maps with float") {
-    val isWill = Condition { (_: Level, context: LoggingContext) =>
+    val isWill = JsonPathCondition { context =>
       val map = context.findObject("$.obj").get
       map("float") == 0.0f
     }
@@ -239,7 +240,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should deal with BigInt") {
-    val isWill = Condition { (_: Level, context: LoggingContext) =>
+    val isWill = JsonPathCondition { context =>
       val obj = context.findObject("$.obj").get
       obj("bigint") == BigInt("1100020323232341313413")
     }
@@ -256,7 +257,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should deal with BigDecimal") {
-    val isWill = Condition { (_: Level, context: LoggingContext) =>
+    val isWill = JsonPathCondition { context =>
       val govt = context.findObject("$.government").get
       govt("debt") == BigDecimal("1100020323232341313413")
     }
@@ -268,7 +269,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should not match on an object mismatch") {
-    val condition: Condition = (_, ctx) => {
+    val condition = JsonPathCondition { ctx =>
       val opt: Option[_] = ctx.findObject("$.foo")
       opt.isDefined
     }
@@ -278,7 +279,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should match on level") {
-    val condition: Condition = (level, _) => level.isGreater(Level.DEBUG)
+    val condition: Condition = (level, _) => level > Level.DEBUG
 
     logger.info(condition, "matches on level")
     matchThis("matches on level")

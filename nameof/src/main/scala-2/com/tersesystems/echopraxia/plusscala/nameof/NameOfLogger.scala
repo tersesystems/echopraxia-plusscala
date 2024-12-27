@@ -1,11 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.nameof
 
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
-import com.tersesystems.echopraxia.spi.CoreLogger
-import com.tersesystems.echopraxia.spi.Utilities
+import echopraxia.api.FieldBuilderResult
+import echopraxia.logging.spi.{CoreLogger, Utilities}
+import echopraxia.plusscala.logging.api.{Condition, LoggerSupport}
 
 import scala.annotation.tailrec
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
@@ -85,35 +83,35 @@ object NameOfLogger {
 
     def error[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
-      val level: Select = q"com.tersesystems.echopraxia.api.Level.ERROR"
+      val level: Select = q"echopraxia.logging.api.Level.ERROR"
 
       handle(tpeA, level, expr)
     }
 
     def warn[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
-      val level: Select = q"com.tersesystems.echopraxia.api.Level.WARN"
+      val level: Select = q"echopraxia.logging.api.Level.WARN"
 
       handle(tpeA, level, expr)
     }
 
     def info[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
-      val level: Select = q"com.tersesystems.echopraxia.api.Level.INFO"
+      val level: Select = q"echopraxia.logging.api.Level.INFO"
 
       handle(tpeA, level, expr)
     }
 
     def debug[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
-      val level: Select = q"com.tersesystems.echopraxia.api.Level.DEBUG"
+      val level: Select = q"echopraxia.logging.api.Level.DEBUG"
 
       handle(tpeA, level, expr)
     }
 
     def trace[A: c.WeakTypeTag](expr: c.Tree): Tree = {
       val tpeA: Type    = implicitly[WeakTypeTag[A]].tpe
-      val level: Select = q"com.tersesystems.echopraxia.api.Level.TRACE"
+      val level: Select = q"echopraxia.logging.api.Level.TRACE"
 
       handle(tpeA, level, expr)
     }
@@ -138,7 +136,7 @@ object NameOfLogger {
 
       val logger           = c.prefix
       val fieldBuilderType = tq"$logger.fieldBuilder.type"
-      val function = q"""new java.util.function.Function[$fieldBuilderType, com.tersesystems.echopraxia.api.FieldBuilderResult]() {
+      val function = q"""new java.util.function.Function[$fieldBuilderType, echopraxia.api.FieldBuilderResult]() {
         def apply(fb: $fieldBuilderType) = fb.keyValue($name, fb.ToValue[$tpeA]($expr))
       }"""
       q"""$logger.core.log($level, "{}", $function, $logger.fieldBuilder)"""

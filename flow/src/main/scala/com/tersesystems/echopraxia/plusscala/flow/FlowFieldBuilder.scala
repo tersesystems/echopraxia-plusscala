@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.Value
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
+import echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api._
 
 trait FlowFieldBuilder extends ValueTypeClasses {

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.{Field, Value}
+import echopraxia.api.{Field, Value}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -36,12 +36,13 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
     }
 
     it("should work on complex objects") {
-      implicit val frameToValue: ToValue[StackWalker.StackFrame] = element => ToObjectValue(
-        "method_name" -> element.getMethodName,
-        "file_name" -> element.getFileName,
-        "class_name" -> element.getClassName,
-        "line_number" -> element.getLineNumber
-      ).withToStringValue("derp")
+      implicit val frameToValue: ToValue[StackWalker.StackFrame] = element =>
+        ToObjectValue(
+          "method_name" -> element.getMethodName,
+          "file_name"   -> element.getFileName,
+          "class_name"  -> element.getClassName,
+          "line_number" -> element.getLineNumber
+        ).withToStringValue("derp")
 
       val value: Value[_] = StackWalker.getInstance.walk[Value[_]](_.toScala(LazyList).map(ToValue(_)).head)
       value.toString must be("derp")

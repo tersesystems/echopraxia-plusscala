@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api._
+import echopraxia.api._
 import com.tersesystems.echopraxia.plusscala.spi.Utils
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes
 
 trait HasFieldClass {
   type FieldType <: Field
@@ -160,21 +159,8 @@ trait FieldBuilderBase
   override def exception(ex: Throwable): FieldType = keyValue(ex, ex)
 }
 
-/**
- * A field builder that uses PresentationField.
- */
-trait PresentationFieldBuilder extends FieldBuilderBase {
-  override type FieldType = PresentationField
-  override protected def fieldClass: Class[FieldType] = classOf[FieldType]
-}
-
-/**
- * Singleton object for PresentationFieldBuilder.
- */
-object PresentationFieldBuilder extends PresentationFieldBuilder
-
 trait FieldBuilder extends FieldBuilderBase {
-  override type FieldType = Field
+  override type FieldType = DefaultField
   override protected def fieldClass: Class[FieldType] = classOf[FieldType]
 }
 

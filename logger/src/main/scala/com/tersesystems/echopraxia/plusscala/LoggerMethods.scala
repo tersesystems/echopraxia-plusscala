@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
+import echopraxia.plusscala.logging.api.Condition
 import sourcecode._
 
 trait LoggerMethod[FB] {
