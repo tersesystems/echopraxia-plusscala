@@ -1,7 +1,6 @@
-package echopraxia.plusscala
+package echopraxia.plusscala.logger
 
-import echopraxia.api.Field
-import echopraxia.api.FieldBuilderResult
+import echopraxia.api.{Field, FieldBuilderResult}
 import echopraxia.plusscala.logging.api.Condition
 import sourcecode._
 

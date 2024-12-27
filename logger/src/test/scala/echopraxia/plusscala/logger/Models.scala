@@ -1,4 +1,4 @@
-package echopraxia.plusscala
+package echopraxia.plusscala.logger
 
 import java.util.Currency
 

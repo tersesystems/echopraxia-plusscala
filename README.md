@@ -7,6 +7,8 @@ The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a 
 In practical terms, you define some type classes that set what the name and value of a class should be:
 
 ```scala
+import echopraxia.plusscala.logging.api._
+
 trait Logging extends LoggingBase {
   implicit val uuidToField: ToField[UUID] = ToField(_ => "uuid", uuid => ToValue(uuid.toString))
 }
@@ -15,10 +17,12 @@ trait Logging extends LoggingBase {
 and then logging will provide both structured logging in JSON and line oriented format in logfmt:
 
 ```scala
+import echopraxia.plusscala.logger._
+
 class Processor extends Logging {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def process(): Unit {
+  def process(): Unit = {
     logger.info(UUID.randomUUID) // uses implicit type class for UUID
   }
 }
@@ -88,8 +92,8 @@ libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json"
 To import the Scala API, add the following:
 
 ```scala
-import echopraxia.plusscala._
-import echopraxia.plusscala.api.LoggingBase
+import echopraxia.plusscala.api._
+import echopraxia.plusscala.logger._
 
 trait Logging extends LoggingBase {
   // add implicits for your classes here
