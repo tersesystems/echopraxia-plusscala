@@ -5,7 +5,7 @@ import echopraxia.api.Value
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class ObjectSpec extends AnyFunSpec with Matchers with Logging {
 

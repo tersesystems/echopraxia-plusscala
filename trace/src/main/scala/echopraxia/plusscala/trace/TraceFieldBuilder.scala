@@ -10,7 +10,7 @@ import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.api.ValueTypeClasses
 import sourcecode._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 import DefaultTraceFieldBuilder.TraceArgumentValues
 import DefaultTraceFieldBuilder.TraceSignature
