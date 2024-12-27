@@ -134,7 +134,7 @@ class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with M
       list(sourceFields.argumentFields)
     }
 
-    override def exiting(sourceFields: SourceFields, retValue: Value[_]): FieldBuilderResult = {
+    override def exiting(sourceFields: SourceFields, retValue: Value[?]): FieldBuilderResult = {
       list(sourceFields.argumentFields :+ value("traceResult", retValue))
     }
 

@@ -28,7 +28,7 @@ trait TraceFieldBuilder extends ValueTypeClasses with FieldBuilderResultTypeClas
 
   def entering(sourceFields: SourceFields): FieldBuilderResult
 
-  def exiting(sourceFields: SourceFields, value: Value[_]): FieldBuilderResult
+  def exiting(sourceFields: SourceFields, value: Value[?]): FieldBuilderResult
 
   def throwing(sourceFields: SourceFields, ex: Throwable): FieldBuilderResult
 }
@@ -43,7 +43,7 @@ trait DefaultTraceFieldBuilder extends FieldBuilder with TraceFieldBuilder {
     list(Seq(DefaultTraceFieldBuilder.entryTag) ++ sourceFields.argumentFields)
   }
 
-  override def exiting(sourceFields: SourceFields, retValue: Value[_]): FieldBuilderResult = {
+  override def exiting(sourceFields: SourceFields, retValue: Value[?]): FieldBuilderResult = {
     list(Seq(DefaultTraceFieldBuilder.exitTag) ++ sourceFields.argumentFields :+ value(DefaultTraceFieldBuilder.TraceResult, retValue))
   }
 
@@ -79,11 +79,11 @@ trait SourceFields {
 class DefaultSourceFields(sc: SourceCode, args: Args) extends SourceFields {
   def signature: String = s"${sc.enclosing.value}(${args.value.map(argumentTypes).mkString(",")})"
 
-  def entryArguments(list: Seq[Text[_]]): String = {
+  def entryArguments(list: Seq[Text[?]]): String = {
     list.map(_.value).mkString(",")
   }
 
-  def argumentTypes(list: Seq[Text[_]]): String = {
+  def argumentTypes(list: Seq[Text[?]]): String = {
     list.map(txt => s"${txt.source}: ${txt.value.getClass.getSimpleName}").mkString(",")
   }
 

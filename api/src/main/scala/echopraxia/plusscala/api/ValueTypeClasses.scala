@@ -17,11 +17,11 @@ trait ValueTypeClasses {
   // noinspection ScalaUnusedSymbol
   @implicitNotFound("Could not find an implicit ToValue[${T}]")
   trait ToValue[-T] {
-    def toValue(t: T): Value[_]
+    def toValue(t: T): Value[?]
   }
 
   trait ToValueImplicits {
-    implicit val valueToValue: ToValue[Value[_]] = identity(_)
+    implicit val valueToValue: ToValue[Value[?]] = identity(_)
 
     implicit def objectValueToValue[T: ToObjectValue]: ToValue[T] = implicitly[ToObjectValue[T]].toValue(_)
     implicit def arrayValueToValue[T: ToArrayValue]: ToValue[T]   = implicitly[ToArrayValue[T]].toValue(_)
@@ -68,7 +68,7 @@ trait ValueTypeClasses {
   }
 
   object ToValue extends ToValueImplicits {
-    def apply[T: ToValue](t: T): Value[_] = implicitly[ToValue[T]].toValue(t)
+    def apply[T: ToValue](t: T): Value[?] = implicitly[ToValue[T]].toValue(t)
   }
 
   /**
@@ -87,13 +87,13 @@ trait ValueTypeClasses {
     implicit val identityArrayValue: ToArrayValue[Value.ArrayValue] = identity(_)
 
     implicit def iterableToArrayValue[V: ToValue]: ToArrayValue[collection.Iterable[V]] =
-      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray: _*)
+      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray*)
 
     implicit def immutableIterableToArrayValue[V: ToValue]: ToArrayValue[collection.immutable.Iterable[V]] =
-      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray: _*)
+      iterable => Value.array(iterable.map(implicitly[ToValue[V]].toValue).toArray*)
 
     implicit def arrayToArrayValue[V: ToValue]: ToArrayValue[Array[V]] = array => {
-      Value.array(array.map(implicitly[ToValue[V]].toValue): _*)
+      Value.array(array.map(implicitly[ToValue[V]].toValue)*)
     }
   }
 
@@ -121,10 +121,10 @@ trait ValueTypeClasses {
 
     implicit val fieldToObjectValue: ToObjectValue[Field] = f => Value.`object`(f)
 
-    implicit val iterableToObjectValue: ToObjectValue[collection.Iterable[Field]] = t => Value.`object`(t.toArray: _*)
+    implicit val iterableToObjectValue: ToObjectValue[collection.Iterable[Field]] = t => Value.`object`(t.toArray*)
 
     implicit val immutableIterableToObjectValue: ToObjectValue[collection.immutable.Iterable[Field]] =
-      t => Value.`object`(t.toArray: _*)
+      t => Value.`object`(t.toArray*)
   }
 
   object ToObjectValue extends ToObjectValueImplicits {
@@ -134,6 +134,6 @@ trait ValueTypeClasses {
 
     def apply(field: Field): Value.ObjectValue = Value.`object`(field)
 
-    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields: _*)
+    def apply(fields: Field*): Value.ObjectValue = Value.`object`(fields*)
   }
 }

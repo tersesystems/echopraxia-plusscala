@@ -4,7 +4,7 @@ import echopraxia.logging.spi.Caller
 import echopraxia.logging.spi.CoreLoggerFactory
 
 object FlowLoggerFactory {
-  val FQCN: String = classOf[DefaultFlowLoggerMethods[_]].getName
+  val FQCN: String = classOf[DefaultFlowLoggerMethods[?]].getName
 
   val fieldBuilder: DefaultFlowFieldBuilder.type = DefaultFlowFieldBuilder
 
@@ -13,17 +13,17 @@ object FlowLoggerFactory {
     FlowLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB <: FlowFieldBuilder with Singleton](name: String, fieldBuilder: FB): FlowLogger[FB] = {
+  def getLogger[FB <: FlowFieldBuilder & Singleton](name: String, fieldBuilder: FB): FlowLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     FlowLogger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): FlowLogger[DefaultFlowFieldBuilder.type] = {
+  def getLogger(clazz: Class[?]): FlowLogger[DefaultFlowFieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     FlowLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB <: FlowFieldBuilder with Singleton](clazz: Class[_], fieldBuilder: FB): FlowLogger[FB] = {
+  def getLogger[FB <: FlowFieldBuilder & Singleton](clazz: Class[?], fieldBuilder: FB): FlowLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     FlowLogger(core, fieldBuilder)
   }
@@ -33,7 +33,7 @@ object FlowLoggerFactory {
     FlowLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB <: FlowFieldBuilder with Singleton](fieldBuilder: FB): FlowLogger[FB] = {
+  def getLogger[FB <: FlowFieldBuilder & Singleton](fieldBuilder: FB): FlowLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     FlowLogger(core, fieldBuilder)
   }

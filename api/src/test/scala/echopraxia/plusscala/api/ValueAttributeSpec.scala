@@ -40,7 +40,7 @@ class ValueAttributeSpec extends AnyFunSpec with BeforeAndAfterEach with Matcher
           "line_number" -> element.getLineNumber
         ).withToStringValue("derp")
 
-      val value: Value[_] = StackWalker.getInstance.walk[Value[_]](_.toScala(LazyList).map(ToValue(_)).head)
+      val value: Value[?] = StackWalker.getInstance.walk[Value[?]](_.toScala(LazyList).map(ToValue(_)).head)
       value.toString must be("derp")
     }
   }
