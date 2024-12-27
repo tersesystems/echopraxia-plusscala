@@ -299,6 +299,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
 
 lazy val optimizeInline = Seq(
   "-opt:l:inline",
-  "-opt-inline-from:com.tersesystems.echopraxia.plusscala.**",
+  "-opt-inline-from:echopraxia.plusscala.**",
   "-opt-warnings:any-inline-failed"
 )

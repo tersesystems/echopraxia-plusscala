@@ -4,9 +4,9 @@
 You can create a custom logger which has your own methods and field builders by extending `DefaultLoggerMethods`.
 
 ```scala
-import com.tersesystems.echopraxia.api.{CoreLogger, Caller, CoreLoggerFactory, FieldBuilderResult, Utilities}
-import com.tersesystems.echopraxia.plusscala.DefaultLoggerMethods
-import com.tersesystems.echopraxia.plusscala.api._
+import echopraxia.api._
+import echopraxia.plusscala.DefaultLoggerMethods
+import echopraxia.plusscala.api._
 
 object CustomLoggerFactory {
   private val FQCN: String = classOf[DefaultLoggerMethods[_]].getName

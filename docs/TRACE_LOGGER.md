@@ -5,7 +5,7 @@ You can use a trace or flow logger to debug methods and interactions in your cod
 This works very well when you want to add "enter" and "exit" logging statements around your method, by adding a block of `traceLogger.trace`.
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.trace._
+import echopraxia.plusscala.trace._
 val traceLogger = TraceLoggerFactory.getLogger
 def myMethod(arg1: String): Int = traceLogger.trace {
   // ... logic
@@ -25,8 +25,8 @@ libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "trace-logger"
 The following program extends the DefaultTraceFieldBuilder to use automatic derivation, useful for mapping return values:
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.generic._
-import com.tersesystems.echopraxia.plusscala.trace._
+import echopraxia.plusscala.generic._
+import echopraxia.plusscala.trace._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}

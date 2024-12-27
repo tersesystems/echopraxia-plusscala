@@ -1,6 +1,6 @@
 package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.plusscala.api.FindPathMethods
+import echopraxia.plusscala.api.FindPathMethods
 
 object JsonPathCondition {
   def apply(f: (Level, LoggingContext with FindPathMethods) => Boolean): JsonPathCondition = new JsonPathCondition {
