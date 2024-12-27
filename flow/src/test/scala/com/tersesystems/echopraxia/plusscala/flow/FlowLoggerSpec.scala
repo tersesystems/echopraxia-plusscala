@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.plusscala.flow
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import echopraxia.plusscala.logging.api.Condition
 import org.scalatest.Assertion
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec

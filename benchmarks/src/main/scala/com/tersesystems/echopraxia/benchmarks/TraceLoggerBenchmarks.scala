@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
-import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.trace.TraceLoggerFactory
+import echopraxia.plusscala.logging.api.Condition
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
@@ -75,7 +75,7 @@ object TraceLoggerBenchmarks {
 
   private val condition: Condition = (_, _) => false
 
-  private val fieldsCondition: Condition = (_, ctx) => ctx.findString("$.sourcecode.file").exists(s => s.endsWith("TraceLoggerBenchmarks.scala"))
+  private val fieldsCondition: Condition = Condition.operational
 
   private val neverLogger = logger.withCondition(Condition.never)
 }

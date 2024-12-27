@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api._
 
 import java.util.Currency

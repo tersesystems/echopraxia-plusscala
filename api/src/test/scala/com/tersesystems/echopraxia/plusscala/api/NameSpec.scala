@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.Field
 import enumeratum.EnumEntry.Snakecase
 import enumeratum._
 import org.scalatest.matchers.must.Matchers

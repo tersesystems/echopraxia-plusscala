@@ -1,9 +1,9 @@
 import sbt.Keys._
 
-val echopraxiaVersion            = "3.2.1"
+val echopraxiaVersion            = "4.0.0"
 val scalatestVersion             = "3.2.18"
 val logbackClassicVersion        = "1.5.3"
-val logstashVersion              = "7.4"
+val logstashVersion              = "8.0"
 val scalaJavaVersion             = "1.0.2"
 val enumeratumVersion            = "1.7.3"
 val zjsonPatchVersion            = "0.4.16"
@@ -91,6 +91,16 @@ lazy val api = (project in file("api"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
 
+lazy val logging = (project in file("logging"))
+  .settings(
+    name := "logging",
+    crossScalaVersions := scalaVersions,
+    scalacOptions := scalacOptionsVersion(scalaVersion.value),
+    libraryDependencies += "com.tersesystems.echopraxia" % "logging"                % echopraxiaVersion,
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
+  )
+  .dependsOn(api)
+
 lazy val generic = (project in file("generic"))
   .settings(
     name := "generic",
@@ -122,7 +132,7 @@ lazy val simple = (project in file("simple"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(logging)
 
 lazy val logger = (project in file("logger"))
   .settings(
@@ -135,7 +145,7 @@ lazy val logger = (project in file("logger"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(api % "compile->compile;test->compile", logging)
 
 lazy val flowLogger = (project in file("flow"))
   .settings(
@@ -148,7 +158,7 @@ lazy val flowLogger = (project in file("flow"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(logging % "compile->compile;test->compile")
 
 lazy val nameOfLogger = (project in file("nameof"))
   .settings(
@@ -161,7 +171,7 @@ lazy val nameOfLogger = (project in file("nameof"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(logging % "compile->compile;test->compile")
 
 // don't include dump for now
 //lazy val dump = (project in file("dump"))
@@ -183,7 +193,7 @@ lazy val traceLogger = (project in file("trace"))
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(logging % "compile->compile;test->compile")
 
 lazy val benchmarks = (project in file("benchmarks"))
   .enablePlugins(JmhPlugin)
@@ -205,7 +215,16 @@ lazy val root = (project in file("."))
     Compile / packageDoc / publishArtifact := false,
     publishArtifact                        := false,
     publish / skip                         := true
-  ).aggregate(api, generic, logger, simple, nameOfLogger, flowLogger, traceLogger, benchmarks)
+  ).aggregate(
+    api,
+    logging,
+    generic,
+    logger,
+    simple,
+    nameOfLogger,
+    flowLogger,
+    traceLogger,
+    benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {

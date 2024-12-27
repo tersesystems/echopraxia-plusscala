@@ -1,10 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.flow
 
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.LoggerHandle
-import com.tersesystems.echopraxia.api.{Level => JLevel}
-import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
+import echopraxia.api.FieldBuilderResult
+import echopraxia.logging.api.LoggerHandle
+import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport}
 
 import java.util.function.Function
 import scala.compat.java8.FunctionConverters._

@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
-import com.tersesystems.echopraxia.plusscala.api.Condition
 import com.tersesystems.echopraxia.plusscala.flow.FlowLoggerFactory
+import echopraxia.plusscala.logging.api.Condition
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 

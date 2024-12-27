@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
+import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport}
 import sourcecode.Args
 import sourcecode.Enclosing
 import sourcecode.File

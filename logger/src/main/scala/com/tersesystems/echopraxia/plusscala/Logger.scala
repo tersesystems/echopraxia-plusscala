@@ -1,21 +1,12 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.FieldBuilderResult.list
-import com.tersesystems.echopraxia.api.Level
-import com.tersesystems.echopraxia.api.Level.DEBUG
-import com.tersesystems.echopraxia.api.Level.ERROR
-import com.tersesystems.echopraxia.api.Level.INFO
-import com.tersesystems.echopraxia.api.Level.TRACE
-import com.tersesystems.echopraxia.api.Level.WARN
-import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
-import com.tersesystems.echopraxia.plusscala.api.SourceCode
-import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import com.tersesystems.echopraxia.plusscala.spi.LoggerSupport
-import com.tersesystems.echopraxia.spi.CoreLogger
-import com.tersesystems.echopraxia.spi.Utilities
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
+import echopraxia.api.FieldBuilderResult.list
+import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCode}
+import echopraxia.logging.spi.{CoreLogger, Utilities}
+import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport, Level, LoggerSupport}
 import sourcecode.Enclosing
 import sourcecode.File
 import sourcecode.Line
@@ -25,6 +16,7 @@ import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 trait Logger[FB <: Singleton] extends LoggerMethods[FB] with LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB]
 
 object Logger {
+  import JLevel._
 
   def apply[FB <: Singleton](core: CoreLogger, fieldBuilder: FB): Logger[FB] = new Impl[FB](core, fieldBuilder)
 
@@ -32,11 +24,11 @@ object Logger {
    */
   class Impl[FB <: Singleton](val core: CoreLogger, val fieldBuilder: FB) extends Logger[FB] {
 
-    private val traceMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(Level.TRACE, core, fieldBuilder)
-    private val debugMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(Level.DEBUG, core, fieldBuilder)
-    private val infoMethod: LoggerMethod[FB]  = new LoggerMethodWithLevel(Level.INFO, core, fieldBuilder)
-    private val warnMethod: LoggerMethod[FB]  = new LoggerMethodWithLevel(Level.WARN, core, fieldBuilder)
-    private val errorMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(Level.ERROR, core, fieldBuilder)
+    private val traceMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(JLevel.TRACE, core, fieldBuilder)
+    private val debugMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(JLevel.DEBUG, core, fieldBuilder)
+    private val infoMethod: LoggerMethod[FB]  = new LoggerMethodWithLevel(JLevel.INFO, core, fieldBuilder)
+    private val warnMethod: LoggerMethod[FB]  = new LoggerMethodWithLevel(JLevel.WARN, core, fieldBuilder)
+    private val errorMethod: LoggerMethod[FB] = new LoggerMethodWithLevel(JLevel.ERROR, core, fieldBuilder)
 
     override def name: String = core.getName
 
@@ -76,7 +68,7 @@ object Logger {
     // TRACE
 
     /** @return true if the logger level is TRACE or higher. */
-    def isTraceEnabled: Boolean = core.isEnabled(TRACE)
+    def isTraceEnabled: Boolean = core.isEnabled(JLevel.TRACE)
 
     /**
      * @param condition
@@ -84,7 +76,7 @@ object Logger {
      * @return
      *   true if the logger level is TRACE or higher and the condition is met.
      */
-    def isTraceEnabled(condition: Condition): Boolean = core.isEnabled(TRACE, condition.asJava)
+    def isTraceEnabled(condition: Condition): Boolean = core.isEnabled(JLevel.TRACE, condition.asJava)
 
     def trace: LoggerMethod[FB] = traceMethod
 
@@ -202,7 +194,7 @@ object Logger {
   }
 }
 
-class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB) extends LoggerMethod[FB] {
+class LoggerMethodWithLevel[FB](level: JLevel, core: CoreLogger, fieldBuilder: FB) extends LoggerMethod[FB] {
 
   override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
     apply(("{} " * fields.size).trim, fields: _*)
@@ -249,13 +241,13 @@ class LoggerMethodWithLevel[FB](level: Level, core: CoreLogger, fieldBuilder: FB
 
   private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
     val sc = SourceCode(line, file, enc)
-    val fb = PresentationFieldBuilder
+    val fb = FieldBuilder
     fb.sourceCode(sc)
   }
 
   @inline
   protected def onlyException(e: Throwable): FieldBuilderResult = {
-    val fb = PresentationFieldBuilder
+    val fb = FieldBuilder
     fb.exception(e)
   }
 }

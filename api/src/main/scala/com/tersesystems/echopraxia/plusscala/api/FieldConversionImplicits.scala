@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Attributes
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.Attributes
+import echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.spi.Utils
 
 trait FieldConversionImplicits { self: ValueTypeClasses with NameTypeClasses =>

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.DefaultField
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.predicates.all.NonEmpty
@@ -27,8 +27,8 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
   }
 
   trait RefinedFieldBuilder extends FieldBuilderBase {
-    override type FieldType = Field
-    override protected def fieldClass: Class[Field] = classOf[Field]
+    override type FieldType = DefaultField
+    override protected def fieldClass: Class[DefaultField] = classOf[DefaultField]
 
     type Name = String Refined NonEmpty
 

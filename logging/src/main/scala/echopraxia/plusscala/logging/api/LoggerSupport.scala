@@ -1,8 +1,6 @@
-package com.tersesystems.echopraxia.plusscala.spi
+package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.plusscala.api.Condition
+import echopraxia.api.{Field, FieldBuilderResult}
 
 trait LoggerSupport[FB, LoggerType[_ <: FB]] { self =>
 

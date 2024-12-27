@@ -47,7 +47,7 @@ class DerivationSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     implicit lazy val someIdToValue: ToValue[SomeId]              = gen[SomeId]
   }
 
-  trait SemiAutoFieldBuilder  extends PresentationFieldBuilder with SemiAutoLogging
+  trait SemiAutoFieldBuilder  extends FieldBuilder with SemiAutoLogging
   object SemiAutoFieldBuilder extends SemiAutoFieldBuilder
 
   // trait KeyValueOnly extends FieldBuilder with AutoDerivation with KeyValueCaseClassDerivation

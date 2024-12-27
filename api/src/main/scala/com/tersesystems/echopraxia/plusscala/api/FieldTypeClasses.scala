@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Value
+import echopraxia.api.Value
 
 trait FieldTypeClasses { self: ValueTypeClasses with NameTypeClasses =>
   // Provides easier packaging for ToName and ToValue

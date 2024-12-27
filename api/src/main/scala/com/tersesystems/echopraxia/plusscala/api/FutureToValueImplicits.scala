@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.plusscala.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.Value
+import echopraxia.api.Field
+import echopraxia.api.Value
 
 import scala.concurrent.Future
 import scala.util.Failure

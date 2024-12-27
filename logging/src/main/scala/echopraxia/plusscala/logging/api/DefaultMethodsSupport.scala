@@ -1,6 +1,6 @@
-package com.tersesystems.echopraxia.plusscala.spi
+package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.spi.CoreLogger
+import echopraxia.logging.spi.CoreLogger
 
 trait DefaultMethodsSupport[FB] {
   def name: String

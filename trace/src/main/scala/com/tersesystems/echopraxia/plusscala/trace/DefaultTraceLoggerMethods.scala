@@ -1,10 +1,9 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.{Level => JLevel}
-import com.tersesystems.echopraxia.plusscala.api.Condition
-import com.tersesystems.echopraxia.plusscala.spi.DefaultMethodsSupport
-import com.tersesystems.echopraxia.spi.CoreLogger
+import echopraxia.api.FieldBuilderResult
+import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.logging.spi.CoreLogger
+import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport}
 import sourcecode._
 
 import java.util.function.Function

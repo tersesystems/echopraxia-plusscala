@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.plusscala
 
-import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
-import com.tersesystems.echopraxia.spi.Caller
-import com.tersesystems.echopraxia.spi.CoreLoggerFactory
+import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
+import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
 
 /**
  * LoggerFactory for a logger with source code enabled.
@@ -10,14 +9,14 @@ import com.tersesystems.echopraxia.spi.CoreLoggerFactory
 object LoggerFactory {
   val FQCN: String = classOf[Logger[_]].getName
 
-  val fieldBuilder: PresentationFieldBuilder.type = PresentationFieldBuilder
+  val fieldBuilder: FieldBuilder.type = FieldBuilder
 
-  def getLogger(name: String): Logger[PresentationFieldBuilder.type] = {
+  def getLogger(name: String): Logger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, name)
     Logger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): Logger[PresentationFieldBuilder.type] = {
+  def getLogger(clazz: Class[_]): Logger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     Logger(core, fieldBuilder)
   }
@@ -32,7 +31,7 @@ object LoggerFactory {
     Logger(core, fieldBuilder)
   }
 
-  def getLogger: Logger[PresentationFieldBuilder.type] = {
+  def getLogger: Logger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName)
     Logger(core, fieldBuilder)
   }

@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.plusscala.trace
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.FieldBuilderResult
-import com.tersesystems.echopraxia.api.Value
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
+import echopraxia.api.Value
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.FieldBuilderResultTypeClasses
 import com.tersesystems.echopraxia.plusscala.api.ListFieldBuilder
-import com.tersesystems.echopraxia.plusscala.api.PresentationFieldBuilder
 import com.tersesystems.echopraxia.plusscala.api.SourceCode
 import com.tersesystems.echopraxia.plusscala.api.ValueTypeClasses
 import com.tersesystems.echopraxia.plusscala.trace.DefaultTraceFieldBuilder.TraceArgumentValues
@@ -93,7 +92,7 @@ class DefaultSourceFields(sc: SourceCode, args: Args) extends SourceFields {
   )
 
   override lazy val loggerFields: Seq[Field] = {
-    val fb = PresentationFieldBuilder
+    val fb = FieldBuilder
     fb.sourceCode(sc).fields().asScala.toSeq
   }
 }

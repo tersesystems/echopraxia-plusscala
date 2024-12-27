@@ -1,17 +1,13 @@
-package com.tersesystems.echopraxia.plusscala.api
+package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.api.Field
-import com.tersesystems.echopraxia.api.{LoggingContext => JLoggingContext}
-import com.tersesystems.echopraxia.spi.FieldConstants
+import com.tersesystems.echopraxia.plusscala.api.FindPathMethods
+import echopraxia.api.{Field, FieldConstants}
+import echopraxia.logging.api.{LoggingContext => JLoggingContext}
+import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingContextWithFindPathMethods}
 
 import java.util
-import scala.compat.java8.OptionConverters._
 import scala.jdk.CollectionConverters._
-
-object ScalaLoggingContext {
-  // This repeats stuff in AbstractLoggingContext
-  private val ExceptionPath = "$." + FieldConstants.EXCEPTION
-}
+import scala.compat.java8.OptionConverters._
 
 /**
  * A scala logging context.
@@ -28,6 +24,11 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   override lazy val loggerFields: Seq[Field] = {
     context.getLoggerFields.asScala.toSeq
   }
+
+  override def asJava: JLoggingContext = context
+}
+
+class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPathMethods) extends ScalaLoggingContext(context) with FindPathMethods {
 
   override def findString(jsonPath: String): Option[String] = {
     context.findString(jsonPath).asScala
@@ -50,7 +51,7 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
   }
 
   override def findThrowable: Option[Throwable] = {
-    findThrowable(ScalaLoggingContext.ExceptionPath)
+    findThrowable("$." + FieldConstants.EXCEPTION)
   }
 
   override def findObject(jsonPath: String): Option[Map[String, Any]] = {
@@ -97,5 +98,4 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
     }
   }
 
-  override def asJava: JLoggingContext = context
 }

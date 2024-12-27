@@ -1,17 +1,16 @@
 package com.tersesystems.echopraxia.plusscala.simple
 
-import com.tersesystems.echopraxia.api.Level._
-import com.tersesystems.echopraxia.api.{Field, FieldBuilderResult, Level}
-import com.tersesystems.echopraxia.plusscala.api.{Condition, FieldBuilder, SourceCode}
-import com.tersesystems.echopraxia.spi.CoreLogger
+import echopraxia.api.{Field, FieldBuilderResult}
+import com.tersesystems.echopraxia.plusscala.api.{FieldBuilder, SourceCode}
+import echopraxia.logging.api.Level
+import echopraxia.logging.spi.CoreLogger
+import echopraxia.plusscala.logging.api.Condition
 import sourcecode.{Enclosing, File, Line}
 
 import java.util
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
 class Logger(val core: CoreLogger) {
-  import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-
   private val traceMethod: LoggerMethod = new LoggerMethod(Level.TRACE)
   private val debugMethod: LoggerMethod = new LoggerMethod(Level.DEBUG)
   private val infoMethod: LoggerMethod  = new LoggerMethod(Level.INFO)
@@ -21,49 +20,45 @@ class Logger(val core: CoreLogger) {
   // -----------------------------------------------------------
   // TRACE
 
-  /** @return true if the logger level is TRACE or higher. */
-  def isTraceEnabled: Boolean = core.isEnabled(TRACE)
+  def isTraceEnabled: Boolean                       = traceMethod.isEnabled
+  def isTraceEnabled(condition: Condition): Boolean = traceMethod.isEnabled(condition)
+  def trace: LoggerMethod                           = traceMethod
 
-  /**
-   * @param condition
-   *   the given condition.
-   * @return
-   *   true if the logger level is TRACE or higher and the condition is met.
-   */
-  def isTraceEnabled(condition: Condition): Boolean = core.isEnabled(TRACE, condition.asJava)
+  // -----------------------------------------------------------
+  // DEBUG
 
-  def trace: LoggerMethod = traceMethod
-
-  /** @return true if the logger level is DEBUG or higher. */
-  def isDebugEnabled: Boolean = core.isEnabled(DEBUG)
-
-  def debug: LoggerMethod = debugMethod
+  def isDebugEnabled: Boolean                       = debugMethod.isEnabled
+  def isDebugEnabled(condition: Condition): Boolean = debugMethod.isEnabled(condition)
+  def debug: LoggerMethod                           = debugMethod
 
   // -----------------------------------------------------------
   // INFO
 
-  /** @return true if the logger level is INFO or higher. */
-  def isInfoEnabled: Boolean = core.isEnabled(INFO)
-
-  def info: LoggerMethod = infoMethod
+  def isInfoEnabled: Boolean                       = infoMethod.isEnabled
+  def isInfoEnabled(condition: Condition): Boolean = infoMethod.isEnabled(condition)
+  def info: LoggerMethod                           = infoMethod
 
   // -----------------------------------------------------------
   // WARN
 
-  /** @return true if the logger level is WARN or higher. */
-  def isWarnEnabled: Boolean = core.isEnabled(WARN)
-
-  def warn: LoggerMethod = warnMethod
+  def isWarnEnabled: Boolean                       = warnMethod.isEnabled
+  def isWarnEnabled(condition: Condition): Boolean = warnMethod.isEnabled(condition)
+  def warn: LoggerMethod                           = warnMethod
 
   // -----------------------------------------------------------
   // ERROR
 
-  /** @return true if the logger level is ERROR or higher. */
-  def isErrorEnabled: Boolean = core.isEnabled(ERROR)
-
-  def error: LoggerMethod = errorMethod
+  def isErrorEnabled: Boolean                       = errorMethod.isEnabled
+  def isErrorEnabled(condition: Condition): Boolean = errorMethod.isEnabled(condition)
+  def error: LoggerMethod                           = errorMethod
 
   class LoggerMethod(level: Level) {
+
+    @inline
+    def isEnabled: Boolean = core.isEnabled(level)
+
+    @inline
+    def isEnabled(condition: Condition): Boolean = core.isEnabled(level, condition.asJava)
 
     def apply(f: FieldBuilderResult*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
       var totalFields = 0
@@ -97,6 +92,7 @@ class Logger(val core: CoreLogger) {
     // -----------------------------------------------------------
     // Internal methods
 
+    @inline
     private def sourceCodeField(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
       FieldBuilder.sourceCode(SourceCode(line, file, enc))
     }

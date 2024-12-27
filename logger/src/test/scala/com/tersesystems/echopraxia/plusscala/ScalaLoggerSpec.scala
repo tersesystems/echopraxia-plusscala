@@ -3,8 +3,9 @@ package com.tersesystems.echopraxia.plusscala
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.tersesystems.echopraxia.api.Field
+import echopraxia.api.{Field, Value}
 import com.tersesystems.echopraxia.plusscala.api._
+import echopraxia.plusscala.logging.api.Condition
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -36,7 +37,10 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val seq = Array("one", "two", "three")
       logger.debug(
         "single tuple {}",
-        fb => fb.list(seq.zipWithIndex.map { case (value, i) => fb.string(i.toString, value) })
+        fb =>
+          fb.list(seq.zipWithIndex.map { case (value, i) =>
+            Field.keyValue(i.toString, Value.string(value))
+          })
       )
       matchThis("single tuple {}")
     }
