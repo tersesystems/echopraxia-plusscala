@@ -1,6 +1,7 @@
 package echopraxia.plusscala.flow
 
-import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
+import echopraxia.logging.spi.Caller
+import echopraxia.logging.spi.CoreLoggerFactory
 
 object FlowLoggerFactory {
   val FQCN: String = classOf[DefaultFlowLoggerMethods[_]].getName

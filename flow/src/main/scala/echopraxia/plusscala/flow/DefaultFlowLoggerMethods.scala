@@ -3,7 +3,8 @@ package echopraxia.plusscala.flow
 import echopraxia.api.FieldBuilderResult
 import echopraxia.logging.api.LoggerHandle
 import echopraxia.logging.api.{Level => JLevel}
-import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport}
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.DefaultMethodsSupport
 
 import java.util.function.Function
 import scala.compat.java8.FunctionConverters._

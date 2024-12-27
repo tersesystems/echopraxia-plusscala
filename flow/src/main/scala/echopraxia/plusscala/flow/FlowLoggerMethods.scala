@@ -1,6 +1,7 @@
 package echopraxia.plusscala.flow
 
-import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport}
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.DefaultMethodsSupport
 
 trait FlowLoggerMethods[FB <: FlowFieldBuilder] { self: DefaultMethodsSupport[FB] =>
 

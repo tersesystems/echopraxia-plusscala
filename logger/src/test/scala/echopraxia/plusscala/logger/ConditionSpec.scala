@@ -4,7 +4,9 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import echopraxia.plusscala.api.FieldBuilder
-import echopraxia.plusscala.logging.api.{Condition, JsonPathCondition, Level}
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.JsonPathCondition
+import echopraxia.plusscala.logging.api.Level
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers

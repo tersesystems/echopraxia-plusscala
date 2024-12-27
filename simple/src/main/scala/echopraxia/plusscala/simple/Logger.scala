@@ -1,11 +1,15 @@
 package echopraxia.plusscala.simple
 
-import echopraxia.api.{Field, FieldBuilderResult}
-import echopraxia.plusscala.api.{FieldBuilder, SourceCode}
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
 import echopraxia.logging.api.Level
 import echopraxia.logging.spi.CoreLogger
+import echopraxia.plusscala.api.FieldBuilder
+import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.logging.api.Condition
-import sourcecode.{Enclosing, File, Line}
+import sourcecode.Enclosing
+import sourcecode.File
+import sourcecode.Line
 
 import java.util
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
