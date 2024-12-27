@@ -14,8 +14,8 @@ You can incorporate automatic type class derivation by adding the `AutoDerivatio
 Automatic derivation applies to all case classes, while semi-automatic derivation requires the type class instance to be derived explicitly:
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api._
-import com.tersesystems.echopraxia.plusscala.generic._
+import echopraxia.plusscala.api._
+import echopraxia.plusscala.generic._
 
 trait AutoFieldBuilder extends FieldBuilder with AutoDerivation
 object AutoFieldBuilder extends AutoFieldBuilder

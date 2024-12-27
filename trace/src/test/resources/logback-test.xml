@@ -11,7 +11,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.tersesystems.echopraxia.plusscala" level="TRACE"/>
+    <logger name="echopraxia.plusscala" level="TRACE"/>
 
     <root level="INFO">
         <appender-ref ref="LIST"/>

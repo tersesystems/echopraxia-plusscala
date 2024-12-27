@@ -88,8 +88,8 @@ libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json"
 To import the Scala API, add the following:
 
 ```scala
-import com.tersesystems.echopraxia.plusscala._
-import com.tersesystems.echopraxia.plusscala.api.LoggingBase
+import echopraxia.plusscala._
+import echopraxia.plusscala.api.LoggingBase
 
 trait Logging extends LoggingBase {
   // add implicits for your classes here
@@ -109,7 +109,7 @@ class Example extends Logging {
 The logger takes `Field*` as arguments, and `LoggingBase` contains the implicit conversions to turn tuples into fields:
 
 ```scala
-// val field: com.tersesystems.echopraxia.api.Field = "name" -> "will" under the hood
+// val field: echopraxia.api.Field = "name" -> "will" under the hood
 logger.info("hi {}", "name" -> "will") // prints hi name=will
 ```
 
@@ -169,7 +169,7 @@ logger.info("User {} can do complex method {}", fb.list(
 You can append fields together using `++` from `LowPriorityImplicits` if you prefer to not use `fb.list`:
 
 ```scala
-import com.tersesystems.echopraxia.api._
+import echopraxia.api._
 logger.info("User {} can do complex method {}", fb => fb.keyValue("name" -> "will") ++ fb.myComplexMethod(foo))
 ```
 
@@ -220,8 +220,8 @@ Extending logging is done by extending the `ToValue`, `ToName` type classes that
 The `ToValue` type class looks like this:
 
 ```scala
-package com.tersesystems.echopraxia.plusscala.api
-import com.tersesystems.echopraxia.api.Value
+package echopraxia.plusscala.api
+import echopraxia.api.Value
 
 trait ValueTypeClasses {
   trait ToValue[-T] {
@@ -233,7 +233,7 @@ trait ValueTypeClasses {
 Let's start off by adding a `ToValue` for `java.time.Instant`, by converting it to a string.  There are already `ToValue` mappings for all the built-ins like string, boolean, and numbers, so calling `ToValue(instant.string)` will resolve the implicit and return a `Value[String]`.
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api._
+import echopraxia.plusscala.api._
 import java.time.Instant
 
 trait Logging extends LoggingBase {
@@ -486,13 +486,13 @@ Conversion of Java levels, conditions, and logging contexts are handled through 
 To enable type enrichment, import the `api` package,
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api._
+import echopraxia.plusscala.api._
 ```
 
 or
 
 ```scala
-import com.tersesystems.echopraxia.plusscala.api.Implicits._
+import echopraxia.plusscala.api.Implicits._
 ```
 
 explicitly if you only want the implicits.

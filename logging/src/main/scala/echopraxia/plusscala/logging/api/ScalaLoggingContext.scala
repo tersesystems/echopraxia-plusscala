@@ -1,9 +1,9 @@
 package echopraxia.plusscala.logging.api
 
-import com.tersesystems.echopraxia.plusscala.api.FindPathMethods
 import echopraxia.api.{Field, FieldConstants}
 import echopraxia.logging.api.{LoggingContext => JLoggingContext}
 import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingContextWithFindPathMethods}
+import echopraxia.plusscala.api.FindPathMethods
 
 import java.util
 import scala.jdk.CollectionConverters._
