@@ -12,8 +12,7 @@ val refinedVersion               = "0.11.1"
 val scala3                       = "3.4.0"
 val scala213                     = "2.13.13"
 
-val scalaVersions = List(scala213, scala3)
-val ideScala = scala213
+val scalaVersions = List(scala3, scala213)
 
 initialize := {
   val _        = initialize.value // run the previous initialization
@@ -24,7 +23,7 @@ initialize := {
 
 inThisBuild(
   Seq(
-    scalaVersion := scala213,
+    scalaVersion := scala3,
     semanticdbEnabled := true, // enable SemanticDB
     semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   )
@@ -245,6 +244,8 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "8",
         "-Vimplicits",
         "-Vtype-diffs",
+        "-Xsource:3-cross",
+        "-quickfix:cat=scala3-migration"
       )
   }
 }
