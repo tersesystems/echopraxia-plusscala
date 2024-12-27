@@ -7,7 +7,7 @@ object LoggerFactory {
 
   def getLogger(): Logger = getLogger(Caller.resolveClassName())
 
-  def getLogger(clazz: Class[_]): Logger = getLogger(clazz.getName)
+  def getLogger(clazz: Class[?]): Logger = getLogger(clazz.getName)
 
   def getLogger(name: String): Logger = {
     val core = CoreLoggerFactory.getLogger(classOf[Logger].getName, name)

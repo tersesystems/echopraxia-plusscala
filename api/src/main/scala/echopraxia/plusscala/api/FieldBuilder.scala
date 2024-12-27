@@ -6,10 +6,10 @@ import echopraxia.plusscala.spi.Utils
 trait HasFieldClass {
   type FieldType <: Field
 
-  protected def fieldClass: Class[_ <: FieldType]
+  protected def fieldClass: Class[? <: FieldType]
 }
 
-trait KeyValueFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
+trait KeyValueFieldBuilder { this: ValueTypeClasses & NameTypeClasses & HasFieldClass =>
   // ------------------------------------------------------------------
   // keyValue
 
@@ -29,7 +29,7 @@ trait KeyValueFieldBuilder { this: ValueTypeClasses with NameTypeClasses with Ha
   def value[F: ToName: ToValue](field: F): FieldType
 }
 
-trait ExceptionFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
+trait ExceptionFieldBuilder { this: ValueTypeClasses & NameTypeClasses & HasFieldClass =>
   def exception[N: ToName](tuple: (N, Throwable)): FieldType
   def exception[N: ToName](name: N, ex: Throwable): FieldType
   def exception(ex: Throwable): FieldType
@@ -38,7 +38,7 @@ trait ExceptionFieldBuilder { this: ValueTypeClasses with NameTypeClasses with H
 /**
  * A field builder that is enhanced with .
  */
-trait ArrayObjFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
+trait ArrayObjFieldBuilder { this: ValueTypeClasses & NameTypeClasses & HasFieldClass =>
   // ------------------------------------------------------------------
   // array
 
@@ -52,7 +52,7 @@ trait ArrayObjFieldBuilder { this: ValueTypeClasses with NameTypeClasses with Ha
   def obj[N: ToName, OV: ToObjectValue](tuple: (N, OV)): FieldType
 }
 
-trait PrimitiveFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
+trait PrimitiveFieldBuilder { this: ValueTypeClasses & NameTypeClasses & HasFieldClass =>
   // ------------------------------------------------------------------
   // string
 
@@ -72,7 +72,7 @@ trait PrimitiveFieldBuilder { this: ValueTypeClasses with NameTypeClasses with H
   def bool[N: ToName](tuple: (N, Boolean)): FieldType
 }
 
-trait NullFieldBuilder { this: ValueTypeClasses with NameTypeClasses with HasFieldClass =>
+trait NullFieldBuilder { this: ValueTypeClasses & NameTypeClasses & HasFieldClass =>
   def nullField[N: ToName](name: N): FieldType
 }
 

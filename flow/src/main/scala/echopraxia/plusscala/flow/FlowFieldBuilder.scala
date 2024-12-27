@@ -15,7 +15,7 @@ trait FlowFieldBuilder extends ValueTypeClasses {
 
   def entering: FieldBuilderResult
 
-  def exiting(value: Value[_]): FieldBuilderResult
+  def exiting(value: Value[?]): FieldBuilderResult
 
   def throwing(ex: Throwable): FieldBuilderResult
 }
@@ -31,7 +31,7 @@ trait DefaultFlowFieldBuilder extends FieldBuilder with FlowFieldBuilder {
     DefaultFlowFieldBuilder.entryTag
   }
 
-  override def exiting(retValue: Value[_]): FieldBuilderResult = {
+  override def exiting(retValue: Value[?]): FieldBuilderResult = {
     list(DefaultFlowFieldBuilder.exitTag, value(DefaultFlowFieldBuilder.Result, retValue))
   }
 

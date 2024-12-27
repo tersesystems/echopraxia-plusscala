@@ -43,7 +43,7 @@ trait AutoDerivation { self: ValueTypeClasses =>
 
     override def join[T](caseClass: CaseClass[ToValue, T]): ToValue[T] =
       new ToValue[T] {
-        def toValue(value: T): Value[_] = {
+        def toValue(value: T): Value[?] = {
           def parameterStrategy(parameter: Param[ToValue, T]) = {
             // What if there's a ToName defined on this guy?
             // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
@@ -58,7 +58,7 @@ trait AutoDerivation { self: ValueTypeClasses =>
     // generate ToValue instance for sealed traits
     override def split[T](sealedTrait: SealedTrait[ToValue, T]): ToValue[T] =
       new ToValue[T] {
-        def toValue(value: T): Value[_] =
+        def toValue(value: T): Value[?] =
           sealedTrait.choose(value) { subtype =>
             subtype.typeclass.toValue(subtype.cast(value))
           }
@@ -77,7 +77,7 @@ trait SemiAutoDerivation { self: ValueTypeClasses =>
 
     override def join[T](caseClass: CaseClass[ToValue, T]): ToValue[T] =
       new ToValue[T] {
-        def toValue(value: T): Value[_] = {
+        def toValue(value: T): Value[?] = {
           def parameterStrategy(parameter: Param[ToValue, T]) = {
             // What if there's a ToName defined on this guy?
             // we want toValue(value: T)(implicit ev: ToValueAttributes[T])?
@@ -92,7 +92,7 @@ trait SemiAutoDerivation { self: ValueTypeClasses =>
     // generate ToValue instance for sealed traits
     override def split[T](sealedTrait: SealedTrait[ToValue, T]): ToValue[T] =
       new ToValue[T] {
-        def toValue(value: T): Value[_] =
+        def toValue(value: T): Value[?] =
           sealedTrait.choose(value) { subtype =>
             subtype.typeclass.toValue(subtype.cast(value))
           }

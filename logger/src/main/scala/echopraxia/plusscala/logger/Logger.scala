@@ -201,7 +201,7 @@ object Logger {
 class LoggerMethodWithLevel[FB](level: JLevel, core: CoreLogger, fieldBuilder: FB) extends LoggerMethod[FB] {
 
   override def apply(fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-    apply(("{} " * fields.size).trim, fields: _*)
+    apply(("{} " * fields.size).trim, fields*)
 
   override def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)
@@ -231,7 +231,7 @@ class LoggerMethodWithLevel[FB](level: JLevel, core: CoreLogger, fieldBuilder: F
   }
 
   override def apply(condition: Condition, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit =
-    apply(condition, ("{} " * fields.size).trim, fields: _*)
+    apply(condition, ("{} " * fields.size).trim, fields*)
 
   override def apply(condition: Condition, message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
     val f1: FB => FieldBuilderResult = _ => list(fields.toArray)

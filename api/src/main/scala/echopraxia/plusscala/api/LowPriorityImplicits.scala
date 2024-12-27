@@ -11,11 +11,11 @@ import java.util.stream.Collectors
 trait LowPriorityImplicits {
 
   final implicit class RichArrayValue(val value: ArrayValue) {
-    def +(v: Value[_]): ArrayValue = value.add(v)
+    def +(v: Value[?]): ArrayValue = value.add(v)
 
-    def ++(vs: Traversable[Value[_]]): ArrayValue = addAll(vs)
+    def ++(vs: Traversable[Value[?]]): ArrayValue = addAll(vs)
 
-    def addAll(newValues: Traversable[Value[_]]): ArrayValue = {
+    def addAll(newValues: Traversable[Value[?]]): ArrayValue = {
       val joinedValues = new util.ArrayList(value.raw())
       for (f <- newValues) {
         joinedValues.add(f)
@@ -23,7 +23,7 @@ trait LowPriorityImplicits {
       Value.array(joinedValues)
     }
 
-    def ++(newValues: util.Collection[Value[_]]): ArrayValue = value.addAll(newValues)
+    def ++(newValues: util.Collection[Value[?]]): ArrayValue = value.addAll(newValues)
   }
 
   final implicit class RichObjectValue(value: ObjectValue) {

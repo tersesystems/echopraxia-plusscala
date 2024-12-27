@@ -9,7 +9,7 @@ val zjsonPatchVersion            = "0.4.16"
 val sourceCodeVersion            = "0.3.1"
 val refinedVersion               = "0.11.1"
 
-val scala3                       = "3.4.0"
+val scala3                       = "3.6.2"
 val scala213                     = "2.13.13"
 
 val scalaVersions = List(scala3, scala213)
@@ -246,7 +246,8 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Vimplicits",
         "-Vtype-diffs",
         "-Xsource:3-cross",
-        "-quickfix:cat=scala3-migration"
+        "-quickfix:cat=scala3-migration",
+
       )
   }
 }

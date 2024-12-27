@@ -272,7 +272,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   it("should not match on an object mismatch") {
     val condition = JsonPathCondition { ctx =>
-      val opt: Option[_] = ctx.findObject("$.foo")
+      val opt: Option[?] = ctx.findObject("$.foo")
       opt.isDefined
     }
     logger.debug(condition, "no match", _.bool("foo" -> true))

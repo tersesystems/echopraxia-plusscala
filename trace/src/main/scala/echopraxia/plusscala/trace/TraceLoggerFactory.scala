@@ -4,7 +4,7 @@ import echopraxia.logging.spi.Caller
 import echopraxia.logging.spi.CoreLoggerFactory
 
 object TraceLoggerFactory {
-  val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName
+  val FQCN: String = classOf[DefaultTraceLoggerMethods[?]].getName
 
   val fieldBuilder: TraceFieldBuilder = DefaultTraceFieldBuilder
 
@@ -18,12 +18,12 @@ object TraceLoggerFactory {
     TraceLogger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): TraceLogger[TraceFieldBuilder] = {
+  def getLogger(clazz: Class[?]): TraceLogger[TraceFieldBuilder] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     TraceLogger(core, fieldBuilder)
   }
 
-  def getLogger[FB <: TraceFieldBuilder](clazz: Class[_], fieldBuilder: FB): TraceLogger[FB] = {
+  def getLogger[FB <: TraceFieldBuilder](clazz: Class[?], fieldBuilder: FB): TraceLogger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     TraceLogger(core, fieldBuilder)
   }

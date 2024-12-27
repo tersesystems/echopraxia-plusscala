@@ -8,7 +8,7 @@ import echopraxia.plusscala.api.FieldBuilder
  * LoggerFactory for a logger with source code enabled.
  */
 object LoggerFactory {
-  val FQCN: String = classOf[Logger[_]].getName
+  val FQCN: String = classOf[Logger[?]].getName
 
   val fieldBuilder: FieldBuilder.type = FieldBuilder
 
@@ -17,7 +17,7 @@ object LoggerFactory {
     Logger(core, fieldBuilder)
   }
 
-  def getLogger(clazz: Class[_]): Logger[FieldBuilder.type] = {
+  def getLogger(clazz: Class[?]): Logger[FieldBuilder.type] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     Logger(core, fieldBuilder)
   }
@@ -27,7 +27,7 @@ object LoggerFactory {
     Logger(core, fieldBuilder)
   }
 
-  def getLogger[FB <: Singleton](clazz: Class[_], fieldBuilder: FB): Logger[FB] = {
+  def getLogger[FB <: Singleton](clazz: Class[?], fieldBuilder: FB): Logger[FB] = {
     val core = CoreLoggerFactory.getLogger(FQCN, clazz.getName)
     Logger(core, fieldBuilder)
   }

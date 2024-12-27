@@ -2,7 +2,7 @@ package echopraxia.plusscala.api
 
 import echopraxia.api.Value
 
-trait FieldTypeClasses { self: ValueTypeClasses with NameTypeClasses =>
+trait FieldTypeClasses { self: ValueTypeClasses & NameTypeClasses =>
   // Provides easier packaging for ToName and ToValue
   trait ToField[-TF] {
     def toName: ToName[TF]
@@ -10,7 +10,7 @@ trait FieldTypeClasses { self: ValueTypeClasses with NameTypeClasses =>
   }
 
   object ToField {
-    def apply[TF](nameFunction: Option[TF] => String, valueFunction: TF => Value[_]): ToField[TF] = new ToField[TF] {
+    def apply[TF](nameFunction: Option[TF] => String, valueFunction: TF => Value[?]): ToField[TF] = new ToField[TF] {
       override val toName: ToName[TF]   = t => nameFunction(t)
       override val toValue: ToValue[TF] = t => valueFunction(t)
     }
