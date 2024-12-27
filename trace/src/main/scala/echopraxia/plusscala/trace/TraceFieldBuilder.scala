@@ -8,12 +8,13 @@ import echopraxia.plusscala.api.FieldBuilderResultTypeClasses
 import echopraxia.plusscala.api.ListFieldBuilder
 import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.api.ValueTypeClasses
-import sourcecode.*
+import sourcecode._
+
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
 import DefaultTraceFieldBuilder.TraceArgumentValues
 import DefaultTraceFieldBuilder.TraceSignature
 import DefaultTraceFieldBuilder.string
-
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 trait TraceFieldBuilder extends ValueTypeClasses with FieldBuilderResultTypeClasses with ListFieldBuilder {
 
