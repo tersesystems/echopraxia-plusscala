@@ -239,6 +239,7 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
         "-Xlint",
         "-Ywarn-dead-code",
         "-Yrangepos",
+        "-Ytasty-reader",
         "-Wunused",
         "-release",
         "8",
