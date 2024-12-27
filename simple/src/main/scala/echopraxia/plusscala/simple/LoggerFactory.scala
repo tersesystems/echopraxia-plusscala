@@ -1,6 +1,7 @@
 package echopraxia.plusscala.simple
 
-import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
+import echopraxia.logging.spi.Caller
+import echopraxia.logging.spi.CoreLoggerFactory
 
 object LoggerFactory {
 

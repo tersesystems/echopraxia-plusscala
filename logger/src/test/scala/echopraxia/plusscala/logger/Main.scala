@@ -1,9 +1,14 @@
 package echopraxia.plusscala.logger
 
 import echopraxia.api.Field
-import echopraxia.plusscala.api.{EitherToNameImplicits, FieldBuilder, HeterogeneousFieldSupport, OptionToNameImplicits, TryToNameImplicits}
+import echopraxia.plusscala.api.EitherToNameImplicits
+import echopraxia.plusscala.api.FieldBuilder
+import echopraxia.plusscala.api.HeterogeneousFieldSupport
+import echopraxia.plusscala.api.OptionToNameImplicits
+import echopraxia.plusscala.api.TryToNameImplicits
 
-import java.util.{Currency, UUID}
+import java.util.Currency
+import java.util.UUID
 import scala.concurrent.Future
 
 object Main {

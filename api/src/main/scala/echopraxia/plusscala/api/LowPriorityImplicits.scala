@@ -1,7 +1,7 @@
 package echopraxia.plusscala.api
 
-import echopraxia.api._
 import echopraxia.api.Value._
+import echopraxia.api._
 import echopraxia.api.{FieldBuilderResult => JFieldBuilderResult}
 
 import java.util

@@ -1,6 +1,7 @@
 package echopraxia.plusscala.logging.api
 
-import echopraxia.api.{Field, FieldBuilderResult}
+import echopraxia.api.Field
+import echopraxia.api.FieldBuilderResult
 
 trait LoggerSupport[FB, LoggerType[_ <: FB]] { self =>
 

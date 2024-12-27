@@ -3,13 +3,18 @@ package echopraxia.plusscala.trace
 import echopraxia.api.Field
 import echopraxia.api.FieldBuilderResult
 import echopraxia.api.Value
-import DefaultTraceFieldBuilder.TraceArgumentValues
-import DefaultTraceFieldBuilder.TraceSignature
-import DefaultTraceFieldBuilder.string
-import echopraxia.plusscala.api.{FieldBuilder, FieldBuilderResultTypeClasses, ListFieldBuilder, SourceCode, ValueTypeClasses}
+import echopraxia.plusscala.api.FieldBuilder
+import echopraxia.plusscala.api.FieldBuilderResultTypeClasses
+import echopraxia.plusscala.api.ListFieldBuilder
+import echopraxia.plusscala.api.SourceCode
+import echopraxia.plusscala.api.ValueTypeClasses
 import sourcecode._
 
 import scala.collection.JavaConverters._
+
+import DefaultTraceFieldBuilder.TraceArgumentValues
+import DefaultTraceFieldBuilder.TraceSignature
+import DefaultTraceFieldBuilder.string
 
 trait TraceFieldBuilder extends ValueTypeClasses with FieldBuilderResultTypeClasses with ListFieldBuilder {
 

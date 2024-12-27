@@ -3,9 +3,11 @@ package echopraxia.plusscala.logger
 import echopraxia.api.Field
 import echopraxia.plusscala.api.LoggingBase
 
-import java.util.{Currency, UUID}
+import java.util.Currency
+import java.util.UUID
 import scala.concurrent.Future
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 // Each package can add its own mappings
 trait Logging extends LoggingBase {

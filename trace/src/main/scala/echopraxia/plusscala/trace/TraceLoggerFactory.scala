@@ -1,6 +1,7 @@
 package echopraxia.plusscala.trace
 
-import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
+import echopraxia.logging.spi.Caller
+import echopraxia.logging.spi.CoreLoggerFactory
 
 object TraceLoggerFactory {
   val FQCN: String = classOf[DefaultTraceLoggerMethods[_]].getName

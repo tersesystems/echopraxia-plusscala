@@ -1,6 +1,7 @@
 package echopraxia.plusscala.nameof
 
-import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
+import echopraxia.logging.spi.Caller
+import echopraxia.logging.spi.CoreLoggerFactory
 import echopraxia.plusscala.api.FieldBuilder
 
 object NameOfLoggerFactory {

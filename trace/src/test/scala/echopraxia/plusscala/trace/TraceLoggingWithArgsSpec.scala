@@ -5,7 +5,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import echopraxia.api.FieldBuilderResult
 import echopraxia.api.Value
-import echopraxia.plusscala.api.{FieldBuilder, SourceCode}
+import echopraxia.plusscala.api.FieldBuilder
+import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.logging.api.Condition
 import org.scalatest.Assertion
 import org.scalatest.BeforeAndAfterEach

@@ -1,13 +1,14 @@
 package echopraxia.plusscala.logging.api
 
-import echopraxia.api.{Field, FieldConstants}
+import echopraxia.api.Field
+import echopraxia.api.FieldConstants
 import echopraxia.logging.api.{LoggingContext => JLoggingContext}
 import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingContextWithFindPathMethods}
 import echopraxia.plusscala.api.FindPathMethods
 
 import java.util
-import scala.jdk.CollectionConverters._
 import scala.compat.java8.OptionConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * A scala logging context.

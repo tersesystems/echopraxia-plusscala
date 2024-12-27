@@ -1,9 +1,11 @@
 package echopraxia.plusscala.nameof
 
 import echopraxia.api.FieldBuilderResult
-import echopraxia.logging.spi.{CoreLogger, Utilities}
+import echopraxia.logging.spi.CoreLogger
+import echopraxia.logging.spi.Utilities
 import echopraxia.plusscala.api.FieldBuilder
-import echopraxia.plusscala.logging.api.{Condition, LoggerSupport}
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.LoggerSupport
 
 import scala.annotation.tailrec
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction

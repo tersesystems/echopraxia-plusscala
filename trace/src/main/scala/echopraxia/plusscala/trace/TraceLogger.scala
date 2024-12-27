@@ -1,9 +1,11 @@
 package echopraxia.plusscala.trace
 
 import echopraxia.api.FieldBuilderResult
-import echopraxia.plusscala.api._
-import echopraxia.logging.spi.{CoreLogger, Utilities}
-import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport, LoggerSupport}
+import echopraxia.logging.spi.CoreLogger
+import echopraxia.logging.spi.Utilities
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.DefaultMethodsSupport
+import echopraxia.plusscala.logging.api.LoggerSupport
 import sourcecode.Args
 import sourcecode.Enclosing
 import sourcecode.File

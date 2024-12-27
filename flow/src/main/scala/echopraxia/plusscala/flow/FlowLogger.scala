@@ -1,8 +1,11 @@
 package echopraxia.plusscala.flow
 
 import echopraxia.api.FieldBuilderResult
-import echopraxia.logging.spi.{CoreLogger, Utilities}
-import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport, LoggerSupport}
+import echopraxia.logging.spi.CoreLogger
+import echopraxia.logging.spi.Utilities
+import echopraxia.plusscala.logging.api.Condition
+import echopraxia.plusscala.logging.api.DefaultMethodsSupport
+import echopraxia.plusscala.logging.api.LoggerSupport
 
 import scala.compat.java8.FunctionConverters._
 
