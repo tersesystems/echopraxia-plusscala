@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.simple
 
-import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
+import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
 
 object LoggerFactory {
 

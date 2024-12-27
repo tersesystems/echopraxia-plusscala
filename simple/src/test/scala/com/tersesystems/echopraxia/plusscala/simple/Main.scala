@@ -1,13 +1,13 @@
 package com.tersesystems.echopraxia.plusscala.simple
 
-import com.tersesystems.echopraxia.api.Field
 import com.tersesystems.echopraxia.plusscala.api.{
   EitherToNameImplicits,
   HeterogeneousFieldSupport,
   OptionToNameImplicits,
-  PresentationFieldBuilder,
+  FieldBuilder,
   TryToNameImplicits
 }
+import echopraxia.api.Field
 
 import java.util.{Currency, UUID}
 import scala.concurrent.Future
@@ -24,7 +24,7 @@ class NoImplicits {
   private val USD = Currency.getInstance("USD")
 
   private val logger = LoggerFactory.getLogger(getClass)
-  object MyFieldBuilder extends PresentationFieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
+  object MyFieldBuilder extends FieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
   private val fb = MyFieldBuilder
 
   logger.info("{}", fb.keyValue("foo" -> "foo"))

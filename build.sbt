@@ -132,7 +132,7 @@ lazy val simple = (project in file("simple"))
     libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
     libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
   )
-  .dependsOn(api % "compile->compile;test->compile")
+  .dependsOn(logging)
 
 lazy val logger = (project in file("logger"))
   .settings(
