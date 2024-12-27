@@ -1,4 +1,4 @@
-package echopraxia.plusscala
+package echopraxia.plusscala.logger
 
 import echopraxia.logging.spi.{Caller, CoreLoggerFactory}
 import echopraxia.plusscala.api.FieldBuilder

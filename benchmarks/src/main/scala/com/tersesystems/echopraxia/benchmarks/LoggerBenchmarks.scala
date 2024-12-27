@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.benchmarks
 
 import echopraxia.plusscala.api.LoggingBase
-import echopraxia.plusscala.LoggerFactory
+import echopraxia.plusscala.logger.LoggerFactory
 import echopraxia.plusscala.logging.api.Condition
 import org.openjdk.jmh.annotations._
 

@@ -1,10 +1,10 @@
-package echopraxia.plusscala
+package echopraxia.plusscala.logger
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import echopraxia.api.{Field, Value}
-import api._
+import echopraxia.plusscala.api.FieldBuilder
 import echopraxia.plusscala.logging.api.Condition
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec

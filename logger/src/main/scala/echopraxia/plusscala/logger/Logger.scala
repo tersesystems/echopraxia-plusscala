@@ -1,15 +1,12 @@
-package echopraxia.plusscala
+package echopraxia.plusscala.logger
 
-import echopraxia.api.Field
-import echopraxia.api.FieldBuilderResult
+import echopraxia.api.{Field, FieldBuilderResult}
 import echopraxia.api.FieldBuilderResult.list
-import api.{FieldBuilder, SourceCode}
-import echopraxia.logging.spi.{CoreLogger, Utilities}
 import echopraxia.logging.api.{Level => JLevel}
-import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport, Level, LoggerSupport}
-import sourcecode.Enclosing
-import sourcecode.File
-import sourcecode.Line
+import echopraxia.logging.spi.{CoreLogger, Utilities}
+import echopraxia.plusscala.api.{FieldBuilder, SourceCode}
+import echopraxia.plusscala.logging.api.{Condition, DefaultMethodsSupport, LoggerSupport}
+import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
