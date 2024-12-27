@@ -1,12 +1,6 @@
 package echopraxia.plusscala.simple
 
-import echopraxia.plusscala.api.{
-  EitherToNameImplicits,
-  HeterogeneousFieldSupport,
-  OptionToNameImplicits,
-  FieldBuilder,
-  TryToNameImplicits
-}
+import echopraxia.plusscala.api.{EitherToNameImplicits, HeterogeneousFieldSupport, OptionToNameImplicits, FieldBuilder, TryToNameImplicits}
 import echopraxia.api.Field
 
 import java.util.{Currency, UUID}

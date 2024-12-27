@@ -1,4 +1,4 @@
-package api
+package echopraxia.plusscala.api
 
 import echopraxia.api.Field
 import echopraxia.api.Value
