@@ -31,10 +31,10 @@ class NoImplicits {
   logger.info("{}", fb.keyValue(Option(USD)))
   val either: Either[Currency, String] = Left(USD)
   logger.info("{}", fb.keyValue(either))
-  logger.info(
-    "{}",
+  logger.info("{}", {
+    import fb._
     fb.list("foo" -> "foo", USD)
-  )
+  })
 }
 
 class Printer extends Logging with HeterogeneousFieldSupport {

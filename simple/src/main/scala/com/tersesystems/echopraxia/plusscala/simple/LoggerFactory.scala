@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.plusscala.simple
 
-import com.tersesystems.echopraxia.plusscala.api.FieldBuilder
-import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory, Utilities}
+import com.tersesystems.echopraxia.spi.{Caller, CoreLoggerFactory}
 
 object LoggerFactory {
 
