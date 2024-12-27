@@ -111,6 +111,19 @@ lazy val generic = (project in file("generic"))
   )
   .dependsOn(api, logger % "test")
 
+lazy val simple = (project in file("simple"))
+  .settings(
+    name := "simple",
+    crossScalaVersions := scalaVersions,
+    scalacOptions := scalacOptionsVersion(scalaVersion.value),
+    //
+    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
+    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
+    libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
+    libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
+  )
+  .dependsOn(api % "compile->compile;test->compile")
+
 lazy val logger = (project in file("logger"))
   .settings(
     name := "logger",
@@ -192,7 +205,7 @@ lazy val root = (project in file("."))
     Compile / packageDoc / publishArtifact := false,
     publishArtifact                        := false,
     publish / skip                         := true
-  ).aggregate(api, generic, logger, nameOfLogger, flowLogger, traceLogger, benchmarks)
+  ).aggregate(api, generic, logger, simple, nameOfLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
