@@ -12,7 +12,7 @@ import sourcecode.File
 import sourcecode.Line
 
 import java.util
-import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 class Logger(val core: CoreLogger) {
   private val traceMethod: LoggerMethod = new LoggerMethod(Level.TRACE)

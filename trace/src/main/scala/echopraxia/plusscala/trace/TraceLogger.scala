@@ -11,7 +11,7 @@ import sourcecode.Enclosing
 import sourcecode.File
 import sourcecode.Line
 
-import scala.compat.java8.FunctionConverters._
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 trait TraceLogger[FB <: TraceFieldBuilder] extends LoggerSupport[FB, TraceLogger] with TraceLoggerMethods[FB] with DefaultMethodsSupport[FB]
 

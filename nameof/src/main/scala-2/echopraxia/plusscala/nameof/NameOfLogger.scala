@@ -8,7 +8,7 @@ import echopraxia.plusscala.logging.api.Condition
 import echopraxia.plusscala.logging.api.LoggerSupport
 
 import scala.annotation.tailrec
-import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 

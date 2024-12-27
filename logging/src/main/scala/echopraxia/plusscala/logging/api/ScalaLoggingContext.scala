@@ -7,22 +7,22 @@ import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingCont
 import echopraxia.plusscala.api.FindPathMethods
 
 import java.util
-import scala.compat.java8.OptionConverters._
 import scala.jdk.CollectionConverters._
+import scala.jdk.OptionConverters.RichOptional
 
 /**
  * A scala logging context.
  */
 class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
-  override lazy val fields: Seq[Field] = {
+  override lazy val fields: scala.collection.immutable.Seq[Field] = {
     context.getFields.asScala.toSeq // needed for 2.13 since it's immutable
   }
 
-  override lazy val argumentFields: Seq[Field] = {
+  override lazy val argumentFields: scala.collection.immutable.Seq[Field] = {
     context.getArgumentFields.asScala.toSeq
   }
 
-  override lazy val loggerFields: Seq[Field] = {
+  override lazy val loggerFields: scala.collection.immutable.Seq[Field] = {
     context.getLoggerFields.asScala.toSeq
   }
 
@@ -32,15 +32,15 @@ class ScalaLoggingContext(context: JLoggingContext) extends LoggingContext {
 class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPathMethods) extends ScalaLoggingContext(context) with FindPathMethods {
 
   override def findString(jsonPath: String): Option[String] = {
-    context.findString(jsonPath).asScala
+    context.findString(jsonPath).toScala
   }
 
   override def findBoolean(jsonPath: String): Option[Boolean] = {
-    context.findBoolean(jsonPath).asScala.map(_.booleanValue())
+    context.findBoolean(jsonPath).toScala.map(_.booleanValue())
   }
 
   override def findNumber(jsonPath: String): Option[Number] = {
-    context.findNumber(jsonPath).asScala
+    context.findNumber(jsonPath).toScala
   }
 
   override def findNull(jsonPath: String): Boolean = {
@@ -48,7 +48,7 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
   }
 
   override def findThrowable(jsonPath: String): Option[Throwable] = {
-    context.findThrowable(jsonPath).asScala
+    context.findThrowable(jsonPath).toScala
   }
 
   override def findThrowable: Option[Throwable] = {
@@ -56,7 +56,7 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
   }
 
   override def findObject(jsonPath: String): Option[Map[String, Any]] = {
-    context.findObject(jsonPath).asScala.map(deepAsScalaMap(_))
+    context.findObject(jsonPath).toScala.map(deepAsScalaMap)
   }
 
   override def findList(jsonPath: String): Seq[Any] = {

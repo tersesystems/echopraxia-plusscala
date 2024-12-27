@@ -7,7 +7,7 @@ import echopraxia.plusscala.logging.api.Condition
 import echopraxia.plusscala.logging.api.DefaultMethodsSupport
 
 import java.util.function.Function
-import scala.compat.java8.FunctionConverters._
+import scala.jdk.FunctionConverters.enrichAsJavaFunction
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try

@@ -1,7 +1,7 @@
 package echopraxia.plusscala.generic
 
-import com.tersesystems.echopraxia.plusscala.LoggerFactory
 import echopraxia.plusscala.api.*
+import echopraxia.plusscala.logger.LoggerFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers

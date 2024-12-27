@@ -9,7 +9,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import scala.jdk.CollectionConverters.SeqHasAsJava
 
 // The tests here compile in 2.13 but do not compile in 2.12
 class IterableSpec extends AnyWordSpec with Matchers with LoggingBase with HeterogeneousFieldSupport {
@@ -24,7 +24,6 @@ class IterableSpec extends AnyWordSpec with Matchers with LoggingBase with Heter
       val seq: Seq[Int] = Seq(1, 2, 3)
       val field: Field  = "test" -> seq
       field.name must be("test")
-      import scala.collection.JavaConverters._
       field.value must be(Value.array(seq.map(ToValue(_)).asJava))
       field.toString must be("test=[1, 2, 3]")
     }
@@ -42,14 +41,14 @@ class IterableSpec extends AnyWordSpec with Matchers with LoggingBase with Heter
     "work for objects with custom attributes" in {
       implicit val readableInstant: ToValue[Instant] = (v: Instant) => {
         val datetime  = LocalDateTime.ofInstant(v, ZoneOffset.UTC)
-        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+        val formatter = DateTimeFormatter.ofPattern("M/d/YY hh:mm a")
         ToValue(v.toString).withToStringValue(formatter.format(datetime))
       }
 
       val instant1     = Instant.ofEpochMilli(0)
       val instant2     = Instant.ofEpochMilli(1000000)
       val field: Field = "test" -> Seq(instant1, instant2)
-      field.toString must be("test=[1/1/70, 12:00 AM, 1/1/70, 12:16 AM]")
+      field.toString must be("test=[1/1/70 12:00 AM, 1/1/70 12:16 AM]")
     }
 
     "work with set" in {
