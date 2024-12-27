@@ -124,17 +124,6 @@ lazy val logger = (project in file("logger"))
   )
   .dependsOn(api % "compile->compile;test->compile")
 
-lazy val asyncLogger = (project in file("async"))
-  .settings(
-    name := "async-logger",
-    crossScalaVersions := scalaVersions,
-    scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % echopraxiaVersion % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest" % scalatestVersion  % Test
-  )
-  .dependsOn(api % "compile->compile;test->compile")
-
 lazy val flowLogger = (project in file("flow"))
   .settings(
     name := "flow-logger",
@@ -170,23 +159,6 @@ lazy val nameOfLogger = (project in file("nameof"))
 //    libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.12"      % Test
 //  ).dependsOn(api % "compile->compile;test->compile")
 
-lazy val diff = (project in file("diff"))
-  .settings(
-    name := "diff",
-    crossScalaVersions := scalaVersions,
-    scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    // https://mvnrepository.com/artifact/com.flipkart.zjsonpatch/zjsonpatch
-    libraryDependencies += "com.flipkart.zjsonpatch"     % "zjsonpatch" % zjsonPatchVersion,
-    libraryDependencies += "com.tersesystems.echopraxia" % "jackson"    % echopraxiaVersion,
-    //
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
-    libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
-  )
-  .dependsOn(api % "compile->compile;test->compile")
-
 lazy val traceLogger = (project in file("trace"))
   .settings(
     name := "trace-logger",
@@ -211,7 +183,7 @@ lazy val benchmarks = (project in file("benchmarks"))
     publish / skip                                      := true,
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % echopraxiaVersion
   )
-  .dependsOn(api, logger, asyncLogger, flowLogger, traceLogger)
+  .dependsOn(api, logger, flowLogger, traceLogger)
 
 lazy val root = (project in file("."))
   .settings(
@@ -220,7 +192,7 @@ lazy val root = (project in file("."))
     Compile / packageDoc / publishArtifact := false,
     publishArtifact                        := false,
     publish / skip                         := true
-  ).aggregate(api, generic, logger, asyncLogger, nameOfLogger, diff, flowLogger, traceLogger, benchmarks)
+  ).aggregate(api, generic, logger, nameOfLogger, flowLogger, traceLogger, benchmarks)
 
 def compatLibraries(scalaVersion: String): Seq[ModuleID] = {
   CrossVersion.partialVersion(scalaVersion) match {
