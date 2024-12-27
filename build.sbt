@@ -156,19 +156,6 @@ lazy val flowLogger = (project in file("flow"))
   )
   .dependsOn(logging % "compile->compile;test->compile")
 
-lazy val nameOfLogger = (project in file("nameof"))
-  .settings(
-    name := "nameof",
-    crossScalaVersions := List(scala213),
-    scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    //
-    libraryDependencies += "com.tersesystems.echopraxia" % "logstash"                 % echopraxiaVersion     % Test,
-    libraryDependencies += "org.scalatest"              %% "scalatest"                % scalatestVersion      % Test,
-    libraryDependencies += "ch.qos.logback"              % "logback-classic"          % logbackClassicVersion % Test,
-    libraryDependencies += "net.logstash.logback"        % "logstash-logback-encoder" % logstashVersion       % Test
-  )
-  .dependsOn(logging % "compile->compile;test->compile")
-
 // don't include dump for now
 //lazy val dump = (project in file("dump"))
 //  .settings(
@@ -217,7 +204,6 @@ lazy val root = (project in file("."))
     generic,
     logger,
     simple,
-    nameOfLogger,
     flowLogger,
     traceLogger,
     benchmarks)
