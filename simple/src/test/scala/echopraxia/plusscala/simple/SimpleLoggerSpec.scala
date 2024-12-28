@@ -27,7 +27,11 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
   }
 
   describe("withFields") {
-    it("should use withFields") {
+    it("should use withFields in a function") {
+      logger.withFields(() => fb.string("herp", "derp"))
+    }
+
+    it("should use withFields directly") {
       logger.withFields(fb.string("herp", "derp"))
     }
   }
