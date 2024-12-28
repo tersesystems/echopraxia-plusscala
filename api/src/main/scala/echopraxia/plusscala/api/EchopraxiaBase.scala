@@ -4,10 +4,10 @@ package echopraxia.plusscala.api
  * This is a trait that should be extended by domain logging traits.
  *
  * This trait recognizes strings as meaningful names. If this is not what you want (for example you want enums or refined types), you can create your
- * own trait extending `LoggingTypeClasses with LoggingToValueImplicits` with your own `ToName` implicits.
+ * own trait extending `LoggingTypeClasses with EchopraxiaToValueImplicits` with your own `ToName` implicits.
  *
  * {{{
- *  trait Logging extends LoggingBase {
+ *  trait Logging extends EchopraxiaBase {
  *    implicit val currencyToField: ToField[Currency] = ToField(_ => "currency", currency => ToValue(currency.getCurrencyCode))
  *
  *    implicit val priceToField: ToField[Price] = ToField(_ => "price", price => ToObjectValue(price.currency, "amount" -> price.amount))

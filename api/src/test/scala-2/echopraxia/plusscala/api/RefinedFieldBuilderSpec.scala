@@ -27,9 +27,6 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
   }
 
   trait RefinedFieldBuilder extends FieldBuilderBase {
-    override type FieldType = DefaultField
-    override protected def fieldClass: Class[DefaultField] = classOf[DefaultField]
-
     type Name = String Refined NonEmpty
 
     implicit val refinedToName: ToName[Name] = _.map(_.value).orNull
