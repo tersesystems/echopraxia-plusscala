@@ -69,15 +69,7 @@ lazy val api = (project in file("api"))
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % echopraxiaVersion,
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
     // tests
-    libraryDependencies ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _)) => Seq.empty
-        case other =>
-          Seq(
-            "eu.timepit"                 %% "refined"                  % refinedVersion        % Test
-          )
-      }
-    },
+    libraryDependencies += "eu.timepit"                 %% "refined"                  % refinedVersion        % Test,
     libraryDependencies += "com.beachape"               %% "enumeratum"               % enumeratumVersion     % Test,
     libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     // use logstash for testing
