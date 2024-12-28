@@ -59,8 +59,7 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     val optPerson: Option[Person] = Option(person1)
     logger.info("optPerson" -> optPerson)
 
-    // XXX this doesn't work in 2.12 but works in 2.13 and 3
-    // logger.info("optPerson" -> None)
+    logger.info("optPerson" -> None)
 
     // As does either
     logger.info("eitherPerson" -> Left(person1))

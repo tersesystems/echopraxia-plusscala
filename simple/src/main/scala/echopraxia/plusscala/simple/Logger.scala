@@ -11,15 +11,23 @@ import sourcecode.Enclosing
 import sourcecode.File
 import sourcecode.Line
 
-import java.util
 import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 class Logger(val core: CoreLogger) {
+
   private val traceMethod: LoggerMethod = new LoggerMethod(Level.TRACE)
   private val debugMethod: LoggerMethod = new LoggerMethod(Level.DEBUG)
   private val infoMethod: LoggerMethod  = new LoggerMethod(Level.INFO)
   private val warnMethod: LoggerMethod  = new LoggerMethod(Level.WARN)
   private val errorMethod: LoggerMethod = new LoggerMethod(Level.ERROR)
+
+  def withCondition(condition: Condition): Logger = {
+    new Logger(core.withCondition(condition.asJava))
+  }
+
+  def withFields(result: FieldBuilderResult): Logger = {
+    new Logger(core.withFields(_ => result, FieldBuilder))
+  }
 
   // -----------------------------------------------------------
   // TRACE
@@ -64,26 +72,18 @@ class Logger(val core: CoreLogger) {
     @inline
     def isEnabled(condition: Condition): Boolean = core.isEnabled(level, condition.asJava)
 
-    def apply(f: FieldBuilderResult*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-      var totalFields = 0
+    def apply(results: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
+      // we can only do this with fields which have already been computed
+      val message = ("{} " * results.size).trim
       val f1: FieldBuilder => FieldBuilderResult = _ => {
-        val buffer = new util.ArrayList[Field]()
-        f.foreach { result =>
-          val fields = result.fields()
-          totalFields += fields.size()
-          buffer.addAll(fields)
-        }
-        FieldBuilderResult.list(buffer)
+        FieldBuilderResult.list(results.toArray)
       }
-      val message = ("{} " * totalFields).trim
       core.log(level, () => sourceCodeField.fields(), message, f1.asJava, FieldBuilder)
     }
 
-    def apply(message: String, f: FieldBuilderResult*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
+    def apply(message: String, fields: Field*)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
       val f1: FieldBuilder => FieldBuilderResult = _ => {
-        val buffer = new util.ArrayList[Field]()
-        f.foreach(result => buffer.addAll(result.fields()))
-        FieldBuilderResult.list(buffer)
+        FieldBuilderResult.list(fields.toArray)
       }
       core.log(level, () => sourceCodeField.fields(), message, f1.asJava, FieldBuilder)
     }
@@ -91,6 +91,11 @@ class Logger(val core: CoreLogger) {
     def apply(message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
       val f: FieldBuilder => FieldBuilderResult = _ => onlyException(exception)
       core.log(level, () => sourceCodeField.fields(), message, f.asJava, FieldBuilder)
+    }
+
+    def apply(exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
+      val f: FieldBuilder => FieldBuilderResult = _ => onlyException(exception)
+      core.log(level, () => sourceCodeField.fields(), "{}", f.asJava, FieldBuilder)
     }
 
     // -----------------------------------------------------------
