@@ -1,13 +1,10 @@
 package echopraxia.plusscala.api
 
-import echopraxia.api.Field
-import echopraxia.api.Value
+import echopraxia.api.{Field, Value}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 import scala.jdk.CollectionConverters.SeqHasAsJava
 

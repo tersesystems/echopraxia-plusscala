@@ -4,9 +4,7 @@ import echopraxia.api.Field
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
 // The tests here compile in 2.13 but do not compile in 2.12
@@ -32,7 +30,7 @@ class OptionSpec extends AnyWordSpec with Matchers with EchopraxiaBase {
 
     "work with objects" in {
       implicit val readableInstant: ToValue[Instant] = (v: Instant) => ToValue(v.toString)
-      val field: Field = "test" -> Option(Instant.ofEpochMilli(0))
+      val field: Field                               = "test" -> Option(Instant.ofEpochMilli(0))
       field.toString must be("test=1970-01-01T00:00:00Z")
     }
 

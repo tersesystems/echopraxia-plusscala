@@ -1,7 +1,6 @@
 package echopraxia.plusscala.api
 
-import echopraxia.api.DefaultField
-import eu.timepit.refined._
+import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.predicates.all.NonEmpty
 import org.scalatest.funspec.AnyFunSpec
@@ -14,14 +13,14 @@ class RefinedFieldBuilderSpec extends AnyFunSpec with Matchers {
   describe("FieldBuilder") {
 
     it("should work with java.lang.Byte") {
-      val byte              = java.lang.Byte.MIN_VALUE
-      val byteName: fb.Name = refineMV("byte")
+      val byte     = java.lang.Byte.MIN_VALUE
+      val byteName = refineV[NonEmpty]("byte")
       fb.keyValue(byteName, byte)
     }
 
     it("should work with java.lang.Short") {
-      val short              = java.lang.Short.MIN_VALUE
-      val shortName: fb.Name = refineMV("short")
+      val short     = java.lang.Short.MIN_VALUE
+      val shortName = refineV[NonEmpty]("short")
       fb.keyValue(shortName, short)
     }
   }
