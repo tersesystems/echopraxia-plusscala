@@ -2,7 +2,7 @@ package echopraxia.plusscala.api
 
 import echopraxia.api.Value.ObjectValue
 import echopraxia.api.*
-import echopraxia.plusscala.spi.Utils.newField
+import Utils.newField
 
 import scala.annotation.implicitNotFound
 
