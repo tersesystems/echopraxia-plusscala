@@ -10,7 +10,7 @@ val sourceCodeVersion            = "0.3.1"
 val refinedVersion               = "0.11.1"
 
 val scala3                       = "3.6.2"
-val scala213                     = "2.13.13"
+val scala213                     = "2.13.15"
 
 val scalaVersions = List(scala3, scala213)
 
