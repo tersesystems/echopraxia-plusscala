@@ -10,6 +10,6 @@ trait OptionToValueImplicits { self: ValueTypeClasses =>
     case Some(v) => ToValue(v)
     case None    => Value.nullValue()
   }
-  implicit def someToValue[V: ToValue]: ToValue[Some[V]] = v => ToValue(v)
+  implicit def someToValue[V: ToValue]: ToValue[Some[V]] = some => ToValue(some.value)
   implicit val noneToValue: ToValue[None.type]           = _ => Value.nullValue()
 }
