@@ -13,9 +13,9 @@ trait LowPriorityImplicits {
   final implicit class RichArrayValue(val value: ArrayValue) {
     def +(v: Value[?]): ArrayValue = value.add(v)
 
-    def ++(vs: Traversable[Value[?]]): ArrayValue = addAll(vs)
+    def ++(vs: Iterable[Value[?]]): ArrayValue = addAll(vs)
 
-    def addAll(newValues: Traversable[Value[?]]): ArrayValue = {
+    def addAll(newValues: Iterable[Value[?]]): ArrayValue = {
       val joinedValues = new util.ArrayList(value.raw())
       for (f <- newValues) {
         joinedValues.add(f)
@@ -29,7 +29,7 @@ trait LowPriorityImplicits {
   final implicit class RichObjectValue(value: ObjectValue) {
     def +(field: Field): ObjectValue = value.add(field)
 
-    def addAll(fields: Traversable[Field]): ObjectValue = {
+    def addAll(fields: Iterable[Field]): ObjectValue = {
       val joinedFields = new util.ArrayList(value.raw)
       for (f <- fields) {
         joinedFields.add(f)
@@ -37,7 +37,7 @@ trait LowPriorityImplicits {
       Value.`object`(joinedFields)
     }
 
-    def ++(fields: Traversable[Field]): ObjectValue = addAll(fields)
+    def ++(fields: Iterable[Field]): ObjectValue = addAll(fields)
 
     def ++(fields: util.Collection[Field]): ObjectValue = value.addAll(fields)
   }

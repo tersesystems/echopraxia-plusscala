@@ -124,7 +124,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       val condition: JsonPathCondition = (_, ctx) => {
         val obj = ctx.findList("$.array")
         obj.head match {
-          case map: Map[String, Any] =>
+          case map: (Map[String, Any] @unchecked) =>
             map.get("a").contains(1) && map.get("c").contains(false)
           case _ =>
             false
