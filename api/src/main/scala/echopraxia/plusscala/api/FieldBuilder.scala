@@ -90,7 +90,7 @@ trait ListFieldBuilder { this: FieldBuilderResultTypeClasses =>
  * A field builder that does not define the field type. Use this if you want to extend / replace DefaultField.
  */
 trait FieldBuilderBase
-    extends LoggingTypeClasses
+    extends EchopraxiaTypeClasses
     with FieldBuilderResultTypeClasses
     with HasFieldClass
     with KeyValueFieldBuilder
@@ -100,8 +100,8 @@ trait FieldBuilderBase
     with SourceCodeFieldBuilder
     with NullFieldBuilder
     with ListFieldBuilder
-    with LoggingToValueImplicits
-    with LoggingToNameImplicits
+    with EchopraxiaToValueImplicits
+    with EchopraxiaToNameImplicits
     with LowPriorityImplicits {
 
   override def keyValue[N: ToName, V: ToValue](name: N, value: V): FieldType = {

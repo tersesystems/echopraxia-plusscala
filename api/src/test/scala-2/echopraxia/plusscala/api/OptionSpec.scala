@@ -10,7 +10,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class OptionSpec extends AnyWordSpec with Matchers with LoggingBase {
+class OptionSpec extends AnyWordSpec with Matchers with EchopraxiaBase {
 
   "option" should {
 

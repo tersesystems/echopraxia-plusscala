@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
 // The tests here compile in 2.13 but do not compile in 2.12
-class IterableSpec extends AnyWordSpec with Matchers with LoggingBase with HeterogeneousFieldSupport {
+class IterableSpec extends AnyWordSpec with Matchers with EchopraxiaBase with HeterogeneousFieldSupport {
 
   "iterable" should {
     // XXX check array depends on implicit
