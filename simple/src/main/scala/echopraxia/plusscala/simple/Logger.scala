@@ -11,15 +11,23 @@ import sourcecode.Enclosing
 import sourcecode.File
 import sourcecode.Line
 
-import java.util
 import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
 class Logger(val core: CoreLogger) {
+
   private val traceMethod: LoggerMethod = new LoggerMethod(Level.TRACE)
   private val debugMethod: LoggerMethod = new LoggerMethod(Level.DEBUG)
   private val infoMethod: LoggerMethod  = new LoggerMethod(Level.INFO)
   private val warnMethod: LoggerMethod  = new LoggerMethod(Level.WARN)
   private val errorMethod: LoggerMethod = new LoggerMethod(Level.ERROR)
+
+  def withCondition(condition: Condition): Logger = {
+    new Logger(core.withCondition(condition.asJava))
+  }
+
+  def withFields(result: FieldBuilderResult): Logger = {
+    new Logger(core.withFields(_ => result, FieldBuilder))
+  }
 
   // -----------------------------------------------------------
   // TRACE
