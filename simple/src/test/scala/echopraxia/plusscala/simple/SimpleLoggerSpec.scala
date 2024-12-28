@@ -16,7 +16,7 @@ import java.util
 class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   private val logger = LoggerFactory.getLogger(getClass)
-  private val fb = MyFieldBuilder
+  private val fb     = MyFieldBuilder
 
   describe("withCondition") {
 
@@ -63,7 +63,8 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
 
       logger.debug(
         "multiple tuples {}",
-        string("foo" -> "bar"), string("k2" -> "v2")
+        string("foo" -> "bar"),
+        string("k2"  -> "v2")
       )
 
       matchThis("multiple tuples {}")
@@ -81,8 +82,8 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
 
     it("should log using a Seq of Instant") {
       logger.debug(
-        "seq {}",
-        { import fb.*
+        "seq {}", {
+          import fb.*
           val seq: List[Instant] = List(Instant.now(), Instant.now(), Instant.now())
           fb.array("someSeq", seq)
         }
@@ -93,8 +94,8 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
 
     it("should log using a Seq of Instant in tuple style") {
       logger.debug(
-        "seq {}",
-        { import fb.*
+        "seq {}", {
+          import fb.*
           val seq: List[Instant] = List(Instant.now(), Instant.now(), Instant.now())
           fb.array("someSeq" -> seq)
         }
@@ -105,8 +106,7 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
 
     it("should log using a Seq of boolean") {
       logger.debug(
-        "seq {}",
-        {
+        "seq {}", {
           import fb.*
           array("someSeq", Seq(true, false, true))
         }
@@ -120,8 +120,7 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
 
     it("should log an instant as a string") {
       logger.debug(
-        "mapping time = {}",
-        {
+        "mapping time = {}", {
           import fb.*
           (instant("iso_timestamp" -> Instant.now()))
         }
@@ -143,8 +142,7 @@ class SimpleLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers 
       import fb.*
 
       logger.info(
-        "testing {}",
-        {
+        "testing {}", {
           val any = Map("int" -> 1, "str" -> "foo", "instant" -> Instant.now())
           val fields = any.map {
             case (k: String, v: String) =>

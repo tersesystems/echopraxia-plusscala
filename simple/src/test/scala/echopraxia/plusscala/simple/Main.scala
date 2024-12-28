@@ -1,6 +1,7 @@
 package echopraxia.plusscala.simple
 
-import echopraxia.api.{Field, FieldBuilderResult}
+import echopraxia.api.Field
+import echopraxia.plusscala.api.FieldBuilder.ToFieldBuilderResult
 import echopraxia.plusscala.api.{FieldBuilder, HeterogeneousFieldSupport}
 
 import java.util.{Currency, UUID}
@@ -70,10 +71,10 @@ class Printer extends Logging with HeterogeneousFieldSupport {
       logger.info("p1" -> person1, "p2" -> person2, "p3" -> person1)
     }
 
-    logger.info("deferred argument construction {} {} {}", () => {
-      import FieldBuilder as fb
-      fb.list("p1" -> person1, "p2" -> person2, "p3" -> person1)
-    })
+    logger.info(
+      "deferred argument construction {} {} {}",
+      () => ToFieldBuilderResult(Seq[Field]("p1" -> person1, "p2" -> person2, "p3" -> person1))
+    )
 
     // Complex objects are no problem
     val book1 = Book(

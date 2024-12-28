@@ -3,9 +3,9 @@ package echopraxia.plusscala.simple
 import echopraxia.api.Field
 import echopraxia.api.FieldBuilderResult
 import echopraxia.logging.api.Level
-import echopraxia.logging.spi.CoreLogger
+import echopraxia.logging.spi.{CoreLogger, Utilities}
 import echopraxia.plusscala.api.FieldBuilder
-import echopraxia.plusscala.api.FieldBuilder.{ToFieldBuilderResult, list}
+import echopraxia.plusscala.api.FieldBuilder.ToFieldBuilderResult
 import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.logging.api.Condition
 import sourcecode.Enclosing
@@ -31,7 +31,11 @@ class Logger(val core: CoreLogger) {
   }
 
   def withFields(function: () => FieldBuilderResult): Logger = {
-    new Logger(core.withFields(_ => function(), FieldBuilder))
+    new Logger(core.withFields((_: FieldBuilder) => function(), FieldBuilder))
+  }
+
+  def withThreadContext: Logger = {
+    new Logger(core.withThreadContext(Utilities.threadContext()))
   }
 
   // -----------------------------------------------------------
@@ -94,7 +98,7 @@ class Logger(val core: CoreLogger) {
     }
 
     def apply(message: String, f1: () => FieldBuilderResult)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
-      core.log(level, () => sourceCodeField.fields(), message, _ => f1(), FieldBuilder)
+      core.log(level, () => sourceCodeField.fields(), message, (_: FieldBuilder) => f1(), FieldBuilder)
     }
 
     def apply(message: String, exception: Throwable)(implicit line: Line, file: File, enclosing: Enclosing): Unit = {
