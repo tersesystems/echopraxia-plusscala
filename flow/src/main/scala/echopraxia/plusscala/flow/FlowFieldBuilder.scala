@@ -3,7 +3,7 @@ package echopraxia.plusscala.flow
 import echopraxia.api.Field
 import echopraxia.api.FieldBuilderResult
 import echopraxia.api.Value
-import echopraxia.plusscala.api._
+import echopraxia.plusscala.api.*
 
 trait FlowFieldBuilder extends ValueTypeClasses {
 

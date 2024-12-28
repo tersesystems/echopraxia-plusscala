@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.benchmarks
 import echopraxia.plusscala.api.EchopraxiaBase
 import echopraxia.plusscala.logger.LoggerFactory
 import echopraxia.plusscala.logging.api.Condition
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import java.util.concurrent.TimeUnit
 
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Fork(1)
 @State(Scope.Benchmark)
 class LoggerBenchmarks extends EchopraxiaBase {
-  import LoggerBenchmarks._
+  import LoggerBenchmarks.*
 
   @Benchmark
   def info(): Unit = {

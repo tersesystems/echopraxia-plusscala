@@ -18,7 +18,7 @@ import sourcecode.File
 import sourcecode.Line
 
 import java.util
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 class TraceLoggingWithArgsSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {

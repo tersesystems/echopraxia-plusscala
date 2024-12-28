@@ -1,6 +1,6 @@
 package echopraxia.plusscala.api
 
-import sourcecode._
+import sourcecode.*
 
 import java.util.ResourceBundle
 

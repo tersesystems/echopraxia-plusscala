@@ -2,12 +2,12 @@ package echopraxia.plusscala.logging.api
 
 import echopraxia.api.Field
 import echopraxia.api.FieldConstants
-import echopraxia.logging.api.{LoggingContext => JLoggingContext}
-import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingContextWithFindPathMethods}
+import echopraxia.logging.api.LoggingContext as JLoggingContext
+import echopraxia.logging.api.LoggingContextWithFindPathMethods as JLoggingContextWithFindPathMethods
 import echopraxia.plusscala.api.FindPathMethods
 
 import java.util
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.RichOptional
 
 /**
@@ -65,9 +65,9 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
 
   private def deepAsScalaSeq(value: util.List[?]): Seq[Any] = {
     value.asScala.map {
-      case (javaMap: util.Map[String, _] @unchecked) =>
+      case (javaMap: util.Map[String, ?] @unchecked) =>
         deepAsScalaMap(javaMap)
-      case list: util.List[_] =>
+      case list: util.List[?] =>
         deepAsScalaSeq(list)
       case other =>
         other
@@ -77,9 +77,9 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
   private def deepAsScalaMap(value: util.Map[String, ?]): Map[String, Any] = {
     value.asScala.map { case (k: String, v) =>
       val mappedV = (v: @unchecked) match {
-        case utilList: util.List[_] =>
+        case utilList: util.List[?] =>
           deepAsScalaSeq(utilList)
-        case (utilMap: util.Map[String, _]) =>
+        case (utilMap: util.Map[String, ?]) =>
           deepAsScalaMap(utilMap)
         case other =>
           deepAsScalaValue(other)

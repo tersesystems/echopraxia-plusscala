@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.benchmarks
 
 import echopraxia.plusscala.flow.FlowLoggerFactory
 import echopraxia.plusscala.logging.api.Condition
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 
 import java.util.concurrent.TimeUnit
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Fork(1)
 @State(Scope.Benchmark)
 class FlowLoggerBenchmarks {
-  import FlowLoggerBenchmarks._
+  import FlowLoggerBenchmarks.*
 
   @Benchmark
   def info(blackhole: Blackhole): Unit = {

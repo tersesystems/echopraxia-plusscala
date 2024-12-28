@@ -1,7 +1,7 @@
 package echopraxia.plusscala.logging.api
 
 import echopraxia.api.Field
-import echopraxia.logging.api.{LoggingContext => JLoggingContext}
+import echopraxia.logging.api.LoggingContext as JLoggingContext
 
 trait LoggingContext {
   def fields: scala.collection.immutable.Seq[Field]

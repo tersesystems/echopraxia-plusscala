@@ -59,7 +59,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "multiple tuples {}",
         fb => {
-          import fb._
+          import fb.*
           fb.list(string("foo" -> "bar"), string("k2" -> "v2"))
         }
       )
@@ -81,7 +81,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "seq {}",
         { fb =>
-          import fb._
+          import fb.*
           val seq: List[Instant] = List(Instant.now(), Instant.now(), Instant.now())
           (fb.array("someSeq", seq))
         }
@@ -94,7 +94,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "seq {}",
         { fb =>
-          import fb._
+          import fb.*
           val seq: List[Instant] = List(Instant.now(), Instant.now(), Instant.now())
           (fb.array("someSeq" -> seq))
         }
@@ -107,7 +107,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "seq {}",
         { fb =>
-          import fb._
+          import fb.*
           array("someSeq", Seq(true, false, true))
         }
       )
@@ -122,7 +122,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "mapping time = {}",
         fb => {
-          import fb._
+          import fb.*
           (instant("iso_timestamp" -> Instant.now()))
         }
       )
@@ -133,7 +133,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "person1 {} person2 {}",
         fb => {
-          import fb._
+          import fb.*
           fb.list(
             fb.person("person1" -> Person("Eloise", 1)),
             fb.obj("person2"    -> Person("Eloise", 1))
@@ -147,7 +147,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.info(
         "testing {}",
         fb => {
-          import fb._
+          import fb.*
           val any = Map("int" -> 1, "str" -> "foo", "instant" -> Instant.now())
           val fields = any.map {
             case (k: String, v: String) =>
@@ -166,7 +166,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "person = {}",
         fb => {
-          import fb._
+          import fb.*
           obj("owner", person("person" -> Person("Eloise", 1)))
         }
       )
@@ -178,7 +178,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       logger.debug(
         "list of tuples = {}",
         fb => {
-          import fb._
+          import fb.*
           list(
             person("owner"          -> Person("Eloise", 1)),
             instant("iso_timestamp" -> Instant.now()),

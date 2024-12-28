@@ -1,9 +1,9 @@
 package echopraxia.plusscala.logging.api
 
-import echopraxia.logging.api.{Condition => JCondition}
-import echopraxia.logging.api.{Level => JLevel}
-import echopraxia.logging.api.{LoggingContext => JLoggingContext}
-import echopraxia.logging.api.{LoggingContextWithFindPathMethods => JLoggingContextWithFindPathMethods}
+import echopraxia.logging.api.Condition as JCondition
+import echopraxia.logging.api.Level as JLevel
+import echopraxia.logging.api.LoggingContext as JLoggingContext
+import echopraxia.logging.api.LoggingContextWithFindPathMethods as JLoggingContextWithFindPathMethods
 
 trait LowPriorityImplicits {
 

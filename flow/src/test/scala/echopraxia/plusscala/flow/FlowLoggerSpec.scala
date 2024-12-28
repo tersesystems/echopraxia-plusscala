@@ -10,7 +10,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.util
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 class FlowLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {

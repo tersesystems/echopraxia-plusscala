@@ -3,7 +3,7 @@ package echopraxia.plusscala.logger
 import echopraxia.api.Field
 import echopraxia.api.FieldBuilderResult
 import echopraxia.api.FieldBuilderResult.list
-import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.logging.api.Level as JLevel
 import echopraxia.logging.spi.CoreLogger
 import echopraxia.logging.spi.Utilities
 import echopraxia.plusscala.api.FieldBuilder
@@ -20,7 +20,7 @@ import scala.jdk.FunctionConverters.enrichAsJavaFunction
 trait Logger[FB <: Singleton] extends LoggerMethods[FB] with LoggerSupport[FB, Logger] with DefaultMethodsSupport[FB]
 
 object Logger {
-  import JLevel._
+  import JLevel.*
 
   def apply[FB <: Singleton](core: CoreLogger, fieldBuilder: FB): Logger[FB] = new Impl[FB](core, fieldBuilder)
 
