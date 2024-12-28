@@ -65,7 +65,7 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
 
   private def deepAsScalaSeq(value: util.List[?]): Seq[Any] = {
     value.asScala.map {
-      case javaMap: util.Map[String, _] =>
+      case (javaMap: util.Map[String, _] @unchecked) =>
         deepAsScalaMap(javaMap)
       case list: util.List[_] =>
         deepAsScalaSeq(list)
@@ -76,7 +76,7 @@ class ScalaLoggingContextWithFindPathMethods(context: JLoggingContextWithFindPat
 
   private def deepAsScalaMap(value: util.Map[String, ?]): Map[String, Any] = {
     value.asScala.map { case (k: String, v) =>
-      val mappedV = v match {
+      val mappedV = (v: @unchecked) match {
         case utilList: util.List[_] =>
           deepAsScalaSeq(utilList)
         case (utilMap: util.Map[String, _]) =>
