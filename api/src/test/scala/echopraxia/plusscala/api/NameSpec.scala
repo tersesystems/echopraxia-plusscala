@@ -2,7 +2,7 @@ package echopraxia.plusscala.api
 
 import echopraxia.api.Field
 import enumeratum.EnumEntry.Snakecase
-import enumeratum._
+import enumeratum.*
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

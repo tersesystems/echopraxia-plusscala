@@ -1,6 +1,6 @@
 package echopraxia.plusscala.spi
 
-import echopraxia.api._
+import echopraxia.api.*
 
 object Utils {
 

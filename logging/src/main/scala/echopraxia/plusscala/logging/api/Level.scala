@@ -1,6 +1,6 @@
 package echopraxia.plusscala.logging.api
 
-import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.logging.api.Level as JLevel
 
 object Level {
   case object TRACE extends Level(JLevel.TRACE)

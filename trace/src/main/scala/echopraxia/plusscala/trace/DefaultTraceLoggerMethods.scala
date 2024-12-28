@@ -1,11 +1,11 @@
 package echopraxia.plusscala.trace
 
 import echopraxia.api.FieldBuilderResult
-import echopraxia.logging.api.{Level => JLevel}
+import echopraxia.logging.api.Level as JLevel
 import echopraxia.logging.spi.CoreLogger
 import echopraxia.plusscala.logging.api.Condition
 import echopraxia.plusscala.logging.api.DefaultMethodsSupport
-import sourcecode._
+import sourcecode.*
 
 import java.util.function.Function
 import scala.jdk.FunctionConverters.enrichAsJavaFunction

@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.benchmarks
 
 import echopraxia.plusscala.logging.api.Condition
 import echopraxia.plusscala.trace.TraceLoggerFactory
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 
 import java.util.concurrent.TimeUnit
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Fork(1)
 @State(Scope.Benchmark)
 class TraceLoggerBenchmarks {
-  import TraceLoggerBenchmarks._
+  import TraceLoggerBenchmarks.*
 
   @Benchmark
   def info(blackhole: Blackhole): Unit = {

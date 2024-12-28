@@ -9,10 +9,7 @@ import echopraxia.plusscala.logging.api.LoggerSupport
 
 import scala.jdk.FunctionConverters.enrichAsJavaFunction
 
-trait FlowLogger[FB <: FlowFieldBuilder & Singleton]
-    extends FlowLoggerMethods[FB]
-    with LoggerSupport[FB, FlowLogger]
-    with DefaultMethodsSupport[FB]
+trait FlowLogger[FB <: FlowFieldBuilder & Singleton] extends FlowLoggerMethods[FB] with LoggerSupport[FB, FlowLogger] with DefaultMethodsSupport[FB]
 
 object FlowLogger {
 

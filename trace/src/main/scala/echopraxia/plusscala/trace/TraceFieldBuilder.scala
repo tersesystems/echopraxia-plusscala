@@ -8,7 +8,7 @@ import echopraxia.plusscala.api.FieldBuilderResultTypeClasses
 import echopraxia.plusscala.api.ListFieldBuilder
 import echopraxia.plusscala.api.SourceCode
 import echopraxia.plusscala.api.ValueTypeClasses
-import sourcecode._
+import sourcecode.*
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 

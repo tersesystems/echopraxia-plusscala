@@ -1,7 +1,7 @@
 package echopraxia.plusscala.simple
 
 import echopraxia.api.Field
-import echopraxia.plusscala.api._
+import echopraxia.plusscala.api.*
 
 import java.util.Currency
 import java.util.UUID

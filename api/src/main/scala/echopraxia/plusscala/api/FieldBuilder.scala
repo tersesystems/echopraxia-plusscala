@@ -1,6 +1,6 @@
 package echopraxia.plusscala.api
 
-import echopraxia.api._
+import echopraxia.api.*
 import echopraxia.plusscala.spi.Utils
 
 trait HasFieldClass {

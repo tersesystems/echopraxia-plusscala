@@ -111,7 +111,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
         condition,
         "found a list with 1 in it!",
         fb => {
-          import fb._
+          import fb.*
           // have to explicitly make Seq[Value[_]] here
           fb.array("foo", Seq(ToValue("derp"), ToValue(1), ToValue(false)))
         }

@@ -18,7 +18,7 @@ trait FieldBuilderResultTypeClasses {
       iterable => FieldBuilderResult.list(iterable.toArray)
 
     implicit val iteratorToFieldBuilderResult: ToFieldBuilderResult[Iterator[Field]] = iterator => {
-      import scala.jdk.CollectionConverters._
+      import scala.jdk.CollectionConverters.*
       FieldBuilderResult.list(iterator.asJava)
     }
 

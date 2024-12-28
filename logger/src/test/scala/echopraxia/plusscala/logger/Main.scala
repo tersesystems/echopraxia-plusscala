@@ -32,7 +32,7 @@ class NoImplicits {
   logger.info(
     "{}",
     fb => {
-      import fb._
+      import fb.*
       list("foo" -> "foo", USD)
     }
   )
