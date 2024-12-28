@@ -1,7 +1,7 @@
 package echopraxia.plusscala.logger
 
 import echopraxia.api.Field
-import echopraxia.plusscala.api.LoggingBase
+import echopraxia.plusscala.api.EchopraxiaBase
 
 import java.util.Currency
 import java.util.UUID
@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 import scala.reflect.classTag
 
 // Each package can add its own mappings
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
 
   // Echopraxia takes a bit more work the more heterogeneous the input gets.
   // For example, to pass through random tuples, you need to map it to an object

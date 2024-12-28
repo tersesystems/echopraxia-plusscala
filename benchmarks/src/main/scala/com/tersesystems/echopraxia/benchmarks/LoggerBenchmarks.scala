@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.benchmarks
 
-import echopraxia.plusscala.api.LoggingBase
+import echopraxia.plusscala.api.EchopraxiaBase
 import echopraxia.plusscala.logger.LoggerFactory
 import echopraxia.plusscala.logging.api.Condition
 import org.openjdk.jmh.annotations._
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-class LoggerBenchmarks extends LoggingBase {
+class LoggerBenchmarks extends EchopraxiaBase {
   import LoggerBenchmarks._
 
   @Benchmark
