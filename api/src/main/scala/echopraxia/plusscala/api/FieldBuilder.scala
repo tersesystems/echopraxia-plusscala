@@ -1,7 +1,7 @@
 package echopraxia.plusscala.api
 
 import echopraxia.api.*
-import echopraxia.plusscala.spi.Utils
+import Utils.newField
 
 trait KeyValueFieldBuilder { this: ValueTypeClasses & NameTypeClasses =>
   // ------------------------------------------------------------------

@@ -1,8 +1,8 @@
-package echopraxia.plusscala.spi
+package echopraxia.plusscala.api
 
 import echopraxia.api.*
 
-object Utils {
+private[api] object Utils {
 
   @inline
   def newField(name: String, value: Value[?], attributes: Attributes): Field = {

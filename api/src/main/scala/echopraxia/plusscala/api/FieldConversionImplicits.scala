@@ -2,7 +2,6 @@ package echopraxia.plusscala.api
 
 import echopraxia.api.Attributes
 import echopraxia.api.Field
-import echopraxia.plusscala.spi.Utils
 
 trait FieldConversionImplicits { self: ValueTypeClasses & NameTypeClasses =>
 
