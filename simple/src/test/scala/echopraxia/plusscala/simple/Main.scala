@@ -1,14 +1,10 @@
 package echopraxia.plusscala.simple
 
 import echopraxia.api.Field
-import echopraxia.plusscala.api.EitherToNameImplicits
-import echopraxia.plusscala.api.FieldBuilder
-import echopraxia.plusscala.api.HeterogeneousFieldSupport
-import echopraxia.plusscala.api.OptionToNameImplicits
-import echopraxia.plusscala.api.TryToNameImplicits
+import echopraxia.plusscala.api.FieldBuilder.ToFieldBuilderResult
+import echopraxia.plusscala.api.{FieldBuilder, HeterogeneousFieldSupport}
 
-import java.util.Currency
-import java.util.UUID
+import java.util.{Currency, UUID}
 import scala.concurrent.Future
 
 object Main {
@@ -23,7 +19,7 @@ class NoImplicits {
   private val USD = Currency.getInstance("USD")
 
   private val logger = LoggerFactory.getLogger(getClass)
-  object MyFieldBuilder extends FieldBuilder with Logging with OptionToNameImplicits with TryToNameImplicits with EitherToNameImplicits
+  object MyFieldBuilder extends FieldBuilder with Logging
   private val fb = MyFieldBuilder
 
   logger.info("{}", fb.keyValue("foo" -> "foo"))
@@ -65,7 +61,6 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     logger.info("people" -> Map("person1" -> person1, "person2" -> person2))
 
     // And even tuples  (defined in Logging.scala)
-    // XXX This doesn't work in 2.12, works in 2.13 and 3
     logger.info("intToPersonMap" -> (1 -> person1))
 
     // support for exceptions
@@ -75,6 +70,11 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     if (logger.isInfoEnabled) {
       logger.info("p1" -> person1, "p2" -> person2, "p3" -> person1)
     }
+
+    logger.info(
+      "deferred argument construction {} {} {}",
+      () => ToFieldBuilderResult(Seq[Field]("p1" -> person1, "p2" -> person2, "p3" -> person1))
+    )
 
     // Complex objects are no problem
     val book1 = Book(
@@ -103,7 +103,7 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     logger.info("oneTrueString" -> Seq(ToValue(1), ToValue(true), ToValue("string")))
 
     // You can also use "withFields" to render JSON on every message (this will not show in line format)
-    // logger.withFields(Seq(book1, person1)).info("testing")
+    logger.withFields(book1, person1).info("testing")
 
     // Can also log using class name
     logger.info(UUID.randomUUID)
