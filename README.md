@@ -2,7 +2,7 @@
 
 [Echopraxia](https://github.com/tersesystems/echopraxia) is a structured logging framework with implementations for Logback and Log4J.
 
-The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that leverages Scala features to provide type classes and source code information.  Echopraxia is compiled for Scala 2.12, 2.13, and 3.
+The Scala API for [Echopraxia](https://github.com/tersesystems/echopraxia) is a layer over the Java API that leverages Scala features to provide type classes and source code information.  Echopraxia is compiled for Scala 2.13, and 3.
 
 In practical terms, you define some type classes that set what the name and value of a class should be:
 

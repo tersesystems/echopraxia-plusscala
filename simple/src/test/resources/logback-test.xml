@@ -1,0 +1,20 @@
+<configuration>
+    <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${ECHOPRAXIA_STDOUT_LOGGING_LEVEL:-OFF}</level>
+        </filter>
+        <encoder>
+            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="echopraxia.plusscala.logger" level="TRACE"/>
+
+    <root level="INFO">
+        <appender-ref ref="LIST"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

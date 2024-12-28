@@ -30,12 +30,6 @@ class NoImplicits {
   logger.info("{}", fb.keyValue(Option(USD)))
   val either: Either[Currency, String] = Left(USD)
   logger.info("{}", fb.keyValue(either))
-  logger.info(
-    "{}", {
-      import fb.*
-      fb.list("foo" -> "foo", USD)
-    }
-  )
 }
 
 class Printer extends Logging with HeterogeneousFieldSupport {
@@ -59,8 +53,7 @@ class Printer extends Logging with HeterogeneousFieldSupport {
     val optPerson: Option[Person] = Option(person1)
     logger.info("optPerson" -> optPerson)
 
-    // XXX this doesn't work in 2.12 but works in 2.13 and 3
-    // logger.info("optPerson" -> None)
+    logger.info("optPerson" -> None)
 
     // As does either
     logger.info("eitherPerson" -> Left(person1))
