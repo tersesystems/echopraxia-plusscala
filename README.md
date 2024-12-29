@@ -9,7 +9,7 @@ In practical terms, you define some type classes that set what the name and valu
 ```scala
 import echopraxia.plusscala.logging.api._
 
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val uuidToField: ToField[UUID] = ToField(_ => "uuid", uuid => ToValue(uuid.toString))
 }
 ```
@@ -76,15 +76,15 @@ libraryDependencies += "com.tersesystems.echopraxia.plusscala" %% "logger" % ech
 and one of the underlying core logger providers and frameworks, i.e. for `logstash-logback-encoder`:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "3.1.2" // provides core logger
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.3" // logback 1.2, 1.3, or 1.4 are supported
-libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
+libraryDependencies += "com.tersesystems.echopraxia" % "logstash" % "4.0.0" // provides core logger
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.15"
+libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "8.0"
 ```
 
 or for log4j2:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "3.0.2"
+libraryDependencies += "com.tersesystems.echopraxia" % "log4j" % "4.0.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.20.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json" % "2.20.0"
 ```
@@ -92,14 +92,15 @@ libraryDependencies += "org.apache.logging.log4j" % "log4j-layout-template-json"
 To import the Scala API, add the following:
 
 ```scala
+import echopraxia.api._
 import echopraxia.plusscala.api._
 import echopraxia.plusscala.logger._
 
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   // add implicits for your classes here
 }
 
-object CustomFieldBuilder extends PresentationFieldBuilder with Logging
+object CustomFieldBuilder extends FieldBuilder with Logging
 
 class Example extends Logging {
   val logger = LoggerFactory.getLogger(CustomFieldBuilder)
@@ -110,7 +111,7 @@ class Example extends Logging {
 }
 ```
 
-The logger takes `Field*` as arguments, and `LoggingBase` contains the implicit conversions to turn tuples into fields:
+The logger takes `Field*` as arguments, and `EchopraxiaBase` contains the implicit conversions to turn tuples into fields:
 
 ```scala
 // val field: echopraxia.api.Field = "name" -> "will" under the hood
@@ -134,7 +135,7 @@ logger.info("seq = {}", "listOfTuples" -> seq)
 There is a slight problem when you render lists which do not have a common base type.  In this case you have to explicitly add `HeterogeneousFieldSupport` in, which will map iterables as arrays automatically, and then cast to `Seq[Field]`:
 
 ```scala
-trait Logging extends LoggingBase with HeterogeneousFieldSupport
+trait Logging extends EchopraxiaBase with HeterogeneousFieldSupport
 
 logger.info("list" -> Seq[Field]("name" -> "will", "admin" -> true))
 ```
@@ -158,7 +159,7 @@ logger.debug("this will render foo=null -- {}", _.nullField("foo"))
 Field builders can take custom methods.  This is particularly when you want to add complex field conversion logic inside a logging statement that you don't want available to the enclosing class, i.e.
 
 ```scala
-object MyFieldBuilder extends PresentationFieldBuilder with Logging {
+object MyFieldBuilder extends FieldBuilder with Logging {
   def state1(foo: Foo): Field = keyValue(foo, foo).withDisplayName("foo in state one")
 }
 
@@ -174,6 +175,7 @@ You can append fields together using `++` from `LowPriorityImplicits` if you pre
 
 ```scala
 import echopraxia.api._
+
 logger.info("User {} can do complex method {}", fb => fb.keyValue("name" -> "will") ++ fb.myComplexMethod(foo))
 ```
 
@@ -194,7 +196,7 @@ logger.debug("This only creates field if logger.level >= DEBUG {}", _.keyValue("
 
 ### Options, Either, and Future
 
-Commonly used types like `Option`, `Either`, and `Future` are handled automatically by `LoggingBase`:
+Commonly used types like `Option`, `Either`, and `Future` are handled automatically by `EchopraxiaBase`:
 
 ```scala
 val optInt: Option[Int] = None
@@ -217,7 +219,7 @@ logger.info("future" -> future) // future={completed=true, success=yay}
 
 ## Extending Logging
 
-Extending logging is done by extending the `ToValue`, `ToName` type classes that are packaged in `LoggingBase`.
+Extending logging is done by extending the `ToValue`, `ToName` type classes that are packaged in `EchopraxiaBase`.
 
 ### ToValue
 
@@ -240,7 +242,7 @@ Let's start off by adding a `ToValue` for `java.time.Instant`, by converting it 
 import echopraxia.plusscala.api._
 import java.time.Instant
 
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val instantToValue: ToValue[Instant] = instant => ToValue(instant.toString)
 }
 ```
@@ -267,7 +269,7 @@ implicit val personToValue: ToObjectValue[Person] = { person =>
 You can also specify a common format for tuples and maps:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit def tupleToValue[TVK: ToValue, TVV: ToValue]: ToValue[Tuple2[TVK, TVV]] = { case (k, v) =>
     ToObjectValue("key" -> k, "value" -> v)
   }
@@ -284,7 +286,7 @@ logger.info("people" -> Map("person1" -> person1, "person2" -> person2))
 You can also include more complex logic in a `ToValue`, for example dealing with sensitive values can be handled by adding an implicit flag:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit def creditCardToValue(implicit cap: Sensitive = Censored): ToValue[CreditCard] = cc => {
     ToObjectValue(
       sensitiveKeyValue("cc_number", cc.number),
@@ -324,7 +326,7 @@ trait NameTypeClass {
 and is typically defined as an implicit like this:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val instantToName: ToName[Instant] = _ => "instant"
 }
 ```
@@ -341,7 +343,7 @@ logger.info(epoch) // instant=1970-01-01T00:00:00Z
 This comes in very handy when using `Future`, for example:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit def futureToName[T: ClassTag]: ToName[Future[T]] = _ => s"future[${classTag[T].runtimeClass.getName}]"
 }
 ```
@@ -361,7 +363,7 @@ For example, rather than defining
 ```scala
 case class Title(raw: String)    extends AnyVal
 
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val titleToName: ToName[Title] = _ => "title"
   implicit val titleToValue: ToValue[Title] = t => ToValue(t.raw)
 }
@@ -370,7 +372,7 @@ trait Logging extends LoggingBase {
 You could define both with `ToField(toNameFunction, toFieldFunction)`:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val titleToField: ToField[Title] = ToField(_ => "title", t => ToValue(t.raw))
 }
 ```
@@ -378,7 +380,7 @@ trait Logging extends LoggingBase {
 This gets especially useful when you are building up complex state objects where the case class fields all line up:
 
 ```scala
-trait Logging extends LoggingBase {
+trait Logging extends EchopraxiaBase {
   implicit val titleToField: ToField[Title] = ToField(_ => "title", t => ToValue(t.raw))
 
   implicit val authorToField: ToField[Author] = ToField(_ => "author", a => ToValue(a.raw))
@@ -505,10 +507,16 @@ This is useful when using the [condition scripts](https://github.com/tersesystem
 
 ## Conditions
 
-Conditions in the Scala API use Scala idioms and classes.  The `find` methods in the logging context are converted to Scala, so `java.math.BigInteger` is converted to `BigInt`, for example:
+Conditions in the Scala API use Scala idioms and classes.  
+
+The `JsonPathCondition` provides some useful JSONPath methods, but is only available by default for the `logstash` module.  You can add the `jsonpath` module to JUL or Log4J2, but it does have an SLF4J dependency.
+
+The `find` methods in the logging context are converted to Scala, so `java.math.BigInteger` is converted to `BigInt`, for example:
 
 ```scala
-val bigIntCondition = Condition(_.findNumber("$.bigInt").contains(BigInt("52")))
+import echopraxia.plusscala.logging.api.JsonPathCondition
+
+val bigIntCondition = JsonPathCondition(_.findNumber("$.bigInt").contains(BigInt("52")))
 val bigIntLogger = logger.withCondition(bigIntCondition)
 bigIntLogger.info("only logs if bigInt is 52", _.number("bigInt", BigInt("52")))
 ```
@@ -516,7 +524,7 @@ bigIntLogger.info("only logs if bigInt is 52", _.number("bigInt", BigInt("52")))
 Likewise, if you look up `findList` to find an object, it will return the object as a `Map[String, Any]` which you can then match on.
 
 ```scala
-val isWill = Condition { (context: LoggingContext) =>
+val isWill = JsonPathCondition { context =>
   val list = context.findList("$.person[?(@.name == 'will')]")
   val map = list.head.asInstanceOf[Map[String, Any]]
   map("name") == "will"
