@@ -22,6 +22,8 @@ class Logger(val core: CoreLogger) {
   private val warnMethod: LoggerMethod  = new LoggerMethod(Level.WARN)
   private val errorMethod: LoggerMethod = new LoggerMethod(Level.ERROR)
 
+  def name: String = core.getName
+
   def withCondition(condition: Condition): Logger = {
     new Logger(core.withCondition(condition.asJava))
   }
